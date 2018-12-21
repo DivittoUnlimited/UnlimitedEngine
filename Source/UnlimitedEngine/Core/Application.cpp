@@ -27,7 +27,8 @@ Application::Application( )
 , mFonts( )
 , mPlayer( )
 , mMusic( )
-, mContext( State::Context( States::None, mWindow, mTextures, mFonts, mMusic, mSoundEffects, mPlayer, new std::vector<std::pair<std::string, int>>( ) ) )
+, mTiledMapManager( )
+, mContext( State::Context( States::None, mWindow, mTextures, mFonts, mMusic, mSoundEffects, mPlayer, mTiledMapManager, new std::vector<std::pair<std::string, int>>( ) ) )
 , mStateStack( mContext )
 , mStatisticsNumFrames( 0 )
 , mStatisticsText( )
@@ -46,7 +47,7 @@ Application::Application( )
     mStatisticsText.setCharacterSize( 10u );
 
     registerStates( );
-    mStateStack.pushState( States::SplashScreen );
+    mStateStack.pushState( States::Loading );
 }
 
 Application::~Application( void )

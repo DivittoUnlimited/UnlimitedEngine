@@ -1,6 +1,5 @@
-#ifndef BOOK_RESOURCEIDENTIFIERS_HPP
-#define BOOK_RESOURCEIDENTIFIERS_HPP
-
+#ifndef RESOURCEIDENTIFIERS_HPP
+#define RESOURCEIDENTIFIERS_HPP
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Audio/Music.hpp>
@@ -8,6 +7,8 @@
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <string>
 #include <map>
+
+#include "Tiled/TiledManager.hpp"
 
 // Forward declaration of SFML classes
 namespace sf
@@ -18,6 +19,14 @@ namespace sf
     class Music;
     class Shader;
 }
+
+///
+///
+///
+/// This should be obsoleted by Lua version and needs to be removed.
+///
+/// |
+/// V
 namespace Shaders
 {
     enum ID
@@ -33,9 +42,10 @@ namespace Shaders
 template <typename Resource>
 class ResourceManager;
 
-typedef ResourceManager<sf::Texture>	TextureManager;
-typedef ResourceManager<sf::Font>		FontManager;
-typedef ResourceManager<sf::SoundBuffer>      SoundManager;
-typedef ResourceManager<sf::Shader>     ShaderManager;
+typedef ResourceManager<sf::Texture>        TextureManager;
+typedef ResourceManager<sf::Font>           FontManager;
+typedef ResourceManager<sf::SoundBuffer>    SoundManager;
+typedef ResourceManager<sf::Shader>         ShaderManager;
+typedef ResourceManager<Tiled::TiledMap>    TiledMapManager;
 
-#endif // BOOK_RESOURCEIDENTIFIERS_HPP
+#endif // RESOURCEIDENTIFIERS_HPP

@@ -13,24 +13,6 @@ TitleState::TitleState( States::ID id, StateStack& stack, Context context )
 , mShowText( true )
 , mTextEffectTime( sf::Time::Zero )
 {
-
-    ////////
-    /////
-    ///
-    /// RELOADING THE LOGO HERE CRASHES WITH THE EXCEPTION MAP::AT
-    ///
-    /// ALL OTHER MAJOR ENGINE COMPONENTS SEAMINGLY BACK ONLINE
-    ///
-    /// FURTHER TESTING NEEDED:
-    /// MUSIC
-    /// SOUND_EFFECTS
-    ///
-    /// MINOR ENGINE COMPONENTS HAVE NOT BEEN ENABLED
-    /// PARTICLES
-    /// ANIMATIONS
-    /// GUI SYSTEM
-    ///
-
     mContext.textures->load( TextureMap.at( "DivittoUnlimitedLogo" ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "DivittoUnlimitedLogo" ) ) );
 
     mBackgroundSprite.setTexture( context.textures->get( TextureMap.at( "DivittoUnlimitedLogo" ) ) );
@@ -48,7 +30,6 @@ TitleState::TitleState( States::ID id, StateStack& stack, Context context )
     centerOrigin( mText );
     mText.setFillColor( sf::Color( 79, 67, 174, 255 ) );
     mText.setPosition( sf::Vector2f( context.window->getView( ).getCenter().x, context.window->getView( ).getCenter().y + (context.window->getView( ).getSize().y / 4) ) );
-
 }
 
 TitleState::~TitleState( )

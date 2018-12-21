@@ -1,13 +1,15 @@
- #include "Core/World.hpp"
+#include "Core/World.hpp"
 
 #include "TextNode.hpp"
 #include "DataTables.hpp"
 #include "State.hpp"
 #include "ParticleNode.hpp"
+#include "Tiled/TiledManager.hpp"
 #include "Core/Player.hpp"
 #include "Core/MusicPlayer.hpp"
 #include "Core/SoundPlayer.hpp"
 #include "Core/Utility.hpp"
+
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
@@ -42,7 +44,7 @@ World::~World( )
 
 }
 
-void World::update( sf::Time dt )
+void World::update( sf::Time )
 {
 
 }
@@ -100,16 +102,31 @@ void World::handleCollisions( )
 {
     std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs;
     mSceneGraph.checkSceneCollision( *mSceneLayers[UpperAir], collisionPairs );
-
+/*
     for( std::pair<SceneNode*, SceneNode*> pair : collisionPairs )
     {
 
     }
+*/
 }
 
 void World::buildScene( )
 {
+
     // Initialize the different layers
+
+    ///
+    /// HEY FUCK FACE    READ ME   !!!!
+    ///
+    /// Make layers get init from lua either in Game.lua, level.lua or the tiled save file.
+    /// Can't have hardcoded values like this if there is goiong to be fliud map making unless
+    /// all layers fo tiled maps are agreed apon in advance and the engine is compiled as such.
+    ///
+    ///
+    /// Move SceneGraph to context so that all of this can be done in the load state with i nice animation
+    /// to explain the hang time if any while this happens.
+    ///
+    ///
     for( std::size_t i = 0; i < LayerCount; ++i )
     {
         Category::Type category = ( i == LowerAir ) ? Category::SceneAirLayer : Category::None;
@@ -120,6 +137,58 @@ void World::buildScene( )
         mSceneGraph.attachChild( std::move( layer ) );
     }
 
+    // load TiledMap
+    std::cout << "World::buildScene using HARCODED filepath to load Tiled map because filePath is broken!!! USE PROPER ASSET LOADING FROM LUA DATA TABLES" << mContext.TiledMapFilePath << std::endl;
+
+    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/testMap.lua" ); //mContext.TiledMapFilePath );
+     LevelMap.at( "TestMap" );
+
+    // construct world
+    std::cout << "Attempting to construct world." << std::endl;
+
+    for( unsigned int i = 0; i < map.layers.size(); ++i )
+    {
+        if( map.layers[i]->type == "tilelayer" )
+        {
+            std::cout << "Building tile layer: " << map.layers[i]->name << std::endl; // DEBUG
+
+
+            std::cout << "(STUB)Tile layer complete: " << map.layers[i]->name << std::endl; // DEBUG
+        }
+        else if( map.layers[i]->type == "objectgroup" )
+        {
+            std::cout << "(STUB)Building object layer " << map.layers[i]->name << std::endl; // DEBUG
+
+
+            std::cout << "(STUB)Object layer complete: " << map.layers[i]->name << std::endl; // DEBUG
+        }
+        else if( map.layers[i]->type == "imagelayer" )
+        {
+            std::cout << "Building image layer " << map.layers[i]->name << std::endl; // DEBUG
+
+
+
+            std::cout << "(STUB)Image layer complete: " << map.layers[i]->name << std::endl; // DEBUG
+        }
+    }
+
+    ///
+    ///
+    /// Where does the level init happen??
+    ///     - refering to when there are more then one level and not just a single "world"
+    ///
+
+
+    /*
+    /// HEY FUCK FACE!!!!!! READ ME!!!!!
+    ///
+    ///
+    ///
+    /// Why is this done here and not with the rest of the assets in the load state?
+    /// This needs to be handled way better!!!!
+    ///
+    ///
+    ///
     lua_State* L = luaL_newstate( );
     luaL_openlibs( L );
 
@@ -147,21 +216,8 @@ void World::buildScene( )
             }
         }
         lua_pop( L, 1 ); // Particles table
-
-        /*
-        lua_getfield( L, -1, "PlayerTexture" );
-        if( lua_isstring( L, -1 ) )
-        {
-            // Add player's aircraft
-            std::unique_ptr<Aircraft> player( new Aircraft( AircraftMap.at( lua_tostring( L, -1 ) ), mTextures, &mSounds, mFonts ) );
-            mPlayerAircraft = player.get( );
-            mPlayerAircraft->setPosition( SpawnPosition );
-            mSceneLayers[UpperAir]->attachChild(std::move( player ) );
-        }else std::cout << "Error Reading background Texture! World::BuildScene( )" << std::endl;
-        lua_pop( L, 1 );
-        */
     }
     lua_close( L );
-
+    */
 }
 

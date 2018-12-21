@@ -21,9 +21,9 @@ extern "C" {
 class Application
 {
 public:
-    Application();
+    Application( );
     ~Application( void );
-    void run();
+    void run( );
 		
 private:
     //## Attributes
@@ -37,7 +37,8 @@ private:
     FontManager  		  mFonts;
     Player				  mPlayer;
     MusicPlayer           mMusic;
-    SoundPlayer          mSoundEffects;
+    SoundPlayer           mSoundEffects;
+    TiledMapManager       mTiledMapManager;
 
     // Game FSM
     State::Context        mContext;
@@ -54,30 +55,27 @@ private:
     ///
     /// \brief processInput
     /// Handle any user input or other world events that occur.
-    void processInput();
+    void processInput( );
     ///
     /// \brief update
     /// update the world logic for this frame in the game loop
     /// \param elapsedTime
     /// the time since the last time this method was called.
-    ///
-    void update(sf::Time dt);
+    void update( sf::Time dt );
     ///
     /// \brief render
     /// Clear the screen, draw the world to buffer, and then display to screen.
-    ///
-    void render();
+    void render( );
     ///
     /// \brief updateStatistics
     /// Calculate and update the frames per seconds the game is currently getting on the fps screen display.
     /// \param elapsedTime
     /// The time since the last time this method was called.
-    ///
-    void updateStatistics(sf::Time dt);
+    void updateStatistics( sf::Time dt );
     ///
     /// \brief registerStates
     /// Register all possible states for later use
-    void registerStates();
+    void registerStates( );
 };
 
 #endif // APPLICATION_HPP

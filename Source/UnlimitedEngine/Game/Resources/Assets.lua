@@ -1,7 +1,11 @@
 return {
     Textures = {
         DivittoUnlimitedLogo = 0;
-        Buttons              = 1;
+        Default              = 1;
+        Buttons              = 2;
+        -- Demo
+        Tiles                = 3;
+        BackgroundImage      = 4;
     };
 
     SoundEffects = {
@@ -23,5 +27,9 @@ return {
         DownSamplePass      = 1;
         GaussianBlurPass    = 3;
         addPass             = 4;
+    };
+
+    Levels = {
+        TestMap             = 0;
     };
 };

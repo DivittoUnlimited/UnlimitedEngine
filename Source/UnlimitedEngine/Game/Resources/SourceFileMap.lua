@@ -4,11 +4,18 @@ local Tex   = Assets.Textures;
 local Font  = Assets.Fonts;
 local Sound = Assets.SoundEffects;
 local Music = Assets.Music;
+local Level = Assets.Levels;
 
 return {
     Textures = {
-        [Tex.DivittoUnlimitedLogo]  = "Media/Textures/DivittoUnlimitedLogo1024X768.png" ;
-        [Tex.Buttons]                = "Media/Textures/Buttons.png"
+        [Tex.DivittoUnlimitedLogo]  = "Media/Textures/DivittoUnlimitedLogo1024X768.png";
+        [Tex.Default]               = "Media/Textures/Default.png";
+        [Tex.Buttons]               = "Media/Textures/Buttons.png";
+
+        -- Demo
+        [Tex.Tiles]                 = "Media/Textures/tilesNstuff.png";
+        [Tex.BackgroundImage]       = "Media/Textures/BackgroundImage.png";
+
     };
     Fonts = {
         [Font.Default]              = "Media/Sansation.ttf";
@@ -16,8 +23,9 @@ return {
     SoundEffects = {
     };
     Music = {
-        --[Music.MenuTheme]           = "Media/Music/MenuTheme.ogg";
-        --[Music.GameTheme]           = "Media/Music/MissionTheme.ogg";
-        --[Music.FuelLow]             = "Media/Music/FuelLow.ogg";
+    };
+    Levels = {
+        -- Demo
+        [Level.TestMap]               = "Game/Levels/testMap.lua";
     };
 };

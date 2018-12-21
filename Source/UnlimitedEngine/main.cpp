@@ -7,7 +7,7 @@
 
 int main()
 {
-
+/*
     std::ifstream stream;
 
     std::string line;
@@ -22,7 +22,7 @@ int main()
         myfile.close( );
         std::cout << "!======================!\n";
     } else std::cout << "Unable to open to-do.txt" << std::endl;;
-
+*/
     try
     {
         Application( ).run( );

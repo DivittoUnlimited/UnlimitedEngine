@@ -35,35 +35,7 @@ struct Direction
 	float angle;
 	float distance;
 };
-struct AircraftData
-{
-    std::string                     id;
-	int								hitpoints;
-	float							speed;
-    unsigned int					texture;
-    sf::Rect<int>                   texRect;
-    sf::Time                        fireInterval;
-    bool                            hasRollAnimation;
-    unsigned int                    fireRate;
-    unsigned int                    spreadLevel;
-    unsigned int                    missileAmmo;
-    std::string                     explosionAnimation; // not sure what data type this should be yet....
-	std::vector<Direction>			directions;
 
-};
-struct ProjectileData
-{
-	int								damage;
-	float							speed;
-    unsigned int					texture;
-    sf::Rect<int>                   texRect;
-};
-struct PickupData
-{
-	std::function<void(Aircraft&)>	action;
-    unsigned int					texture;
-    sf::Rect<int>                   texRect;
-};
 struct AnimationData  {
     unsigned int texture;
     sf::Vector2i frameSize;
@@ -83,6 +55,7 @@ static std::map<std::string, unsigned int> TextureMap;
 static std::map<std::string, unsigned int> FontMap;
 static std::map<std::string, unsigned int> SoundEffectMap;
 static std::map<std::string, unsigned int> MusicMap;
+static std::map<std::string, unsigned int> LevelMap;
 
 static bool loadAssetsLuaFile = []() -> bool {
         lua_State* L = luaL_newstate();
@@ -114,11 +87,12 @@ static bool loadAssetsLuaFile = []() -> bool {
         FontMap         = getMap( "Fonts"        );
         SoundEffectMap  = getMap( "SoundEffects" );
         MusicMap        = getMap( "Music"        );
+        LevelMap        = getMap( "Levels"       );
 
         lua_close( L );
 
         return true;
-}();
+}( );
 static std::map<std::string, std::map<unsigned int, std::string>> MediaFileMap = []( ) -> std::map<std::string, std::map<unsigned int, std::string>>
 {
     std::map<std::string, std::map<unsigned int, std::string>> t;
@@ -207,7 +181,7 @@ static std::map<std::string, std::map<unsigned int, std::string>> MediaFileMap =
     lua_close( L );
 
     return t;
-}();
+}( );
 static std::map<std::string, unsigned  int> buildResourceMap( std::string fileName )
 {
     std::map<std::string, unsigned int> t;
@@ -218,7 +192,7 @@ static std::map<std::string, unsigned  int> buildResourceMap( std::string fileNa
     lua_getglobal( L, "debug" );
     lua_getfield( L, -1, "traceback" );
     lua_replace( L, -2 );
-    luaL_loadfile( L, fileName.c_str() );
+    luaL_loadfile( L, fileName.c_str( ) );
     if( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
         luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
         throw( lua_tostring( L, -1 ) );
@@ -240,11 +214,13 @@ static std::map<std::string, unsigned  int> buildResourceMap( std::string fileNa
     return t;
 }
 
-//static std::map<std::string, unsigned int> ParticleMap   = buildResourceMap( "Game/Resources/Particles.lua" );
-//static std::map<std::string, unsigned int> AnimationMap   = buildResourceMap( "Game/Resources/Animations.lua" );
+static std::map<std::string, unsigned int> ParticleMap    = buildResourceMap( "Game/Resources/Particles.lua" );
+static std::map<std::string, unsigned int> AnimationMap   = buildResourceMap( "Game/Resources/Animations.lua" );
 
 
 static std::vector<ParticleData> initializeParticleData = []() -> std::vector<ParticleData> {
+    std::vector<ParticleData> data( ParticleMap.size( ) );
+
         /*
         lua_State* L = luaL_newstate();
         luaL_openlibs(L);
@@ -257,7 +233,6 @@ static std::vector<ParticleData> initializeParticleData = []() -> std::vector<Pa
             std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
             throw( lua_tostring( L, -1 ) );
         }
-        std::vector<ParticleData> data( ParticleMap.size( ) );
 
         if( lua_istable( L, -1 ) ) // Anon table
         {
@@ -295,65 +270,67 @@ static std::vector<ParticleData> initializeParticleData = []() -> std::vector<Pa
         }else std::cout << "Error reading Projectiles.lua" << std::endl;
 
         lua_close( L );
-        return data;
                 */
+    return data;
+
 }( ); // initializeParticleData
 static std::vector<AnimationData> initializeAnimationData = []() -> std::vector<AnimationData> {
-        /*
-        lua_State* L = luaL_newstate();
-        luaL_openlibs(L);
-        lua_getglobal( L, "debug" );
-        lua_getfield( L, -1, "traceback" );
-        lua_replace( L, -2 );
-        luaL_loadfile( L, "Game/Resources/Animations.lua" );
-        if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
-            luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
-            std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
-            throw( lua_tostring( L, -1 ) );
-        }
-        std::vector<AnimationData> data( AnimationMap.size( ) );
-        if( lua_istable( L, -1 ) ) // Anon table
+    std::vector<AnimationData> data( AnimationMap.size( ) );
+    /*
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+    lua_getglobal( L, "debug" );
+    lua_getfield( L, -1, "traceback" );
+    lua_replace( L, -2 );
+    luaL_loadfile( L, "Game/Resources/Animations.lua" );
+    if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+        luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+        std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+        throw( lua_tostring( L, -1 ) );
+    }
+
+    if( lua_istable( L, -1 ) ) // Anon table
+    {
+        for( auto i = AnimationMap.begin(); i != AnimationMap.end(); ++i )
         {
-            for( auto i = AnimationMap.begin(); i != AnimationMap.end(); ++i )
+            lua_getfield( L, -1, i->first.c_str( ) );
+            if( lua_istable( L, -1 ) ) // Animation Definition
             {
-                lua_getfield( L, -1, i->first.c_str( ) );
-                if( lua_istable( L, -1 ) ) // Animation Definition
+                lua_getfield( L, -1, "texture" );
+                if( lua_isnumber( L, -1 ) ) data[i->second].texture = (unsigned int)lua_tointeger( L, -1 );
+                lua_pop( L, 1 );
+                lua_getfield( L, -1, "frameSize" );
+                if( lua_istable( L, -1 ) )
                 {
-                    lua_getfield( L, -1, "texture" );
-                    if( lua_isnumber( L, -1 ) ) data[i->second].texture = (unsigned int)lua_tointeger( L, -1 );
-                    lua_pop( L, 1 );
-                    lua_getfield( L, -1, "frameSize" );
-                    if( lua_istable( L, -1 ) )
-                    {
-                        int frameSize[2];
-                        lua_pushnil( L );
-                        lua_next( L, -2 );
-                        if( lua_isnumber( L, -1 ) ) frameSize[0] = lua_tointeger( L, -1 );
-                        lua_pop( L, 1 ); // value
-                        lua_next( L, -2 );
-                        if( lua_isnumber( L, -1 ) ) frameSize[1] = lua_tointeger( L, -1 );
-                        lua_pop( L, 1 ); // value
-                        lua_pop( L, 1 ); // nil (key)
-                        data[i->second].frameSize = sf::Vector2i( frameSize[0], frameSize[1] );
-                    }
-                    lua_pop( L, 1 ); // frameSize table
-                    lua_getfield( L, -1, "numFrames" );
-                    if( lua_isnumber( L, -1 ) ) data[i->second].numFrames = (unsigned int)lua_tointeger( L, -1 );
-                    lua_pop( L, 1 );
-                    lua_getfield( L, -1, "duration" );
-                    if( lua_isnumber( L, -1 ) ) data[i->second].duration = sf::milliseconds((unsigned int)lua_tointeger( L, -1 ));
-                    lua_pop( L, 1 );
-                    lua_getfield( L, -1, "isRepeated" );
-                    if( lua_isboolean( L, -1 ) ) data[i->second].isRepeated = lua_toboolean( L, -1 );
-                    lua_pop( L, 1 );
+                   int frameSize[2];
+                    lua_pushnil( L );
+                    lua_next( L, -2 );
+                    if( lua_isnumber( L, -1 ) ) frameSize[0] = lua_tointeger( L, -1 );
+                    lua_pop( L, 1 ); // value
+                    lua_next( L, -2 );
+                    if( lua_isnumber( L, -1 ) ) frameSize[1] = lua_tointeger( L, -1 );
+                    lua_pop( L, 1 ); // value
+                    lua_pop( L, 1 ); // nil (key)
+                    data[i->second].frameSize = sf::Vector2i( frameSize[0], frameSize[1] );
                 }
-                lua_pop( L, 1 ); // defintion table
+                lua_pop( L, 1 ); // frameSize table
+                lua_getfield( L, -1, "numFrames" );
+                if( lua_isnumber( L, -1 ) ) data[i->second].numFrames = (unsigned int)lua_tointeger( L, -1 );
+                lua_pop( L, 1 );
+                lua_getfield( L, -1, "duration" );
+                if( lua_isnumber( L, -1 ) ) data[i->second].duration = sf::milliseconds((unsigned int)lua_tointeger( L, -1 ));
+                lua_pop( L, 1 );
+                lua_getfield( L, -1, "isRepeated" );
+                if( lua_isboolean( L, -1 ) ) data[i->second].isRepeated = lua_toboolean( L, -1 );
+                lua_pop( L, 1 );
             }
-            lua_pop( L, 1 ); // anon table
-        }else std::cout << "Error reading Projectiles.lua" << std::endl;
-        lua_close( L );
-        return data;
-                */
+            lua_pop( L, 1 ); // defintion table
+        }
+        lua_pop( L, 1 ); // anon table
+    }else std::cout << "Error reading Projectiles.lua" << std::endl;
+    lua_close( L );
+*/
+    return data;
 }( ); // initializeAnimationData
 
 #endif // DATATABLES_HPP
