@@ -193,4 +193,5 @@ DISTFILES += \
     Game/Application.lua \
     Game/Game.lua \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
-    Notes.txt
+    Notes.txt \
+    TiledMapReader.lua
