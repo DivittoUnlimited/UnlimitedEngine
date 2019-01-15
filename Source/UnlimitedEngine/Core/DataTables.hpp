@@ -55,7 +55,11 @@ static std::map<std::string, unsigned int> TextureMap;
 static std::map<std::string, unsigned int> FontMap;
 static std::map<std::string, unsigned int> SoundEffectMap;
 static std::map<std::string, unsigned int> MusicMap;
-static std::map<std::string, unsigned int> LevelMap;
+static std::map<std::string, unsigned int> LayerMap;
+static std::map<std::string, unsigned int> ObjectMap;
+// Add levels here once everything is working and finally remove Game.lua in place of World1_1.lua
+// Which will have everything Game.lua has plus a optional tiledMap path that will be loaded in the World class
+
 
 static bool loadAssetsLuaFile = []() -> bool {
         lua_State* L = luaL_newstate();
@@ -87,7 +91,8 @@ static bool loadAssetsLuaFile = []() -> bool {
         FontMap         = getMap( "Fonts"        );
         SoundEffectMap  = getMap( "SoundEffects" );
         MusicMap        = getMap( "Music"        );
-        LevelMap        = getMap( "Levels"       );
+        LayerMap        = getMap( "Layers"       );
+        ObjectMap       = getMap( "Objects"      );
 
         lua_close( L );
 
@@ -158,23 +163,6 @@ static std::map<std::string, std::map<unsigned int, std::string>> MediaFileMap =
                 }
                     t.insert( std::pair<std::string, std::map<unsigned int, std::string>>( "SoundEffects", soundSource ) );
                     lua_pop( L ,1 );
-            }
-         }
-         if( lua_istable( L, -1 ) )
-         {
-            lua_pushstring( L, "Levels" );
-            lua_gettable( L, -2 );
-            if( lua_istable( L, -1 )  )
-            {
-                std::map<unsigned int, std::string> levelSource;
-                lua_pushnil( L );
-                while( lua_next( L, -2 ) != 0 )
-                {
-                    levelSource.insert( std::pair<unsigned int, std::string>( lua_tonumber( L , -2 ), lua_tostring( L , -1 ) ) );
-                    lua_pop( L, 1 );
-                }
-                t.insert( std::pair<std::string, std::map<unsigned int, std::string>>( "Levels", levelSource ) );
-                lua_pop( L ,1 );
             }
          }
     } else std::cout << "Error reading SourceFileMap.lua" << std::endl;

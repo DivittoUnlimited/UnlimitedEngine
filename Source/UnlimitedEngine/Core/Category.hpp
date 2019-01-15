@@ -6,19 +6,17 @@ namespace Category {
 enum Type
 {
     None				= 0,
-    SceneAirLayer		= 1 << 0,
-    PlayerAircraft		= 1 << 1,
-    Tree        		= 1 << 2,
-    EnemyAircraft		= 1 << 3,
-    Pickup				= 1 << 4,
-    AlliedProjectile	= 1 << 5,
-    EnemyProjectile		= 1 << 6,
-    ParticleSystem		= 1 << 7,
-    SoundEffect			= 1 << 8,
-    Decoration          = 1 << 9,
+    ImageLayer  		= 1 << 0,
+    Player      		= 1 << 1,
 
-    Aircraft = PlayerAircraft | EnemyAircraft,
-    Projectile = AlliedProjectile | EnemyProjectile,
+    TileLayer           = 1 << 2,
+    ObjectLayer         = 1 << 3,
+    NPC            		= 1 << 4,
+    Item				= 1 << 5,
+    Trigger             = 1 << 6,
+    ParticleSystem		= 1 << 7,
+    SoundEffect			= 1 << 8
 };
+
 }
 #endif // CATEGORY_HPP

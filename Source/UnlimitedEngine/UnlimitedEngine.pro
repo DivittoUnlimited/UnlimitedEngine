@@ -75,7 +75,11 @@ SOURCES += \
     States/PauseState.cpp \
     States/SettingsState.cpp \
     States/SplashScreen.cpp \
-    States/TitleState.cpp
+    States/TitleState.cpp \
+    Objects/Wall.cpp \
+    Objects/Trigger.cpp \
+    Objects/Actor.cpp \
+    Objects/Item.cpp
 
 HEADERS += \
     Core/Animation.hpp \
@@ -143,12 +147,15 @@ HEADERS += \
     States/SettingsState.hpp \
     States/SplashScreen.hpp \
     States/TitleState.hpp \
-    Tiled/TiledManager.hpp
+    Tiled/TiledManager.hpp \
+    Objects/Wall.hpp \
+    Objects/Trigger.hpp \
+    Objects/Actor.hpp \
+    Objects/Item.hpp
 
 DISTFILES += \
     Game/Application.lua \
     Game/Game.lua \
-    Game/MapManager.lua \
     Game/Resources/Animations.lua \
     Game/Resources/Assets.lua \
     Game/Resources/Particles.lua \
@@ -169,4 +176,8 @@ DISTFILES += \
     Notes.txt \
     Game/Levels/testMap.lua \
     Media/Textures/tilesNstuff.png \
-    Media/Textures/BackgroundImage.png
+    Media/Textures/BackgroundImage.png \
+    Game/Levels/PalletTown.lua \
+    Media/Textures/ExteriorTiles.png \
+    Game/Levels/PalletTownCollision.lua \
+    Media/Textures/Trainer.png

@@ -10,10 +10,10 @@
 #include <cmath>
 
 
-SceneNode::SceneNode(Category::Type category)
-: mChildren()
-, mParent(nullptr)
-, mDefaultCategory(category)
+SceneNode::SceneNode( Category::Type category )
+: mChildren( )
+, mParent( nullptr )
+, mDefaultCategory( Category::None )
 {
 }
 
@@ -21,17 +21,17 @@ unsigned int SceneNode::attachChild( Ptr child )
 {
     child->mParent = this;
     mChildren.push_back( std::move( child ) );
-    return (unsigned int)mChildren.size() - 1; // index of new child
+    return (unsigned int)mChildren.size( ) - 1; // index of new child
 }
 
 SceneNode::Ptr SceneNode::detachChild(const SceneNode& node)
 {
-    auto found = std::find_if(mChildren.begin(), mChildren.end(), [&] (Ptr& p) { return p.get() == &node; });
-    assert(found != mChildren.end());
+    auto found = std::find_if( mChildren.begin( ), mChildren.end(), [&] (Ptr& p) { return p.get() == &node; });
+    assert(found != mChildren.end( ) );
 
     Ptr result = std::move(*found);
     result->mParent = nullptr;
-    mChildren.erase(found);
+    mChildren.erase( found );
     return result;
 }
 
@@ -49,15 +49,15 @@ void SceneNode::update( sf::Time dt, CommandQueue& commands )
     updateChildren( dt, commands );
 }
 
-void SceneNode::updateCurrent(sf::Time, CommandQueue&)
+void SceneNode::updateCurrent( sf::Time, CommandQueue& )
 {
     // Do nothing by default
 }
 
-void SceneNode::updateChildren(sf::Time dt, CommandQueue& commands)
+void SceneNode::updateChildren( sf::Time dt, CommandQueue& commands )
 {
-    for(Ptr& child : mChildren)
-        child->update(dt, commands);
+    for( Ptr& child : mChildren )
+        child->update( dt, commands );
 }
 
 void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
@@ -70,7 +70,7 @@ void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
     drawChildren( target, states );
 
     // Draw bounding rectangle - disabled by default
-    //drawBoundingRect( target, states );
+    drawBoundingRect( target, states );
 }
 
 void SceneNode::drawCurrent( sf::RenderTarget&, sf::RenderStates ) const
@@ -92,18 +92,18 @@ void SceneNode::drawBoundingRect( sf::RenderTarget& target, sf::RenderStates ) c
     shape.setPosition( sf::Vector2f( rect.left, rect.top ) );
     shape.setSize( sf::Vector2f( rect.width, rect.height ) );
     shape.setFillColor( sf::Color::Transparent );
-    shape.setOutlineColor( sf::Color::Green );
+    shape.setOutlineColor( sf::Color( 255, 0, 255, 255 ) );
     shape.setOutlineThickness( 1.f );
 
-    target.draw(shape);
+    target.draw( shape );
 }
 
-sf::Vector2f SceneNode::getWorldPosition() const
+sf::Vector2f SceneNode::getWorldPosition( ) const
 {
-    return getWorldTransform() * sf::Vector2f();
+    return getWorldTransform() * sf::Vector2f( );
 }
 
-sf::Transform SceneNode::getWorldTransform() const
+sf::Transform SceneNode::getWorldTransform( ) const
 {
     sf::Transform transform = sf::Transform::Identity;
 
@@ -113,72 +113,72 @@ sf::Transform SceneNode::getWorldTransform() const
     return transform;
 }
 
-void SceneNode::onCommand(const Command& command, sf::Time dt)
+void SceneNode::onCommand( const Command& command, sf::Time dt )
 {
     // Command current node, if category matches
     if( command.category & getCategory( ) )
         command.action( *this, dt );
 
     // Command children
-    for(Ptr& child : mChildren)
-        child->onCommand(command, dt);
+    for( Ptr& child : mChildren )
+        child->onCommand( command, dt );
 }
 
-unsigned int SceneNode::getCategory() const
+unsigned int SceneNode::getCategory( ) const
 {
     return mDefaultCategory;
 }
 
-void SceneNode::checkSceneCollision(SceneNode& sceneGraph, std::set<std::pair<SceneNode *, SceneNode *> > &collisionPairs)
+void SceneNode::checkSceneCollision( SceneNode& sceneGraph, std::set<std::pair<SceneNode *, SceneNode *> > &collisionPairs )
 {
-    checkNodeCollision(sceneGraph, collisionPairs);
+    checkNodeCollision( sceneGraph, collisionPairs );
 
-    for(Ptr& child : sceneGraph.mChildren)
-        checkSceneCollision(*child, collisionPairs);
+    for( Ptr& child : sceneGraph.mChildren )
+        checkSceneCollision( *child, collisionPairs );
 }
 
-void SceneNode::checkNodeCollision(SceneNode& node, std::set<std::pair<SceneNode*, SceneNode*>>& collisionPairs)
+void SceneNode::checkNodeCollision( SceneNode& node, std::set<std::pair<SceneNode*, SceneNode*>>& collisionPairs )
 {
     if( this != &node && collision( *this, node ) && !isDestroyed( ) && !node.isDestroyed( ) )
-        collisionPairs.insert(std::minmax( this, &node ) );
+        collisionPairs.insert( std::minmax( this, &node ) );
 
     for( Ptr& child : mChildren )
-        child->checkNodeCollision(node, collisionPairs);
+        child->checkNodeCollision( node, collisionPairs );
 }
 
-void SceneNode::removeWrecks()
+void SceneNode::removeWrecks( )
 {
     // Remove all children which request so
-    auto wreckfieldBegin = std::remove_if(mChildren.begin(), mChildren.end(), std::mem_fn(&SceneNode::isMarkedForRemoval));
-    mChildren.erase(wreckfieldBegin, mChildren.end());
+    auto wreckfieldBegin = std::remove_if( mChildren.begin( ), mChildren.end( ), std::mem_fn( &SceneNode::isMarkedForRemoval ) );
+    mChildren.erase( wreckfieldBegin, mChildren.end( ) );
 
     // Call function recursively for all remaining children
-    std::for_each(mChildren.begin(), mChildren.end(), std::mem_fn(&SceneNode::removeWrecks));
+    std::for_each( mChildren.begin( ), mChildren.end( ), std::mem_fn( &SceneNode::removeWrecks ) );
 }
 
-sf::FloatRect SceneNode::getBoundingRect() const
+sf::FloatRect SceneNode::getBoundingRect( void ) const
 {
-    return sf::FloatRect();
+    return sf::FloatRect( );
 }
 
-bool SceneNode::isMarkedForRemoval() const
+bool SceneNode::isMarkedForRemoval( void ) const
 {
     // By default, remove node if entity is destroyed
-    return isDestroyed();
+    return isDestroyed( );
 }
 
-bool SceneNode::isDestroyed() const
+bool SceneNode::isDestroyed( void ) const
 {
     // By default, scene node needn't be removed
     return false;
 }
 
-bool collision(const SceneNode& lhs, const SceneNode& rhs)
+bool collision( const SceneNode& lhs, const SceneNode& rhs )
 {
-    return lhs.getBoundingRect().intersects(rhs.getBoundingRect());
+    return lhs.getBoundingRect( ).intersects( rhs.getBoundingRect ( ) );
 }
 
-float distance(const SceneNode& lhs, const SceneNode& rhs)
+float distance( const SceneNode& lhs, const SceneNode& rhs )
 {
-    return length(lhs.getWorldPosition() - rhs.getWorldPosition());
+    return length( lhs.getWorldPosition( ) - rhs.getWorldPosition( ) );
 }

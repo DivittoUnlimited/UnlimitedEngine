@@ -43,7 +43,7 @@ return {
     {
       type = "imagelayer",
       id = 5,
-      name = "BackgroundImageLayer",
+      name = "BackgroundImage",
       visible = true,
       opacity = 1,
       offsetx = 0,
@@ -79,6 +79,36 @@ return {
       }
     },
     {
+      type = "objectgroup",
+      id = 3,
+      name = "BottomObjLayer",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      draworder = "topdown",
+      properties = {},
+      objects = {
+        {
+          id = 1,
+          name = "BottomObj1",
+          type = "NPC",
+          shape = "rectangle",
+          x = 16.5,
+          y = 177,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          gid = 19,
+          visible = true,
+          properties = {
+            ["color"] = "blue",
+            ["health"] = 100
+          }
+        }
+      }
+    },
+    {
       type = "tilelayer",
       id = 2,
       name = "TopTileLayer",
@@ -103,6 +133,33 @@ return {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      }
+    },
+    {
+      type = "objectgroup",
+      id = 4,
+      name = "TopObjLayer",
+      visible = false,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      draworder = "topdown",
+      properties = {},
+      objects = {
+        {
+          id = 2,
+          name = "TopObj1",
+          type = "NPC",
+          shape = "rectangle",
+          x = 273,
+          y = 177,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          gid = 20,
+          visible = true,
+          properties = {}
+        }
       }
     }
   }

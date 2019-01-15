@@ -30,7 +30,7 @@ public:
 
         }
 
-        Context( States::ID stateID, sf::RenderWindow& window, TextureManager& textures, FontManager& fonts, MusicPlayer& music, SoundPlayer& sounds, Player& player, TiledMapManager& tiledMaps, std::vector<std::pair<std::string, int>>* highScores )
+        Context( States::ID stateID, sf::RenderWindow& window, TextureManager& textures, FontManager& fonts, MusicPlayer& music, SoundPlayer& sounds, Player& player, std::vector<std::pair<std::string, int>>* highScores )
         : stateID( stateID )
         , window( &window )
         , textures( &textures )
@@ -38,7 +38,6 @@ public:
         , music( &music )
         , sounds( &sounds )
         , player( &player )
-        , tiledMaps( &tiledMaps )
         , highScores( highScores )
         {
         }
@@ -50,8 +49,7 @@ public:
         MusicPlayer*      music;
         SoundPlayer*      sounds;
         Player*			  player;
-        TiledMapManager*   tiledMaps;
-
+        std::string       tiledMapFilePath;
         std::vector<std::pair<std::string, int>>* highScores;
     };
 

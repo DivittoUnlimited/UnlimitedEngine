@@ -15,6 +15,8 @@ return {
         -- Demo
         [Tex.Tiles]                 = "Media/Textures/tilesNstuff.png";
         [Tex.BackgroundImage]       = "Media/Textures/BackgroundImage.png";
+        [Tex.ExteriorTiles]         = "Media/Textures/ExteriorTiles.png";
+        [Tex.Trainer]               = "Media/Textures/Trainer.png";
 
     };
     Fonts = {
@@ -23,9 +25,5 @@ return {
     SoundEffects = {
     };
     Music = {
-    };
-    Levels = {
-        -- Demo
-        [Level.TestMap]               = "Game/Levels/testMap.lua";
     };
 };

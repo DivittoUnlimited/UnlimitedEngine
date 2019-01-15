@@ -10,6 +10,10 @@
 #include "Core/SoundPlayer.hpp"
 #include "Core/Utility.hpp"
 
+#include "Objects/Wall.hpp"
+#include "Objects/Actor.hpp"
+#include "Objects/Trigger.hpp"
+#include "Objects/Item.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
@@ -34,9 +38,12 @@ World::World( sf::RenderTarget &outputTarget, TextureManager &textures, FontMana
 , mSceneGraph( )
 , mSceneLayers( )
 {
-    if( !mSceneTexture.create( sf::VideoMode::getDesktopMode().width + 100, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
+    mWorldView.move( -275, -200 );
+    mWorldView.zoom( .49 );
+    if( !mSceneTexture.create( sf::VideoMode::getDesktopMode( ).width + 100, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
     buildScene( );
+    mWindowSprite.scale( .5, 1 );
 }
 
 World::~World( )
@@ -44,9 +51,11 @@ World::~World( )
 
 }
 
-void World::update( sf::Time )
+void World::update( sf::Time dt )
 {
-
+    while( !mCommandQueue.isEmpty( ) )
+        mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
+    mSceneGraph.update( dt, mCommandQueue );
 }
 
 void World::draw( )
@@ -63,7 +72,7 @@ void World::draw( )
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
 
         mTarget.draw( sf::Sprite( mWindowSprite ) );
-        mBloomEffect.apply( mSceneTexture, mTarget );
+        //mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
     }
     else
     {
@@ -100,8 +109,8 @@ bool matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Category::
 
 void World::handleCollisions( )
 {
-    std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs;
-    mSceneGraph.checkSceneCollision( *mSceneLayers[UpperAir], collisionPairs );
+    // std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs;
+    // mSceneGraph.checkSceneCollision( *mSceneLayers[LayerMap.at( "ObjectLayer" )], collisionPairs );
 /*
     for( std::pair<SceneNode*, SceneNode*> pair : collisionPairs )
     {
@@ -112,63 +121,141 @@ void World::handleCollisions( )
 
 void World::buildScene( )
 {
-
-    // Initialize the different layers
-
-    ///
-    /// HEY FUCK FACE    READ ME   !!!!
-    ///
-    /// Make layers get init from lua either in Game.lua, level.lua or the tiled save file.
-    /// Can't have hardcoded values like this if there is goiong to be fliud map making unless
-    /// all layers fo tiled maps are agreed apon in advance and the engine is compiled as such.
-    ///
-    ///
-    /// Move SceneGraph to context so that all of this can be done in the load state with i nice animation
-    /// to explain the hang time if any while this happens.
-    ///
-    ///
-    for( std::size_t i = 0; i < LayerCount; ++i )
-    {
-        Category::Type category = ( i == LowerAir ) ? Category::SceneAirLayer : Category::None;
-
-        SceneNode::Ptr layer( new SceneNode( category ) );
-        mSceneLayers[i] = layer.get( );
-
-        mSceneGraph.attachChild( std::move( layer ) );
-    }
-
     // load TiledMap
-    std::cout << "World::buildScene using HARCODED filepath to load Tiled map because filePath is broken!!! USE PROPER ASSET LOADING FROM LUA DATA TABLES" << mContext.TiledMapFilePath << std::endl;
+    std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
+    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/PalletTownCollision.lua" ); //mContext.TiledMapFilePath );
 
-    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/testMap.lua" ); //mContext.TiledMapFilePath );
-     LevelMap.at( "TestMap" );
+    struct Tile {
+        std::string texID;
+        sf::Rect<int> rect;
+    };
 
-    // construct world
-    std::cout << "Attempting to construct world." << std::endl;
+    std::vector<Tile> tiles = std::vector<Tile>( );
+    tiles.push_back( Tile() );
+    tiles[0].texID = "NONE";
+    tiles[0].rect = sf::Rect<int>( 0, 0, 16, 16 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
 
+    for( unsigned int i = 0; i < map.tileSets.size(); ++i )
+    {
+        // define loops to divide up image
+        unsigned int y = 0;
+        unsigned int x = 0;
+        unsigned int tileWidth = map.tileSets[i].tileWidth;
+        unsigned int tileHeight =  map.tileSets[i].tileHeight;
+        std::string name = map.tileSets[i].name;
+        std::cout << "Creating tileSet from image: " << name << std::endl;
+
+        while( y < ( map.tileSets[i].imageHeight - tileHeight) )
+        {
+            while( x < map.tileSets[i].imageWidth )
+            {
+                // Create tile
+                Tile tile;
+                tile.texID = name;
+                tile.rect = sf::Rect<int>( x, y, tileWidth, tileHeight );
+
+                // add tile to set of possible tiles to use later it's index in vector is it's id as found in testMap.lua
+                tiles.push_back( tile );
+
+                x += tileWidth;
+            }
+            x = 0;
+            y += tileHeight;
+        }
+    }
     for( unsigned int i = 0; i < map.layers.size(); ++i )
     {
-        if( map.layers[i]->type == "tilelayer" )
+        auto layer = map.layers[i];
+        if( layer.type == "tilelayer" )
         {
-            std::cout << "Building tile layer: " << map.layers[i]->name << std::endl; // DEBUG
+            // Create Layer
+            SceneNode::Ptr node( new SceneNode( Category::TileLayer ) );
 
+            // use tiles vector to build layer
+            unsigned int x = 0;
+            unsigned int y = 0;
+            for( unsigned int k = 0; k < layer.data.size(); ++k )
+            {
+                //std::cout << "Layer.data[" << k << "] == " << layer.data[k] << std::endl;
+                if( layer.data[k] != 0 )
+                {
+                    // Create Sprite Node using appropriate tile and then add it to the layer dont forget to add layer to the graph!!!!!!
+                    std::unique_ptr<SpriteNode> newTile( new SpriteNode( mTextures.get( TextureMap.at( tiles[layer.data[k]].texID ) ) ) );
+                    // edit tile for placement
+                    newTile->getSprite( )->setTextureRect( tiles[layer.data[k]].rect );
+                    newTile->getSprite( )->setPosition( x, y );
 
-            std::cout << "(STUB)Tile layer complete: " << map.layers[i]->name << std::endl; // DEBUG
+                    node->attachChild( std::move( newTile ) );
+                }
+                // move down the row to the left unless at the left most side in which case move down to the next row and start at the begining again
+                if ( x <= ( (layer.width-1) * tiles[layer.data[k]].rect.width)-1 )
+                    x += tiles[layer.data[k]].rect.width;
+                else
+                {
+                    x = 0;
+                    y += tiles[layer.data[k]].rect.height;
+                }
+            }
+            mSceneLayers.push_back( node.get( ) );
+            mSceneGraph.attachChild( std::move( node ) );
         }
-        else if( map.layers[i]->type == "objectgroup" )
+        else if( layer.type == "objectgroup" )
         {
-            std::cout << "(STUB)Building object layer " << map.layers[i]->name << std::endl; // DEBUG
+            std::cout << "Building object layer " << layer.name << std::endl; // DEBUG
+            SceneNode::Ptr node( new SceneNode( Category::ObjectLayer ) );
 
+            // Build loop through all objects
+            for( unsigned int i = 0; i < layer.objects.size(); ++i )
+            {
+                auto object = layer.objects.at( i );
 
-            std::cout << "(STUB)Object layer complete: " << map.layers[i]->name << std::endl; // DEBUG
+                std::cout << "Atttempting to create: " << object.name << " Type: " << object.type << std::endl;
+                if( object.type == "Wall" )
+                {
+                    //std::unique_ptr<Wall> wall( new Wall( ) );
+
+                    //node.get( )->attachChild( std::move( wall ) );
+                }else if( object.type == "Trigger" )
+                {
+                    //std::unique_ptr<Trigger> trigger( new Trigger( ) );
+
+                    //node.get( )->attachChild( std::move( trigger ) );
+                }else if( object.type == "Actor" || object.type == "Player" )
+                {
+                    std::unique_ptr<Actor> actor( new Actor( object, sf::Sprite( mTextures.get( TextureMap.at( tiles[object.gid].texID ) ), tiles[object.gid].rect ), mTextures, &mSounds, mFonts ) );
+
+                    node.get( )->attachChild( std::move( actor ) );
+                }else if( object.type == "Item" )
+                {
+                    //std::unique_ptr<Item> item( new Item( ) );
+
+                    //node.get( )->attachChild( std::move( item ) );
+                }else
+                    std::cout << "Invalid object being loaded from tile map" << std::endl;
+
+                std::cout << object.name << " has been created!" << std::endl;
+             }
+
+            mSceneLayers.push_back( node.get( ) );
+            mSceneGraph.attachChild( std::move( node ) );
+
+            std::cout << "(STUB)Object layer complete: " << layer.name << std::endl; // DEBUG
         }
-        else if( map.layers[i]->type == "imagelayer" )
+        else if( layer.type == "imagelayer" )
         {
-            std::cout << "Building image layer " << map.layers[i]->name << std::endl; // DEBUG
+            // Create Layer
+            SceneNode::Ptr node( new SceneNode( Category::ImageLayer ) );
+            mSceneLayers[i] = node.get( );
+            mSceneGraph.attachChild( std::move( node ) );
 
+            // load texture for use by SpriteNode
+            sf::Texture& texture = mTextures.get( TextureMap.at( layer.name ) );
+            texture.setSmooth( true );
 
-
-            std::cout << "(STUB)Image layer complete: " << map.layers[i]->name << std::endl; // DEBUG
+            // Create SpriteNode to hold image attach to layer node
+            std::unique_ptr<SpriteNode> backgroundImage( new SpriteNode( texture ) );
+            //backgroundImage->getSprite()->setPosition( 0, 0 );
+            mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
         }
     }
 
@@ -176,7 +263,7 @@ void World::buildScene( )
     ///
     /// Where does the level init happen??
     ///     - refering to when there are more then one level and not just a single "world"
-    ///
+    ///     - See flow chart on your phone.
 
 
     /*

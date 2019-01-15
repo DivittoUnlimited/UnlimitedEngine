@@ -55,15 +55,6 @@ protected:
     sf::FloatRect getViewBounds( ) const;
     sf::FloatRect getBattlefieldBounds( ) const;
 
-    enum Layer
-    {
-        Background,
-        LowerAir,
-        UpperAir,
-        Text,
-        LayerCount
-    };
-
     sf::RenderTarget&					mTarget;
     sf::RenderTexture					mSceneTexture;
     sf::View							mWorldView;
@@ -74,7 +65,7 @@ protected:
     State::Context                      mContext;
     sf::Sprite                          mWindowSprite;
     SceneNode							mSceneGraph;
-    std::array<SceneNode*, LayerCount>	mSceneLayers;
+    std::vector<SceneNode*>          	mSceneLayers;
     CommandQueue						mCommandQueue;
     BloomEffect							mBloomEffect;
 };

@@ -24,7 +24,7 @@ PauseState::PauseState( States::ID id, StateStack& stack, Context context )
     mPausedText.setPosition( 0.5f * viewSize.x, 0.4f * viewSize.y );
 
     mInstructionText.setFont( font );
-    mInstructionText.setString( "(Press Backspace to return to the main menu)" );
+    mInstructionText.setString( "(Press Backspace/Start to return to the main menu)" );
     centerOrigin( mInstructionText );
     mInstructionText.setPosition( 0.5f * viewSize.x, 0.6f * viewSize.y );
 }
@@ -50,16 +50,21 @@ bool PauseState::update( sf::Time )
 
 bool PauseState::handleEvent( const sf::Event& event )
 {
-    if ( event.type != sf::Event::KeyPressed )
+    if( event.type != sf::Event::KeyPressed )
 		return false;
 
-    if ( event.key.code == sf::Keyboard::Escape )
+    if( event.key.code == sf::Keyboard::Escape )
 	{
 		// Escape pressed, remove itself to return to the game
         requestStackPop( );
 	}
 
-    if ( event.key.code == sf::Keyboard::BackSpace )
+    ///
+    /// REAAD ME!!!
+    ///
+    // NEED TO ADD BOOLEAN TO KNOW IF START BUTTON SHOULD PAUSE OR UN-PAUSE
+
+    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Backspace ) )
 	{
 		// Escape pressed, remove itself to return to the game
         requestStateClear( );

@@ -3,9 +3,9 @@
 #include <cassert>
 
 
-Entity::Entity( int hitpoints )
+Entity::Entity( void )
 : mVelocity( )
-, mHitpoints( hitpoints )
+, mHitpoints( 100 )
 {
 }
 

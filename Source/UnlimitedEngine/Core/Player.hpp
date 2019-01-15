@@ -68,9 +68,6 @@ public:
     /// sf::Keyboard enum
     sf::Keyboard::Key getAssignedKey( Action action ) const;
 
-    void setMissionStatus( MissionStatus status );
-    MissionStatus getMissionStatus( ) const;
-
 private:
     ///
     /// \brief initializeActions
@@ -88,6 +85,5 @@ private:
     //## Attributes
     std::map<sf::Keyboard::Key, Action>	mKeyBinding;    // user modifiable map of key inputs and their corresponding game action
     std::map<Action, Command>			mActionBinding; // a map that links game actions and the Commands (events) they invoke.
-    MissionStatus                       mCurrentMissionStatus;
 };
 #endif // PLAYER_HPP

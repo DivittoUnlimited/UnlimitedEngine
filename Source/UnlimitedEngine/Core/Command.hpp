@@ -2,6 +2,7 @@
 #define COMMAND_HPP
 
 #include "Category.hpp"
+#include "Core/ParticleNode.hpp"
 
 #include <SFML/System/Time.hpp>
 
@@ -31,10 +32,10 @@ std::function<void(SceneNode&, sf::Time)> derivedAction(Function fn)
 	return [=] (SceneNode& node, sf::Time dt)
 	{
 		// Check if cast is safe
-//		assert(dynamic_cast<GameObject*>(&node) != nullptr);
+        assert(dynamic_cast<GameObject*>(&node) != nullptr);
 
 		// Downcast node and invoke function on it
-//		fn(static_cast<GameObject&>(node), dt);
+        fn(static_cast<GameObject&>(node), dt);
 	};
 }
 

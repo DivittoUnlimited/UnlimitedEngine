@@ -11,7 +11,6 @@ GameState::GameState( States::ID id, StateStack& stack, Context context )
 
 GameState::~GameState( )
 {
-
     lua_State* L = luaL_newstate( );
     luaL_openlibs( L );
 
@@ -93,8 +92,8 @@ bool GameState::handleEvent( const sf::Event& event )
     CommandQueue& commands = mWorld.getCommandQueue( );
     mPlayer.handleEvent( event, commands );
 
-	// Escape pressed, trigger the pause screen
-    if( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape ) {
+    // Escape pressed, trigger the pause screen -- 9 is the id of the start button
+    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape )) {
         requestStackPush( States::Pause );
     }
 
