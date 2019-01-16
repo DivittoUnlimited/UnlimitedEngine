@@ -37,13 +37,12 @@ World::World( sf::RenderTarget &outputTarget, TextureManager &textures, FontMana
 , mWindowSprite(  )
 , mSceneGraph( )
 , mSceneLayers( )
+, mPlayer( nullptr )
 {
-    mWorldView.move( -275, -200 );
-    mWorldView.zoom( .49 );
-    if( !mSceneTexture.create( sf::VideoMode::getDesktopMode( ).width + 100, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
+    //mWorldView.zoom( 2 );
+    if( !mSceneTexture.create( outputTarget.getView().getSize().x, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
     buildScene( );
-    mWindowSprite.scale( .5, 1 );
 }
 
 World::~World( )
@@ -56,6 +55,8 @@ void World::update( sf::Time dt )
     while( !mCommandQueue.isEmpty( ) )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     mSceneGraph.update( dt, mCommandQueue );
+    handleCollisions();
+    mWorldView.setCenter( mPlayer->getPosition() );
 }
 
 void World::draw( )
@@ -109,14 +110,36 @@ bool matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Category::
 
 void World::handleCollisions( )
 {
-    // std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs;
-    // mSceneGraph.checkSceneCollision( *mSceneLayers[LayerMap.at( "ObjectLayer" )], collisionPairs );
-/*
+    std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs;
+    mSceneGraph.checkSceneCollision( *mSceneLayers[LayerMap.at( "ObjectLayer" )], collisionPairs );
+
     for( std::pair<SceneNode*, SceneNode*> pair : collisionPairs )
     {
+        if( matchesCategories( pair, Category::Player, Category::Wall ) )
+        {
+              auto& player = static_cast<Actor&>( *pair.first );
+              player.setVelocity( 0, 0 );
+        }
+        else if( matchesCategories( pair, Category::Player, Category::Trigger ) )
+        {
+             ///
+             /// Still need to add the activate method!!!
+             ///
 
+             // auto& player = static_cast<Actor&>( *pair.first );
+             // auto& trigger = static_cast<Trigger&>( *pair.second );
+             // trigger.activate( player );
+
+        }
+        else if( matchesCategories( pair, Category::Player, Category::NPC ) )
+        {
+            ///
+            /// Activate dialog engine here!!! lol ;p
+            ///
+            std::cout <<  "Hey Whatch'it man!" << std::endl;
+        }
     }
-*/
+
 }
 
 void World::buildScene( )
@@ -153,10 +176,8 @@ void World::buildScene( )
                 Tile tile;
                 tile.texID = name;
                 tile.rect = sf::Rect<int>( x, y, tileWidth, tileHeight );
-
                 // add tile to set of possible tiles to use later it's index in vector is it's id as found in testMap.lua
                 tiles.push_back( tile );
-
                 x += tileWidth;
             }
             x = 0;
@@ -183,8 +204,7 @@ void World::buildScene( )
                     std::unique_ptr<SpriteNode> newTile( new SpriteNode( mTextures.get( TextureMap.at( tiles[layer.data[k]].texID ) ) ) );
                     // edit tile for placement
                     newTile->getSprite( )->setTextureRect( tiles[layer.data[k]].rect );
-                    newTile->getSprite( )->setPosition( x, y );
-
+                    newTile->setPosition( x, y );
                     node->attachChild( std::move( newTile ) );
                 }
                 // move down the row to the left unless at the left most side in which case move down to the next row and start at the begining again
@@ -201,45 +221,41 @@ void World::buildScene( )
         }
         else if( layer.type == "objectgroup" )
         {
-            std::cout << "Building object layer " << layer.name << std::endl; // DEBUG
             SceneNode::Ptr node( new SceneNode( Category::ObjectLayer ) );
-
             // Build loop through all objects
             for( unsigned int i = 0; i < layer.objects.size(); ++i )
             {
                 auto object = layer.objects.at( i );
-
-                std::cout << "Atttempting to create: " << object.name << " Type: " << object.type << std::endl;
-                if( object.type == "Wall" )
-                {
-                    //std::unique_ptr<Wall> wall( new Wall( ) );
-
-                    //node.get( )->attachChild( std::move( wall ) );
-                }else if( object.type == "Trigger" )
-                {
-                    //std::unique_ptr<Trigger> trigger( new Trigger( ) );
-
-                    //node.get( )->attachChild( std::move( trigger ) );
-                }else if( object.type == "Actor" || object.type == "Player" )
+                if( object.type == "Player" )
                 {
                     std::unique_ptr<Actor> actor( new Actor( object, sf::Sprite( mTextures.get( TextureMap.at( tiles[object.gid].texID ) ), tiles[object.gid].rect ), mTextures, &mSounds, mFonts ) );
-
+                    this->mPlayer = actor.get();
+                    node.get( )->attachChild( std::move( actor ) );
+                }
+                else if( object.type == "Wall" )
+                {
+                    std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
+                    node.get( )->attachChild( std::move( wall ) );
+                }else if( object.type == "Trigger" )
+                {
+                    std::unique_ptr<Trigger> trigger( new Trigger( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
+                    node.get( )->attachChild( std::move( trigger ) );
+                }else if( object.type == "Actor" )
+                {
+                    std::unique_ptr<Actor> actor( new Actor( object, sf::Sprite( mTextures.get( TextureMap.at( tiles[object.gid].texID ) ), tiles[object.gid].rect ), mTextures, &mSounds, mFonts ) );
                     node.get( )->attachChild( std::move( actor ) );
                 }else if( object.type == "Item" )
                 {
-                    //std::unique_ptr<Item> item( new Item( ) );
-
-                    //node.get( )->attachChild( std::move( item ) );
+                    // std::unique_ptr<Item> item( new Item( ) );
+                    // node.get( )->attachChild( std::move( item ) );
                 }else
                     std::cout << "Invalid object being loaded from tile map" << std::endl;
-
-                std::cout << object.name << " has been created!" << std::endl;
              }
 
             mSceneLayers.push_back( node.get( ) );
             mSceneGraph.attachChild( std::move( node ) );
 
-            std::cout << "(STUB)Object layer complete: " << layer.name << std::endl; // DEBUG
+            std::cout << "Object layer complete: " << layer.name << std::endl; // DEBUG
         }
         else if( layer.type == "imagelayer" )
         {
@@ -254,7 +270,6 @@ void World::buildScene( )
 
             // Create SpriteNode to hold image attach to layer node
             std::unique_ptr<SpriteNode> backgroundImage( new SpriteNode( texture ) );
-            //backgroundImage->getSprite()->setPosition( 0, 0 );
             mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
         }
     }

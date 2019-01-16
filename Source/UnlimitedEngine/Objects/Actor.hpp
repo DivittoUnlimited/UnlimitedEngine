@@ -31,8 +31,9 @@ public:
     void speed( float speed ) { this->mSpeed = speed; }
 
 private:
-    std::string mType;
     sf::Sprite mSprite;
+    std::string mType;
+
     TextNode* mLabel;
 
     float mSpeed;

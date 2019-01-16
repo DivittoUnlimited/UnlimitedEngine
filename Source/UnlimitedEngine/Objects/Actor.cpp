@@ -9,10 +9,7 @@ Actor::Actor( Tiled::Object data, sf::Sprite sprite, const TextureManager& textu
     // Build object using resource manager and data from tiled map
     this->setPosition( data.x, data.y );
 
-    if( getCategory( ) == Category::Player )
-        this->mSpeed = 32;
-    else
-        this->mSpeed = 16;
+    this->mSpeed = 10;
 
     std::unique_ptr<TextNode> name( new TextNode( fonts, data.name ) );
     this->mLabel = name.get();
@@ -47,7 +44,6 @@ void Actor::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) con
 
 void Actor::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
-    //if( getCategory( ) == Category::Player )
-        //this->move( 0, -1 * dt.asSeconds( ) );
+
     Entity::updateCurrent( dt, commands );
 }

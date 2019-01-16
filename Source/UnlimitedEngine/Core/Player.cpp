@@ -19,12 +19,10 @@ struct ActorMover
     : velocity( vx, vy )
 	{
 	}
-
     void operator( )( Actor& actor, sf::Time ) const
     {
         actor.accelerate( velocity * actor.speed( ) );
 	}
-
 	sf::Vector2f velocity;
 };
 
@@ -51,25 +49,13 @@ Player::Player( )
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 {  
     if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 )
-    {
-        //std::cout << "Down activated" << std::endl;
         commands.push( mActionBinding[MoveUp] );
-    }
     else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
-    {
-        //std::cout << "Up activated" << std::endl;
         commands.push( mActionBinding[MoveDown] );
-    }
     if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position > 0 )
-    {
-        std::cout << "Right activated" << std::endl;
         commands.push( mActionBinding[MoveRight] );
-    }
     else if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position < 0 )
-    {
-        std::cout << "Left activated" << std::endl;
         commands.push( mActionBinding[MoveLeft] );
-    }
 
     if( event.type == sf::Event::JoystickButtonReleased )
     {

@@ -13,6 +13,8 @@
 #include "Core/BloomEffect.hpp"
 #include "Core/Globals.hpp"
 
+#include "Objects/Actor.hpp"
+
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>
@@ -68,6 +70,8 @@ protected:
     std::vector<SceneNode*>          	mSceneLayers;
     CommandQueue						mCommandQueue;
     BloomEffect							mBloomEffect;
+
+    Actor*                              mPlayer;
 };
 
 #endif // WORLD_HPP
