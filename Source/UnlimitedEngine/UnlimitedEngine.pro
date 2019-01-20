@@ -77,9 +77,9 @@ SOURCES += \
     States/SplashScreen.cpp \
     States/TitleState.cpp \
     Objects/Wall.cpp \
-    Objects/Trigger.cpp \
     Objects/Actor.cpp \
-    Objects/Item.cpp
+    Objects/Item.cpp \
+    Objects/Warp.cpp
 
 HEADERS += \
     Core/Animation.hpp \
@@ -149,9 +149,9 @@ HEADERS += \
     States/TitleState.hpp \
     Tiled/TiledManager.hpp \
     Objects/Wall.hpp \
-    Objects/Trigger.hpp \
     Objects/Actor.hpp \
-    Objects/Item.hpp
+    Objects/Item.hpp \
+    Objects/Warp.hpp
 
 DISTFILES += \
     Game/Application.lua \
@@ -174,10 +174,9 @@ DISTFILES += \
     Media/Textures/Defualt.png \
     Media/Textures/Default.png \
     Notes.txt \
-    Game/Levels/testMap.lua \
-    Media/Textures/tilesNstuff.png \
-    Media/Textures/BackgroundImage.png \
-    Game/Levels/PalletTown.lua \
-    Media/Textures/ExteriorTiles.png \
-    Game/Levels/PalletTownCollision.lua \
-    Media/Textures/Trainer.png
+    Game/Resources/Actors.lua \
+    Game/Resources/Items.lua \
+    Game/Resources/Warps.lua \
+    Game/Levels/Greenville.lua \
+    Media/Textures/tiles.png \
+    Media/Textures/trainers.png

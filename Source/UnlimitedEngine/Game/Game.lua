@@ -2,10 +2,8 @@ return {
     Textures = {
                     [0] = "DivittoUnlimitedLogo"
                     ,     "Default"
-                    ,     "Tiles"
-                    ,     "BackgroundImage"
-                    ,     "ExteriorTiles"
-                    ,     "Trainer"
+                    ,     "tiles"
+                    ,     "trainers"
     };
 
 
@@ -19,6 +17,6 @@ return {
     };
 
     PlayerTexture       = "Default";
-    TiledMapFilePath    = "Game/Levels/PalletTownCollision.lua";
+    TiledMapFilePath    = "Game/Levels/Greenville.lua";
 
 };

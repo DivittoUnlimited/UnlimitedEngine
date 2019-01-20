@@ -20,7 +20,9 @@ extern "C" {
 #include <iostream>
 
 class Entity;
-class Aircraft;
+class Actor;
+class Trigger;
+class Item;
 
 extern std::string CurrentLuaFile;
 
@@ -51,6 +53,19 @@ struct ParticleData
     int          particleCount;
 };
 
+struct ActorData {
+    std::vector<Direction> directions;
+};
+
+struct WarpData {
+    float x; // the new position of the thing being warped.
+    float y;
+};
+
+struct ItemData {
+
+};
+
 static std::map<std::string, unsigned int> TextureMap;
 static std::map<std::string, unsigned int> FontMap;
 static std::map<std::string, unsigned int> SoundEffectMap;
@@ -59,7 +74,6 @@ static std::map<std::string, unsigned int> LayerMap;
 static std::map<std::string, unsigned int> ObjectMap;
 // Add levels here once everything is working and finally remove Game.lua in place of World1_1.lua
 // Which will have everything Game.lua has plus a optional tiledMap path that will be loaded in the World class
-
 
 static bool loadAssetsLuaFile = []() -> bool {
         lua_State* L = luaL_newstate();
@@ -86,16 +100,13 @@ static bool loadAssetsLuaFile = []() -> bool {
             } else throw( "Error reading Assets.lua" );
             return map;
         };
-
         TextureMap      = getMap( "Textures"     );
         FontMap         = getMap( "Fonts"        );
         SoundEffectMap  = getMap( "SoundEffects" );
         MusicMap        = getMap( "Music"        );
         LayerMap        = getMap( "Layers"       );
         ObjectMap       = getMap( "Objects"      );
-
         lua_close( L );
-
         return true;
 }( );
 static std::map<std::string, std::map<unsigned int, std::string>> MediaFileMap = []( ) -> std::map<std::string, std::map<unsigned int, std::string>>
@@ -204,7 +215,132 @@ static std::map<std::string, unsigned  int> buildResourceMap( std::string fileNa
 
 static std::map<std::string, unsigned int> ParticleMap    = buildResourceMap( "Game/Resources/Particles.lua" );
 static std::map<std::string, unsigned int> AnimationMap   = buildResourceMap( "Game/Resources/Animations.lua" );
+static std::map<std::string, unsigned int> ActorMap       = buildResourceMap( "Game/Resources/Actors.lua" );
+static std::map<std::string, unsigned int> WarpMap        = buildResourceMap( "Game/Resources/Warps.lua" );
+static std::map<std::string, unsigned int> ItemMap        = buildResourceMap( "Game/Resources/Items.lua" );
 
+static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorData> {
+        std::vector<ActorData> data( ActorMap.size( ) );
+        lua_State* L = luaL_newstate();
+        luaL_openlibs(L);
+        lua_getglobal( L, "debug" );
+        lua_getfield( L, -1, "traceback" );
+        lua_replace( L, -2 );
+        luaL_loadfile( L, "Game/Resources/Actors.lua" );
+        if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+            luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+            std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+            throw( lua_tostring( L, -1 ) );
+        }
+        if( lua_istable( L, -1 ) ) // Anon table
+        {
+            for( auto i = ActorMap.begin(); i != ActorMap.end( ); ++i )
+            {
+                lua_getfield( L, -1, i->first.c_str( ) );
+                if( lua_istable( L, -1 ) ) // Actor Definition
+                {
+                    // "path finding"
+                    lua_getfield( L, -1, "path" );
+                    if( lua_istable( L, -1 ) )
+                    {
+                        unsigned int index = 0;
+                        lua_pushnil( L );
+                        while( lua_next(L , -2 ) != 0 )
+                        {
+                            if( lua_istable( L, -1 ) )
+                            {
+                                lua_pushnil( L );
+                                std::vector<float> v;
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    v.push_back((float)lua_tonumber( L, -1 ));
+                                    lua_pop( L, 1 );
+                                }
+                                //std::cout << "attempting: "<< i->second << ": path {" << a << ", " << d << " }" << std::endl;
+                                data[i->second].directions.push_back( Direction( v[0], v[1] ) );
+                                lua_pop( L, 1 ); // anon vector
+                            } else std::cout << "Error reading actor path data" << std::endl;
+                            index++;
+                        }
+                        lua_pop( L, 1 ); // "path" table
+                    }
+                }
+                lua_pop( L, 1 ); // defintion table
+            }
+            lua_pop( L, 1 ); // anon table
+        }else std::cout << "Error reading Actors.lua" << std::endl;
+
+    lua_close( L );
+    return data;
+}( );
+
+static std::vector<WarpData> initializeWarpData = []() -> std::vector<WarpData> {
+    std::vector<WarpData> data( WarpMap.size( ) );
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+    lua_getglobal( L, "debug" );
+    lua_getfield( L, -1, "traceback" );
+    lua_replace( L, -2 );
+    luaL_loadfile( L, "Game/Resources/Warps.lua" );
+    if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+        luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+        std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+        throw( lua_tostring( L, -1 ) );
+    }
+    if( lua_istable( L, -1 ) ) // Anon table
+    {
+        for( auto i = WarpMap.begin(); i != WarpMap.end(); ++i )
+        {
+            lua_getfield( L, -1, i->first.c_str( ) );
+            if( lua_istable( L, -1 ) ) // Warp Definition
+            {
+                lua_getfield( L, -1, "x" );
+                if( lua_isnumber( L, -1 ) ) data[i->second].x = (float)lua_tonumber( L, -1 );
+                else std::cout << "Error loading warp " << i->first.c_str() << "X" << std::endl;
+                lua_pop( L, 1 );
+                lua_getfield( L, -1, "y" );
+                if( lua_isnumber( L, -1 ) ) data[i->second].y = (float)lua_tonumber( L, -1 );
+                else std::cout << "Error Loading warp  " << i->first.c_str() << "Y" << std::endl;
+                lua_pop( L, 1 );
+            }
+            lua_pop( L, 1 ); // defintion table
+        }
+        lua_pop( L, 1 ); // anon table
+    }else std::cout << "Error reading Warps.lua" << std::endl;
+    lua_close( L );
+    return data;
+}( );
+
+static std::vector<ItemData> initializeItemData = []() -> std::vector<ItemData> {
+    std::vector<ItemData> data( ItemMap.size( ) );
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+    lua_getglobal( L, "debug" );
+    lua_getfield( L, -1, "traceback" );
+    lua_replace( L, -2 );
+    luaL_loadfile( L, "Game/Resources/Items.lua" );
+    if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+        luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+        std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+        throw( lua_tostring( L, -1 ) );
+    }
+    if( lua_istable( L, -1 ) ) // Anon table
+    {
+        for( auto i = ItemMap.begin(); i != ItemMap.end(); ++i )
+        {
+            lua_getfield( L, -1, i->first.c_str( ) );
+            if( lua_istable( L, -1 ) ) // Item Definition
+            {
+                 // Get Item Data Here!!!
+            }
+            lua_pop( L, 1 ); // defintion table
+        }
+        lua_pop( L, 1 ); // anon table
+    }else std::cout << "Error reading Projectiles.lua" << std::endl;
+
+    lua_close( L );
+    return data;
+}( );
 
 static std::vector<ParticleData> initializeParticleData = []() -> std::vector<ParticleData> {
     std::vector<ParticleData> data( ParticleMap.size( ) );
@@ -260,7 +396,6 @@ static std::vector<ParticleData> initializeParticleData = []() -> std::vector<Pa
         lua_close( L );
                 */
     return data;
-
 }( ); // initializeParticleData
 static std::vector<AnimationData> initializeAnimationData = []() -> std::vector<AnimationData> {
     std::vector<AnimationData> data( AnimationMap.size( ) );

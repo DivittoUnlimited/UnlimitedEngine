@@ -10,7 +10,7 @@ enum Type
     Wall          		= 1 << 1,
     NPC            		= 1 << 2,
     Item				= 1 << 3,
-    Trigger             = 1 << 4,
+    Warp                = 1 << 4,
     ImageLayer          = 1 << 5,
     TileLayer           = 1 << 6,
     ObjectLayer         = 1 << 7,

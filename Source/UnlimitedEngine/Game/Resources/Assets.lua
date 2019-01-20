@@ -6,10 +6,8 @@ return {
         Default              = 1;
         Buttons              = 2;
         -- Demo
-        Tiles                = 3;
-        BackgroundImage      = 4;
-        ExteriorTiles        = 5;
-        Trainer              = 6;
+        tiles                = 3;
+        trainers             = 4;
     };
 
     SoundEffects = {
@@ -27,10 +25,13 @@ return {
     };
 
     Layers = {
-        BottomTileLayer     = 0;
-        ObjectLayer         = 1;
+        TileLayer1          = 0;
+        TileLayer2          = 1;
+        ObjectLayer         = 2;
+        TileLayer3          = 3;
     };
 
+-- maybe usefull in World::buildScene dont delete yet
     Objects = {
         Wall                = 0;
         Trigger             = 1;

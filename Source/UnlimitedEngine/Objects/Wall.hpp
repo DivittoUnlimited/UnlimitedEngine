@@ -19,7 +19,6 @@ public:
 
 private:
     std::string mType;
-    sf::Rect<float> mBounds;
     sf::RectangleShape mSprite;
 };
 

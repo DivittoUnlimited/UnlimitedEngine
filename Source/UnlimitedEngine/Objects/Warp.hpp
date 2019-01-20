@@ -1,25 +1,30 @@
-#ifndef TRIGGER_HPP
-#define TRIGGER_HPP
+#ifndef WARP_HPP
+#define WARP_HPP
 
-#include "Core/SceneNode.hpp"
-
-#include "Tiled/TiledManager.hpp"
 #include <SFML/Graphics/RectangleShape.hpp>
+#include "Core/SceneNode.hpp"
+#include "Core/TextNode.hpp"
+#include "Core/DataTables.hpp"
+#include "Tiled/TiledManager.hpp"
 
-class Trigger : public SceneNode
+class Warp : public SceneNode
 {
 public:
-    Trigger( Tiled::Object data, sf::RectangleShape mSprite );
+    Warp( Tiled::Object data, sf::RectangleShape sprite, const FontManager& fonts );
+
     virtual unsigned int  getCategory( ) const;
     virtual sf::FloatRect getBoundingRect( ) const;
     virtual bool 		  isMarkedForRemoval( ) const;
+
     virtual void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
     virtual void updateCurrent( sf::Time dt, CommandQueue& commands );
-    std::string type( void ) { return mType; }
 
+    sf::Vector2f getNewPosition( void ) { return mNewPosition; }
 private:
-    std::string mType;
+    std::string     mName;
+    TextNode*       mLabel;
     sf::RectangleShape mSprite;
+    sf::Vector2f mNewPosition;
 };
 
-#endif // TRIGGER_HPP
+#endif // WARP_HPP

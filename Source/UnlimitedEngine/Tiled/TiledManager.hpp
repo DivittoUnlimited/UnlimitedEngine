@@ -111,7 +111,7 @@ struct TiledMap
 
 static TiledMap loadFromFile( std::string filePath )
 {
-    std::cout << "Loading Map: " << filePath << std::endl;
+    std::cout << "TiledManager LoadFromFile: " << filePath << std::endl;
     Tiled::TiledMap currentTileMap;
     // open lua file at path or throw exception
     lua_State* L = luaL_newstate( );
@@ -569,6 +569,7 @@ static TiledMap loadFromFile( std::string filePath )
     }
     else
         std::cout << "Error reading Tiled level @" << filePath << std::endl;
+    std::cout << "TiledManager loadFromFile complete!" << std::endl;
     return currentTileMap;
 }
 

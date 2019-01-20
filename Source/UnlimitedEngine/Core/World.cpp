@@ -12,7 +12,7 @@
 
 #include "Objects/Wall.hpp"
 #include "Objects/Actor.hpp"
-#include "Objects/Trigger.hpp"
+#include "Objects/Warp.hpp"
 #include "Objects/Item.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -39,10 +39,11 @@ World::World( sf::RenderTarget &outputTarget, TextureManager &textures, FontMana
 , mSceneLayers( )
 , mPlayer( nullptr )
 {
-    //mWorldView.zoom( 2 );
+    mWorldView.zoom( .70 );
     if( !mSceneTexture.create( outputTarget.getView().getSize().x, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
     buildScene( );
+    mWorldView.setCenter( mPlayer->getPosition() );
 }
 
 World::~World( )
@@ -52,18 +53,18 @@ World::~World( )
 
 void World::update( sf::Time dt )
 {
+    mWorldView.setCenter( mPlayer->getPosition() );
     while( !mCommandQueue.isEmpty( ) )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     mSceneGraph.update( dt, mCommandQueue );
-    handleCollisions();
-    mWorldView.setCenter( mPlayer->getPosition() );
+    handleCollisions( );
 }
 
 void World::draw( )
 {
     if( PostEffect::isSupported( ) )
     {
-        mSceneTexture.clear( sf::Color( 34, 120, 34 ) );
+        mSceneTexture.clear( sf::Color( 100, 0, 150 ) );
 
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
@@ -73,7 +74,7 @@ void World::draw( )
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
 
         mTarget.draw( sf::Sprite( mWindowSprite ) );
-        //mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
+        mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
     }
     else
     {
@@ -120,16 +121,11 @@ void World::handleCollisions( )
               auto& player = static_cast<Actor&>( *pair.first );
               player.setVelocity( 0, 0 );
         }
-        else if( matchesCategories( pair, Category::Player, Category::Trigger ) )
+        else if( matchesCategories( pair, Category::Player, Category::Warp ) )
         {
-             ///
-             /// Still need to add the activate method!!!
-             ///
-
-             // auto& player = static_cast<Actor&>( *pair.first );
-             // auto& trigger = static_cast<Trigger&>( *pair.second );
-             // trigger.activate( player );
-
+             auto& player = static_cast<Actor&>( *pair.first );
+             auto& warp = static_cast<Warp&>( *pair.second );
+             player.setPosition( warp.getNewPosition( ) );
         }
         else if( matchesCategories( pair, Category::Player, Category::NPC ) )
         {
@@ -146,7 +142,7 @@ void World::buildScene( )
 {
     // load TiledMap
     std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
-    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/PalletTownCollision.lua" ); //mContext.TiledMapFilePath );
+    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/Greenville.lua" ); //mContext.TiledMapFilePath );
 
     struct Tile {
         std::string texID;
@@ -166,7 +162,6 @@ void World::buildScene( )
         unsigned int tileWidth = map.tileSets[i].tileWidth;
         unsigned int tileHeight =  map.tileSets[i].tileHeight;
         std::string name = map.tileSets[i].name;
-        std::cout << "Creating tileSet from image: " << name << std::endl;
 
         while( y < ( map.tileSets[i].imageHeight - tileHeight) )
         {
@@ -184,6 +179,7 @@ void World::buildScene( )
             y += tileHeight;
         }
     }
+
     for( unsigned int i = 0; i < map.layers.size(); ++i )
     {
         auto layer = map.layers[i];
@@ -208,7 +204,7 @@ void World::buildScene( )
                     node->attachChild( std::move( newTile ) );
                 }
                 // move down the row to the left unless at the left most side in which case move down to the next row and start at the begining again
-                if ( x <= ( (layer.width-1) * tiles[layer.data[k]].rect.width)-1 )
+                if ( x < ( (layer.width-1) * tiles[layer.data[k]].rect.width) )
                     x += tiles[layer.data[k]].rect.width;
                 else
                 {
@@ -219,6 +215,7 @@ void World::buildScene( )
             mSceneLayers.push_back( node.get( ) );
             mSceneGraph.attachChild( std::move( node ) );
         }
+
         else if( layer.type == "objectgroup" )
         {
             SceneNode::Ptr node( new SceneNode( Category::ObjectLayer ) );
@@ -236,10 +233,10 @@ void World::buildScene( )
                 {
                     std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
                     node.get( )->attachChild( std::move( wall ) );
-                }else if( object.type == "Trigger" )
+                }else if( object.type == "Warp" )
                 {
-                    std::unique_ptr<Trigger> trigger( new Trigger( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
-                    node.get( )->attachChild( std::move( trigger ) );
+                    std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mFonts ) );
+                    node.get( )->attachChild( std::move( warp ) );
                 }else if( object.type == "Actor" )
                 {
                     std::unique_ptr<Actor> actor( new Actor( object, sf::Sprite( mTextures.get( TextureMap.at( tiles[object.gid].texID ) ), tiles[object.gid].rect ), mTextures, &mSounds, mFonts ) );
@@ -251,11 +248,8 @@ void World::buildScene( )
                 }else
                     std::cout << "Invalid object being loaded from tile map" << std::endl;
              }
-
             mSceneLayers.push_back( node.get( ) );
             mSceneGraph.attachChild( std::move( node ) );
-
-            std::cout << "Object layer complete: " << layer.name << std::endl; // DEBUG
         }
         else if( layer.type == "imagelayer" )
         {
@@ -273,7 +267,6 @@ void World::buildScene( )
             mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
         }
     }
-
     ///
     ///
     /// Where does the level init happen??

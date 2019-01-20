@@ -8,7 +8,7 @@ Wall::Wall( Tiled::Object data, sf::RectangleShape sprite )
    // mSprite.setOrigin( sf::Vector2f( mSprite.getSize().x / 2, mSprite.getSize( ).y / 2 ) ); // the center
     // Build object using resource manager and data from tiled map
     this->setPosition( data.x, data.y );
-    mSprite.setFillColor( sf::Color( 255, 0, 0, 100 ) );
+    mSprite.setFillColor( sf::Color( 255, 0, 0, 0 ) );
 }
 
 unsigned int Wall::getCategory( ) const
