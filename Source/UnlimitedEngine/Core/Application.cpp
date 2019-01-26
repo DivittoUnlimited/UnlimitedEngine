@@ -17,8 +17,6 @@
 // Debugging only!!
 #include <iostream>
 
-int PLAYER_LIVES = 3;
-
 const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 
 Application::Application( )
@@ -34,10 +32,8 @@ Application::Application( )
 , mStatisticsText( )
 , mStatisticsUpdateTime( )
 {
-    PLAYER_LIVES = 3;
     mWindow.setKeyRepeatEnabled( false );
     mWindow.setVerticalSyncEnabled( true );
-
 
     mFonts.load(    FontMap.at( "Default"         ), MediaFileMap.at( "Fonts"    ).at(    FontMap.at( "Default"  ) ) );
     mTextures.load( TextureMap.at( "Buttons"         ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "Buttons"  ) ) );
@@ -58,7 +54,6 @@ void Application::run( )
 {
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
-
     while( mWindow.isOpen( ) )
 	{
         sf::Time dt = clock.restart( );
@@ -67,14 +62,13 @@ void Application::run( )
 		{
 			timeSinceLastUpdate -= TimePerFrame;
 
-			processInput();
+            processInput( );
             update( TimePerFrame );
 
 			// Check inside this loop, because stack might be empty before update() call
             if( mStateStack.isEmpty( ) )
                 mWindow.close( );
 		}
-
         updateStatistics( dt );
         render( );
 	}
@@ -86,7 +80,6 @@ void Application::processInput( )
     while( mWindow.pollEvent( event ) )
 	{
         mStateStack.handleEvent( event );
-
         if( event.type == sf::Event::Closed )
             mWindow.close( );
 	}
@@ -101,7 +94,7 @@ void Application::render( )
 {
     mWindow.clear( sf::Color::Black );
     mStateStack.draw( );
-    mWindow.setView( mWindow.getDefaultView( ) );
+
     mWindow.draw( mStatisticsText );
     mWindow.display( );
 }

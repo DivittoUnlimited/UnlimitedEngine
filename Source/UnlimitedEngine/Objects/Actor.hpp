@@ -14,6 +14,7 @@
 #include "Core/EmitterNode.hpp"
 #include "Core/SoundNode.hpp"
 #include "Core/SoundPlayer.hpp"
+#include "Core/SpriteNode.hpp"
 
 #include "Tiled/TiledManager.hpp"
 
@@ -21,7 +22,7 @@
 class Actor : public Entity
 {
 public:
-    Actor( Tiled::Object data, sf::Sprite sprite, const TextureManager& textures, SoundPlayer* soundPlayer, const FontManager& fonts );
+    Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, const TextureManager& textures, SoundPlayer* soundPlayer, const FontManager& fonts );
 
     virtual unsigned int  getCategory( ) const;
     virtual sf::FloatRect getBoundingRect( ) const;

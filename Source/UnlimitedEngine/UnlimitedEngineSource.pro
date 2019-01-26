@@ -77,7 +77,13 @@ SOURCES += \
     States/SplashScreen.cpp \
     Gui/Button.cpp \
     States/SettingsState.cpp \
-    Core/ParticleNode.cpp
+    Core/ParticleNode.cpp \
+    Core/VertexArrayNode.cpp \
+    Objects/Actor.cpp \
+    Objects/Item.cpp \
+    Objects/Wall.cpp \
+    Objects/Warp.cpp \
+    Core/RectangleShapeNode.cpp
 
 HEADERS += \
     lua/lapi.h \
@@ -145,7 +151,14 @@ HEADERS += \
     Gui/Button.hpp \
     States/SettingsState.hpp \
     Core/Particle.hpp \
-    Core/ParticleNode.hpp
+    Core/ParticleNode.hpp \
+    Tiled/TiledManager.hpp \
+    Core/VertexArrayNode.hpp \
+    Objects/Actor.hpp \
+    Objects/Item.hpp \
+    Objects/Wall.hpp \
+    Objects/Warp.hpp \
+    Core/RectangleShapeNode.hpp
 
 DISTFILES += \
     Media/Sansation.ttf \
@@ -194,4 +207,5 @@ DISTFILES += \
     Game/Game.lua \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Notes.txt \
-    TiledMapReader.lua
+    TiledMapReader.lua \
+    Game/Levels/Greenville.lua

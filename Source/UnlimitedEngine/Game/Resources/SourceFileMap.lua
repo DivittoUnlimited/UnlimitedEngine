@@ -14,7 +14,7 @@ return {
 
         -- Demo
         [Tex.tiles]                 = "Media/Textures/tiles.png";
-        [Tex.trainers]               = "Media/Textures/trainers.png";
+        [Tex.trainers]             = "Media/Textures/trainers.png";
     };
     Fonts = {
         [Font.Default]              = "Media/Sansation.ttf";

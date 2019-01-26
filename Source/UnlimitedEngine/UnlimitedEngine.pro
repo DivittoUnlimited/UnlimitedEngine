@@ -79,7 +79,9 @@ SOURCES += \
     Objects/Wall.cpp \
     Objects/Actor.cpp \
     Objects/Item.cpp \
-    Objects/Warp.cpp
+    Objects/Warp.cpp \
+    Core/RectangleShapeNode.cpp \
+    Core/VertexArrayNode.cpp
 
 HEADERS += \
     Core/Animation.hpp \
@@ -151,7 +153,9 @@ HEADERS += \
     Objects/Wall.hpp \
     Objects/Actor.hpp \
     Objects/Item.hpp \
-    Objects/Warp.hpp
+    Objects/Warp.hpp \
+    Core/RectangleShapeNode.hpp \
+    Core/VertexArrayNode.hpp
 
 DISTFILES += \
     Game/Application.lua \

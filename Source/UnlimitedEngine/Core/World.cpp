@@ -43,7 +43,7 @@ World::World( sf::RenderTarget &outputTarget, TextureManager &textures, FontMana
     if( !mSceneTexture.create( outputTarget.getView().getSize().x, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
     buildScene( );
-    mWorldView.setCenter( mPlayer->getPosition() );
+    //mWorldView.setCenter( mPlayer->getPosition() );
 }
 
 World::~World( )
@@ -53,7 +53,7 @@ World::~World( )
 
 void World::update( sf::Time dt )
 {
-    mWorldView.setCenter( mPlayer->getPosition() );
+    //mWorldView.setCenter( mPlayer->getPosition() );
     while( !mCommandQueue.isEmpty( ) )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     mSceneGraph.update( dt, mCommandQueue );
@@ -64,7 +64,7 @@ void World::draw( )
 {
     if( PostEffect::isSupported( ) )
     {
-        mSceneTexture.clear( sf::Color( 100, 0, 150 ) );
+        mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
 
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
@@ -74,7 +74,7 @@ void World::draw( )
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
 
         mTarget.draw( sf::Sprite( mWindowSprite ) );
-        mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
+        // mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
     }
     else
     {
@@ -134,8 +134,10 @@ void World::handleCollisions( )
             ///
             std::cout <<  "Hey Whatch'it man!" << std::endl;
         }
+        else {
+            std::cout << "Error occured while checking Collision something is being checked that shouldn't be!" << std::endl;
+        }
     }
-
 }
 
 void World::buildScene( )
@@ -144,6 +146,77 @@ void World::buildScene( )
     std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
     Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/Greenville.lua" ); //mContext.TiledMapFilePath );
 
+    for( unsigned int i = 0; i < map.layers.size(); ++i )
+    {
+        if( map.layers[i].type == "tilelayer" )
+        {
+            auto tileSets = map.tileSets[0];
+            std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( ) );
+            if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
+                std::cout << "ERROR loading TiledMap! BuildScene ln: 155" << std::endl;
+            else {
+                mSceneLayers.push_back( layer.get( ) );
+                mSceneGraph.attachChild( std::move( layer ) );
+            }
+        }
+        else if( map.layers[i].type == "objectgroup" )
+        {
+            auto layer = map.layers[i];
+            SceneNode::Ptr node( new SceneNode( Category::ObjectLayer ) );
+            // Build loop through all objects
+            for( unsigned int i = 0; i < layer.objects.size(); ++i )
+            {
+                 auto object = layer.objects.at( i );
+                 if( object.type == "Player" )
+                 {
+                     // std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                     // this->mPlayer = actor.get( );
+                     // node.get( )->attachChild( std::move( actor ) );
+                 }
+                 else if( object.type == "Wall" )
+                 {
+                     std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
+                     node.get( )->attachChild( std::move( wall ) );
+                 }else if( object.type == "Warp" )
+                 {
+                     std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mFonts ) );
+                     node.get( )->attachChild( std::move( warp ) );
+                 }else if( object.type == "Actor" )
+                 {
+                    // std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                    // node.get( )->attachChild( std::move( actor ) );
+                 }else if( object.type == "Item" )
+                 {
+                     // std::unique_ptr<Item> item( new Item( ) );
+                     // node.get( )->attachChild( std::move( item ) );
+                 }else
+                     std::cout << "Invalid object being loaded from tile map" << std::endl;
+            }
+                mSceneLayers.push_back( node.get( ) );
+                mSceneGraph.attachChild( std::move( node ) );
+
+
+        }
+        else if( map.layers[i].type == "imageLayer" )
+        {
+            // Create Layer
+            SceneNode::Ptr node( new SceneNode( Category::ImageLayer ) );
+            mSceneLayers[i] = node.get( );
+            mSceneGraph.attachChild( std::move( node ) );
+
+            // load texture for use by SpriteNode
+            sf::Texture& texture = mTextures.get( TextureMap.at( map.tileSets[i].name ) );
+            texture.setSmooth( true );
+
+            // Create SpriteNode to hold image attach to layer node
+            std::unique_ptr<SpriteNode> backgroundImage( new SpriteNode( texture ) );
+            mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
+        }
+    }
+
+
+
+/*
     struct Tile {
         std::string texID;
         sf::Rect<int> rect;
@@ -196,6 +269,7 @@ void World::buildScene( )
                 //std::cout << "Layer.data[" << k << "] == " << layer.data[k] << std::endl;
                 if( layer.data[k] != 0 )
                 {
+
                     // Create Sprite Node using appropriate tile and then add it to the layer dont forget to add layer to the graph!!!!!!
                     std::unique_ptr<SpriteNode> newTile( new SpriteNode( mTextures.get( TextureMap.at( tiles[layer.data[k]].texID ) ) ) );
                     // edit tile for placement
@@ -225,8 +299,8 @@ void World::buildScene( )
                 auto object = layer.objects.at( i );
                 if( object.type == "Player" )
                 {
-                    std::unique_ptr<Actor> actor( new Actor( object, sf::Sprite( mTextures.get( TextureMap.at( tiles[object.gid].texID ) ), tiles[object.gid].rect ), mTextures, &mSounds, mFonts ) );
-                    this->mPlayer = actor.get();
+                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                    this->mPlayer = actor.get( );
                     node.get( )->attachChild( std::move( actor ) );
                 }
                 else if( object.type == "Wall" )
@@ -239,7 +313,7 @@ void World::buildScene( )
                     node.get( )->attachChild( std::move( warp ) );
                 }else if( object.type == "Actor" )
                 {
-                    std::unique_ptr<Actor> actor( new Actor( object, sf::Sprite( mTextures.get( TextureMap.at( tiles[object.gid].texID ) ), tiles[object.gid].rect ), mTextures, &mSounds, mFonts ) );
+                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
                     node.get( )->attachChild( std::move( actor ) );
                 }else if( object.type == "Item" )
                 {
@@ -267,6 +341,7 @@ void World::buildScene( )
             mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
         }
     }
+    */
     ///
     ///
     /// Where does the level init happen??

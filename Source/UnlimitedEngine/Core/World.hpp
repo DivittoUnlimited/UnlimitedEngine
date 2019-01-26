@@ -6,12 +6,14 @@
 
 #include "Core/SceneNode.hpp"
 #include "Core/SpriteNode.hpp"
+#include "Core/VertexArrayNode.hpp"
 #include "Core/CommandQueue.hpp"
 #include "Core/Command.hpp"
 #include "Core/State.hpp"
 #include "Core/PostEffect.hpp"
 #include "Core/BloomEffect.hpp"
 #include "Core/Globals.hpp"
+
 
 #include "Objects/Actor.hpp"
 

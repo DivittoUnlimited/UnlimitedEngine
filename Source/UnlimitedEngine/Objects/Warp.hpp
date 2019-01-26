@@ -5,6 +5,7 @@
 #include "Core/SceneNode.hpp"
 #include "Core/TextNode.hpp"
 #include "Core/DataTables.hpp"
+#include "Core/RectangleShapeNode.hpp"
 #include "Tiled/TiledManager.hpp"
 
 class Warp : public SceneNode
@@ -23,7 +24,7 @@ public:
 private:
     std::string     mName;
     TextNode*       mLabel;
-    sf::RectangleShape mSprite;
+    sf::RectangleShape* mSprite;
     sf::Vector2f mNewPosition;
 };
 
