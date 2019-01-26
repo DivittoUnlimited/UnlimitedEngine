@@ -38,8 +38,8 @@ public:
     void speed( float speed ) { this->mSpeed = speed; }
 
 private:
-    sf::Sprite      mSprite;
     std::string     mType;
+    sf::Sprite      mSprite;
     std::string     mName;
     float           mTravelledDistance;
     std::size_t     mDirectionIndex;

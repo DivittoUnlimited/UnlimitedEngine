@@ -43,7 +43,7 @@ World::World( sf::RenderTarget &outputTarget, TextureManager &textures, FontMana
     if( !mSceneTexture.create( outputTarget.getView().getSize().x, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
     buildScene( );
-    //mWorldView.setCenter( mPlayer->getPosition() );
+    mWorldView.setCenter( mPlayer->getPosition() );
 }
 
 World::~World( )
@@ -53,7 +53,7 @@ World::~World( )
 
 void World::update( sf::Time dt )
 {
-    //mWorldView.setCenter( mPlayer->getPosition() );
+    mWorldView.setCenter( mPlayer->getPosition() );
     while( !mCommandQueue.isEmpty( ) )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     mSceneGraph.update( dt, mCommandQueue );
@@ -146,6 +146,42 @@ void World::buildScene( )
     std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
     Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/Greenville.lua" ); //mContext.TiledMapFilePath );
 
+    struct Tile {
+        std::string texID;
+        sf::Rect<int> rect;
+    };
+
+    std::vector<Tile> tiles = std::vector<Tile>( );
+    tiles.push_back( Tile() );
+    tiles[0].texID = "NONE";
+    tiles[0].rect = sf::Rect<int>( 0, 0, 16, 16 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
+
+    for( unsigned int i = 0; i < map.tileSets.size(); ++i )
+    {
+        // define loops to divide up image
+        unsigned int y = 0;
+        unsigned int x = 0;
+        unsigned int tileWidth = map.tileSets[i].tileWidth;
+        unsigned int tileHeight =  map.tileSets[i].tileHeight;
+        std::string name = map.tileSets[i].name;
+
+        while( y < ( map.tileSets[i].imageHeight - tileHeight) )
+        {
+            while( x < map.tileSets[i].imageWidth )
+            {
+                // Create tile
+                Tile tile;
+                tile.texID = name;
+                tile.rect = sf::Rect<int>( x, y, tileWidth, tileHeight );
+                // add tile to set of possible tiles to use later it's index in vector is it's id as found in testMap.lua
+                tiles.push_back( tile );
+                x += tileWidth;
+            }
+            x = 0;
+            y += tileHeight;
+        }
+    }
+
     for( unsigned int i = 0; i < map.layers.size(); ++i )
     {
         if( map.layers[i].type == "tilelayer" )
@@ -169,9 +205,10 @@ void World::buildScene( )
                  auto object = layer.objects.at( i );
                  if( object.type == "Player" )
                  {
-                     // std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                     // this->mPlayer = actor.get( );
-                     // node.get( )->attachChild( std::move( actor ) );
+
+                     std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                     this->mPlayer = actor.get( );
+                     node.get( )->attachChild( std::move( actor ) );
                  }
                  else if( object.type == "Wall" )
                  {
@@ -183,8 +220,8 @@ void World::buildScene( )
                      node.get( )->attachChild( std::move( warp ) );
                  }else if( object.type == "Actor" )
                  {
-                    // std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                    // node.get( )->attachChild( std::move( actor ) );
+                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                    node.get( )->attachChild( std::move( actor ) );
                  }else if( object.type == "Item" )
                  {
                      // std::unique_ptr<Item> item( new Item( ) );

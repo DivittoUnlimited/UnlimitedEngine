@@ -24,7 +24,7 @@ public:
 private:
     std::string     mName;
     TextNode*       mLabel;
-    sf::RectangleShape* mSprite;
+    sf::RectangleShape mSprite;
     sf::Vector2f mNewPosition;
 };
 
