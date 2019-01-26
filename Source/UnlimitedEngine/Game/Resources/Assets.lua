@@ -26,9 +26,9 @@ return {
 
     Layers = {
         TileLayer1          = 0;
-        TileLayer2          = 1;
-        ObjectLayer         = 2;
-        TileLayer3          = 3;
+        --TileLayer2          = 1;
+        ObjectLayer         = 1; -- Dont forget to change value here!!
+        --TileLayer3          = 3;
     };
 
 -- maybe usefull in World::buildScene dont delete yet
