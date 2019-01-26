@@ -23,10 +23,8 @@ void EmitterNode::updateCurrent( sf::Time dt, CommandQueue& commands )
 		// Find particle node with the same type as emitter node
         auto finder = [this] ( ParticleNode& container, sf::Time )
 		{
-            /*
             if( container.getParticleType() == mType )
 				mParticleSystem = &container;
-                */
 		};
 
 		Command command;

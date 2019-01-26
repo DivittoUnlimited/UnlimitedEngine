@@ -26,7 +26,7 @@ public:
     typedef std::unique_ptr<SceneNode> Ptr;
     //typedef std::pair<SceneNode*, SceneNode*> Pair;
 
-    explicit SceneNode( Category::Type category = Category::None );
+    explicit SceneNode( Category::Type type = Category::None );
 
     unsigned int            attachChild( Ptr child );
     Ptr						detachChild( const SceneNode& node );
@@ -46,8 +46,6 @@ public:
     virtual sf::FloatRect	getBoundingRect( ) const;
     virtual bool			isMarkedForRemoval( ) const;
     virtual bool			isDestroyed( ) const;
-
-
 
 private:
     virtual void			updateCurrent( sf::Time dt, CommandQueue& commands );
