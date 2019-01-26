@@ -38,7 +38,6 @@ private:
     Player				  mPlayer;
     MusicPlayer           mMusic;
     SoundPlayer           mSoundEffects;
-    TiledMapManager       mTiledMapManager;
 
     // Game FSM
     State::Context        mContext;

@@ -8,7 +8,6 @@
 #include <string>
 #include <map>
 
-#include "Tiled/TiledManager.hpp"
 
 // Forward declaration of SFML classes
 namespace sf
@@ -46,6 +45,6 @@ typedef ResourceManager<sf::Texture>        TextureManager;
 typedef ResourceManager<sf::Font>           FontManager;
 typedef ResourceManager<sf::SoundBuffer>    SoundManager;
 typedef ResourceManager<sf::Shader>         ShaderManager;
-typedef ResourceManager<Tiled::TiledMap>    TiledMapManager;
+
 
 #endif // RESOURCEIDENTIFIERS_HPP

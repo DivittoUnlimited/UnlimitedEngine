@@ -69,8 +69,8 @@ void SceneNode::draw( sf::RenderTarget& target, sf::RenderStates states ) const
     drawCurrent( target, states );
     drawChildren( target, states );
 
-    // Draw bounding rectangle - disabled by default      /// MEGA resource drain use wit caution
-    // drawBoundingRect( target, states );
+    // Draw bounding rectangle - disabled by default      /// MEGA resource drain use with caution
+    drawBoundingRect( target, states );
 }
 
 void SceneNode::drawCurrent( sf::RenderTarget&, sf::RenderStates ) const
@@ -86,9 +86,6 @@ void SceneNode::drawChildren( sf::RenderTarget& target, sf::RenderStates states 
 
 void SceneNode::drawBoundingRect( sf::RenderTarget& target, sf::RenderStates ) const
 {
-    ///
-    /// \brief
-    /// MEGA resource drain use wit caution
     sf::FloatRect rect = getBoundingRect( );
 
     sf::RectangleShape shape;
@@ -99,7 +96,6 @@ void SceneNode::drawBoundingRect( sf::RenderTarget& target, sf::RenderStates ) c
     shape.setOutlineThickness( 1.f );
 
     target.draw( shape );
-
 }
 
 sf::Vector2f SceneNode::getWorldPosition( ) const

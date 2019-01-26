@@ -7,7 +7,7 @@ namespace
     const auto Table = initializeActorData; // Gives access to the data in Actors.lua
 }
 
-Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, const TextureManager& textures, SoundPlayer* soundPlayer, const FontManager& fonts )
+Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, const TextureManager& textures, SoundPlayer*, const FontManager& fonts )
     : mType( data.type )
     , mSprite( textures.get( texID ), texRect )
     , mName( data.name )
@@ -16,14 +16,13 @@ Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, con
     // std::cout << "Actor name: " << mName << std::endl;
     centerOrigin( mSprite );
 
-    /*
     std::unique_ptr<TextNode> name( new TextNode( fonts, data.name ) );
     this->mLabel = name.get( );
     this->mLabel->setColor( sf::Color( 255, 0, 255, 255 ) );
     this->mLabel->getText( )->setCharacterSize( 10 );
     this->mLabel->setPosition( 8, -20 );
     this->attachChild( std::move( name ) );
-    */
+
     this->setPosition( data.x, data.y );
     this->mSpeed = 20;
 

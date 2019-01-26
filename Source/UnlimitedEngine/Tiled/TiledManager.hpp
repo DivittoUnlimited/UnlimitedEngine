@@ -109,7 +109,7 @@ struct TiledMap
     std::vector<Layer> layers;
 };
 
-static TiledMap loadFromFile( std::string filePath )
+static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
 {
     std::cout << "TiledManager LoadFromFile: " << filePath << std::endl;
     Tiled::TiledMap currentTileMap;
@@ -480,7 +480,7 @@ static TiledMap loadFromFile( std::string filePath )
                                     if( lua_isboolean( L, -1 ) ) currentObj.visible = lua_toboolean( L, -1 );
                                     else throw( "Error: Object visible invalid" );
                                     lua_pop( L, 1 ); // visible value
-  /*
+    /*
                                     lua_getfield( L, -1, "properties" );
                                     if( lua_istable( L, -1 ) )
                                     {
@@ -488,7 +488,7 @@ static TiledMap loadFromFile( std::string filePath )
                                     }
                                     else throw( "Error: Object Properties invalid" );
                                     lua_pop( L, 1 ); // Properties table
-*/
+    */
                                     currentLayer.objects.push_back( currentObj );
                                 }
                                 else
@@ -571,7 +571,8 @@ static TiledMap loadFromFile( std::string filePath )
         std::cout << "Error reading Tiled level @" << filePath << std::endl;
     std::cout << "TiledManager loadFromFile complete!" << std::endl;
     return currentTileMap;
-}
+};
+
 
 
 }
