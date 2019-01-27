@@ -27,6 +27,7 @@ public:
     virtual unsigned int  getCategory( ) const;
     virtual sf::FloatRect getBoundingRect( ) const;
     virtual bool 		  isMarkedForRemoval( ) const;
+    virtual bool          isDestroyed( void ) const;
 
     virtual void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
     virtual void updateCurrent( sf::Time dt, CommandQueue& commands );

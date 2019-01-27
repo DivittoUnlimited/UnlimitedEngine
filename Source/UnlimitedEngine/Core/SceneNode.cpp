@@ -139,7 +139,7 @@ void SceneNode::checkSceneCollision( SceneNode& sceneGraph, std::set<std::pair<S
 
 void SceneNode::checkNodeCollision( SceneNode& node, std::set<std::pair<SceneNode*, SceneNode*>>& collisionPairs )
 {
-    if( this != &node && collision( *this, node ) && !isDestroyed( ) && !node.isDestroyed( ) )
+    if( this != &node && !isDestroyed( ) && !node.isDestroyed( ) && collision( *this, node )  )
         collisionPairs.insert( std::minmax( this, &node ) );
 
     for( Ptr& child : mChildren )

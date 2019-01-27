@@ -12,17 +12,16 @@ Warp::Warp( Tiled::Object data, sf::RectangleShape sprite, const FontManager& fo
 {
     // Build object using resource manager and data from tiled map
     this->setPosition( data.x, data.y );
-    mSprite.setFillColor( sf::Color( 0, 0, 255, 255 ) );
+    mSprite.setFillColor( sf::Color( 0, 0, 255, 100 ) );
 
     std::unique_ptr<TextNode> name( new TextNode( fonts, data.name ) );
     this->mLabel = name.get( );
-    this->mLabel->setColor( sf::Color( 255, 0, 255, 255 ) );
+    this->mLabel->setColor( sf::Color( 255, 0, 0, 255 ) );
     this->mLabel->getText( )->setCharacterSize( 10 );
-    this->mLabel->setPosition( 8, -10 );
+    this->mLabel->setPosition( 27, 20 );
     this->attachChild( std::move( name ) );
 
     // WarpsMap data here!! i.e where to warp to...
-    std::cout << mName << "Set to warp to " << Table[WarpMap.at( mName )].x << ", " <<  Table[WarpMap.at( mName )].y << std::endl;
     mNewPosition = sf::Vector2f( Table[WarpMap.at( mName )].x, Table[WarpMap.at( mName )].y );
 }
 

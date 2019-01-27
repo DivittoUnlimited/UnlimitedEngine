@@ -48,6 +48,12 @@ bool Actor::isMarkedForRemoval( ) const
     return false;
 }
 
+bool Actor::isDestroyed( void ) const
+{
+    // By default, scene node needn't be removed
+    return false;
+}
+
 void Actor::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
     target.draw( mSprite, states );

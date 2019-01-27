@@ -98,7 +98,7 @@ bool matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Category::
     {
         return true;
     }
-    else if ( type1 & category2 && type2 & category1 )
+    else if( type1 & category2 && type2 & category1 )
     {
         std::swap( colliders.first, colliders.second );
         return true;
@@ -205,7 +205,6 @@ void World::buildScene( )
                  auto object = layer.objects.at( i );
                  if( object.type == "Player" )
                  {
-
                      std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
                      this->mPlayer = actor.get( );
                      node.get( )->attachChild( std::move( actor ) );
@@ -231,8 +230,6 @@ void World::buildScene( )
             }
                 mSceneLayers.push_back( node.get( ) );
                 mSceneGraph.attachChild( std::move( node ) );
-
-
         }
         else if( map.layers[i].type == "imageLayer" )
         {
@@ -250,135 +247,6 @@ void World::buildScene( )
             mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
         }
     }
-
-
-
-/*
-    struct Tile {
-        std::string texID;
-        sf::Rect<int> rect;
-    };
-
-    std::vector<Tile> tiles = std::vector<Tile>( );
-    tiles.push_back( Tile() );
-    tiles[0].texID = "NONE";
-    tiles[0].rect = sf::Rect<int>( 0, 0, 16, 16 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
-
-    for( unsigned int i = 0; i < map.tileSets.size(); ++i )
-    {
-        // define loops to divide up image
-        unsigned int y = 0;
-        unsigned int x = 0;
-        unsigned int tileWidth = map.tileSets[i].tileWidth;
-        unsigned int tileHeight =  map.tileSets[i].tileHeight;
-        std::string name = map.tileSets[i].name;
-
-        while( y < ( map.tileSets[i].imageHeight - tileHeight) )
-        {
-            while( x < map.tileSets[i].imageWidth )
-            {
-                // Create tile
-                Tile tile;
-                tile.texID = name;
-                tile.rect = sf::Rect<int>( x, y, tileWidth, tileHeight );
-                // add tile to set of possible tiles to use later it's index in vector is it's id as found in testMap.lua
-                tiles.push_back( tile );
-                x += tileWidth;
-            }
-            x = 0;
-            y += tileHeight;
-        }
-    }
-
-    for( unsigned int i = 0; i < map.layers.size(); ++i )
-    {
-        auto layer = map.layers[i];
-        if( layer.type == "tilelayer" )
-        {
-            // Create Layer
-            SceneNode::Ptr node( new SceneNode( Category::TileLayer ) );
-
-            // use tiles vector to build layer
-            unsigned int x = 0;
-            unsigned int y = 0;
-            for( unsigned int k = 0; k < layer.data.size(); ++k )
-            {
-                //std::cout << "Layer.data[" << k << "] == " << layer.data[k] << std::endl;
-                if( layer.data[k] != 0 )
-                {
-
-                    // Create Sprite Node using appropriate tile and then add it to the layer dont forget to add layer to the graph!!!!!!
-                    std::unique_ptr<SpriteNode> newTile( new SpriteNode( mTextures.get( TextureMap.at( tiles[layer.data[k]].texID ) ) ) );
-                    // edit tile for placement
-                    newTile->getSprite( )->setTextureRect( tiles[layer.data[k]].rect );
-                    newTile->setPosition( x, y );
-                    node->attachChild( std::move( newTile ) );
-                }
-                // move down the row to the left unless at the left most side in which case move down to the next row and start at the begining again
-                if ( x < ( (layer.width-1) * tiles[layer.data[k]].rect.width) )
-                    x += tiles[layer.data[k]].rect.width;
-                else
-                {
-                    x = 0;
-                    y += tiles[layer.data[k]].rect.height;
-                }
-            }
-            mSceneLayers.push_back( node.get( ) );
-            mSceneGraph.attachChild( std::move( node ) );
-        }
-
-        else if( layer.type == "objectgroup" )
-        {
-            SceneNode::Ptr node( new SceneNode( Category::ObjectLayer ) );
-            // Build loop through all objects
-            for( unsigned int i = 0; i < layer.objects.size(); ++i )
-            {
-                auto object = layer.objects.at( i );
-                if( object.type == "Player" )
-                {
-                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                    this->mPlayer = actor.get( );
-                    node.get( )->attachChild( std::move( actor ) );
-                }
-                else if( object.type == "Wall" )
-                {
-                    std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
-                    node.get( )->attachChild( std::move( wall ) );
-                }else if( object.type == "Warp" )
-                {
-                    std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mFonts ) );
-                    node.get( )->attachChild( std::move( warp ) );
-                }else if( object.type == "Actor" )
-                {
-                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                    node.get( )->attachChild( std::move( actor ) );
-                }else if( object.type == "Item" )
-                {
-                    // std::unique_ptr<Item> item( new Item( ) );
-                    // node.get( )->attachChild( std::move( item ) );
-                }else
-                    std::cout << "Invalid object being loaded from tile map" << std::endl;
-             }
-            mSceneLayers.push_back( node.get( ) );
-            mSceneGraph.attachChild( std::move( node ) );
-        }
-        else if( layer.type == "imagelayer" )
-        {
-            // Create Layer
-            SceneNode::Ptr node( new SceneNode( Category::ImageLayer ) );
-            mSceneLayers[i] = node.get( );
-            mSceneGraph.attachChild( std::move( node ) );
-
-            // load texture for use by SpriteNode
-            sf::Texture& texture = mTextures.get( TextureMap.at( layer.name ) );
-            texture.setSmooth( true );
-
-            // Create SpriteNode to hold image attach to layer node
-            std::unique_ptr<SpriteNode> backgroundImage( new SpriteNode( texture ) );
-            mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
-        }
-    }
-    */
     ///
     ///
     /// Where does the level init happen??
@@ -387,7 +255,7 @@ void World::buildScene( )
 
 
     /*
-    /// HEY FUCK FACE!!!!!! READ ME!!!!!
+    /// READ ME!!!!!
     ///
     ///
     ///
