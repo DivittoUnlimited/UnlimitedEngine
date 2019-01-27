@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <set>
@@ -24,7 +25,6 @@ class SceneNode : public sf::Transformable, public sf::Drawable, private sf::Non
 {
 public:
     typedef std::unique_ptr<SceneNode> Ptr;
-    //typedef std::pair<SceneNode*, SceneNode*> Pair;
 
     explicit SceneNode( Category::Type type = Category::None );
 

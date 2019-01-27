@@ -208,4 +208,7 @@ DISTFILES += \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Notes.txt \
     TiledMapReader.lua \
-    Game/Levels/Greenville.lua
+    Game/Levels/Greenville.lua \
+    Game/Resources/Actors.lua \
+    Game/Resources/Items.lua \
+    Game/Resources/Warps.lua
