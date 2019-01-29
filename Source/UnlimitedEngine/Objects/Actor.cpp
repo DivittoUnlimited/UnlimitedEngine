@@ -12,6 +12,7 @@ Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, con
     , mSprite( textures.get( texID ), texRect )
     , mName( data.name )
     , mDirectionIndex( 0 )
+    , mCanSpeak( true )
 {
     // std::cout << "Actor name: " << mName << std::endl;
     centerOrigin( mSprite );
@@ -63,6 +64,16 @@ void Actor::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
     updateMovementPattern( dt );
     Entity::updateCurrent( dt, commands );
+}
+
+void Actor::handleAction( void )
+{
+    // call actions in order of there priority in the game world
+            // i.e speaking to NPC will be triggered before opening a warp
+
+
+    // For now just start a DialogState if within range of npc
+    std::cout << "This could have been a dialog state!" << std::endl;
 }
 
 void Actor::updateMovementPattern( sf::Time dt )

@@ -33,7 +33,7 @@ Player::Player( )
     mKeyBinding[sf::Keyboard::Right]    = MoveRight;
     mKeyBinding[sf::Keyboard::Up]       = MoveUp;
     mKeyBinding[sf::Keyboard::Down]     = MoveDown;
-    //mKeyBinding[sf::Keyboard::Space]    = Fire;
+    mKeyBinding[sf::Keyboard::Space]    = ActionButton;
     //mKeyBinding[sf::Keyboard::M]        = LaunchMissile;
     //mKeyBinding[sf::Keyboard::LShift]   = TurnAround;
 
@@ -70,7 +70,7 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
             //std::cout << "button 1(A) activated" << std::endl;
             break;
         case 2:
-            // commands.push( mActionBinding[Fire] );
+             commands.push( mActionBinding[ActionButton] );
              //std::cout << "button 2(B) activated" << std::endl;
             break;
         case 3:
@@ -152,7 +152,7 @@ void Player::initializeActions( )
     mActionBinding[MoveRight].action     = derivedAction<Actor>( ActorMover( +1,  0 ) );
     mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0, +1 ) );
     mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, -1 ) );
-    // mActionBinding[Fire].action          = derivedAction<Aircraft>( [] ( Aircraft& a, sf::Time) { a.fire( ); } );
+    mActionBinding[ActionButton].action  = derivedAction<Actor>( [] ( Actor& a, sf::Time) { a.handleAction( ); } );
     // mActionBinding[LaunchMissile].action = derivedAction<Aircraft>( [] ( Aircraft& a, sf::Time ) { a.launchMissile( ); } );
     // mActionBinding[TurnAround].action    = derivedAction<Aircraft>( []( Aircraft&, sf::Time ) { if( FLIP_GAMEPLAY ) FLIP_GAMEPLAY = false; else FLIP_GAMEPLAY = true; } );
 }

@@ -32,7 +32,12 @@ public:
     virtual void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
     virtual void updateCurrent( sf::Time dt, CommandQueue& commands );
 
+    void handleAction( void );
+
     void updateMovementPattern( sf::Time dt );
+
+    bool speak( void ) { return mCanSpeak; }
+    void speak( bool flag ) { mCanSpeak = flag; }
 
     std::string type( void ) { return mType; }
     float speed( void ) { return mSpeed; }
@@ -46,6 +51,8 @@ private:
     std::size_t     mDirectionIndex;
     TextNode*       mLabel;
     float           mSpeed;
+    bool            mCanSpeak;
+
 };
 
 #endif // ACTOR_HPP

@@ -30,7 +30,6 @@ SOURCES += \
     Core/TextNode.cpp \
     Core/Utility.cpp \
     Core/Utility.inl \
-    Core/World.cpp \
     Gui/Button.cpp \
     Gui/Component.cpp \
     Gui/Container.cpp \
@@ -81,7 +80,8 @@ SOURCES += \
     Objects/Item.cpp \
     Objects/Warp.cpp \
     Core/RectangleShapeNode.cpp \
-    Core/VertexArrayNode.cpp
+    Core/VertexArrayNode.cpp \
+    States/DialogState.cpp
 
 HEADERS += \
     Core/Animation.hpp \
@@ -111,7 +111,6 @@ HEADERS += \
     Core/StateStack.hpp \
     Core/TextNode.hpp \
     Core/Utility.hpp \
-    Core/World.hpp \
     Gui/Button.hpp \
     Gui/Component.hpp \
     Gui/Container.hpp \
@@ -155,7 +154,8 @@ HEADERS += \
     Objects/Item.hpp \
     Objects/Warp.hpp \
     Core/RectangleShapeNode.hpp \
-    Core/VertexArrayNode.hpp
+    Core/VertexArrayNode.hpp \
+    States/DialogState.hpp
 
 DISTFILES += \
     Game/Application.lua \

@@ -20,7 +20,7 @@ public:
         MoveRight,
         MoveUp,
         MoveDown,
-        Fire,
+        ActionButton,
         TurnAround,
         LaunchMissile,
         ActionCount

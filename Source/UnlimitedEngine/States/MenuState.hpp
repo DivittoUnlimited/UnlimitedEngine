@@ -12,10 +12,10 @@ class MenuState : public State
 {
 public:
     MenuState( States::ID id, StateStack& stack, Context context );
-    ~MenuState();
-    virtual void draw();
-    virtual bool update(sf::Time dt);
-    virtual bool handleEvent(const sf::Event& event);
+    ~MenuState( void );
+    virtual void draw( void );
+    virtual bool update( sf::Time dt );
+    virtual bool handleEvent( const sf::Event& event );
 
 private:
     sf::Text       mTitleText;
