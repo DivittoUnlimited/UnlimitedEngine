@@ -3,7 +3,6 @@
 
 #include "State.hpp"
 #include "DataTables.hpp"
-#include "World.hpp"
 #include "ResourceIdentifiers.hpp"
 #include "Core/SoundPlayer.hpp"
 

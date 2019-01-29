@@ -3,6 +3,7 @@
 #include "Core/ResourceManager.hpp"
 #include "Core/DataTables.hpp"
 #include "Core/MusicPlayer.hpp"
+#include "Core/Globals.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>

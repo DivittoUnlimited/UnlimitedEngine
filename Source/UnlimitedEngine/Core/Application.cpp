@@ -10,6 +10,7 @@
 #include "States/SettingsState.hpp"
 #include "States/GameState.hpp"
 #include "States/SplashScreen.hpp"
+#include "States/DialogState.hpp"
 #include "DataTables.hpp"
 #include "Globals.hpp"
 
@@ -42,7 +43,7 @@ Application::Application( )
     mStatisticsText.setCharacterSize( 10u );
 
     registerStates( );
-    mStateStack.pushState( States::Loading );
+    mStateStack.pushState( States::Menu );
 }
 
 Application::~Application( void )
@@ -120,5 +121,6 @@ void Application::registerStates( )
     mStateStack.registerState<GameState>        ( States::Game              );
     mStateStack.registerState<PauseState>       ( States::Pause             );
     mStateStack.registerState<SettingsState>    ( States::Settings          );
+    mStateStack.registerState<DialogState>      ( States::Dialog            );
 }
 

@@ -1,5 +1,6 @@
 #include "ResourceManager.hpp"
-
+#include "SFML/Graphics/Texture.hpp"
+#include "SFML/Graphics/Font.hpp"
 template <typename Resource>
 void ResourceManager<Resource>::load( unsigned int id, const std::string& filename )
 {
