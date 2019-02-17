@@ -3,7 +3,7 @@
 
 #include "ResourceManager.hpp"
 #include "ResourceIdentifiers.hpp"
-
+#include "DialogNode.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -24,7 +24,6 @@ class Actor;
 class Trigger;
 class Item;
 
-extern std::string CurrentLuaFile;
 
 struct Direction
 {
@@ -64,6 +63,10 @@ struct WarpData {
 
 struct ItemData {
 
+};
+
+struct ConversationData {
+    std::vector<DialogNode> conversationBranches;
 };
 
 static std::map<std::string, unsigned int> TextureMap;
@@ -213,11 +216,12 @@ static std::map<std::string, unsigned  int> buildResourceMap( std::string fileNa
     return t;
 }
 
-static std::map<std::string, unsigned int> ParticleMap    = buildResourceMap( "Game/Resources/Particles.lua" );
-static std::map<std::string, unsigned int> AnimationMap   = buildResourceMap( "Game/Resources/Animations.lua" );
-static std::map<std::string, unsigned int> ActorMap       = buildResourceMap( "Game/Resources/Actors.lua" );
-static std::map<std::string, unsigned int> WarpMap        = buildResourceMap( "Game/Resources/Warps.lua" );
-static std::map<std::string, unsigned int> ItemMap        = buildResourceMap( "Game/Resources/Items.lua" );
+static std::map<std::string, unsigned int> ParticleMap      = buildResourceMap( "Game/Resources/Particles.lua" );
+static std::map<std::string, unsigned int> AnimationMap     = buildResourceMap( "Game/Resources/Animations.lua" );
+static std::map<std::string, unsigned int> ActorMap         = buildResourceMap( "Game/Resources/Actors.lua" );
+static std::map<std::string, unsigned int> WarpMap          = buildResourceMap( "Game/Resources/Warps.lua" );
+static std::map<std::string, unsigned int> ItemMap          = buildResourceMap( "Game/Resources/Items.lua" );
+static std::map<std::string, unsigned int> ConversationMap  = buildResourceMap( "Game/Resources/Conversations.lua" );
 
 static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorData> {
         std::vector<ActorData> data( ActorMap.size( ) );
@@ -243,7 +247,6 @@ static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorDat
                     lua_getfield( L, -1, "path" );
                     if( lua_istable( L, -1 ) )
                     {
-                        unsigned int index = 0;
                         lua_pushnil( L );
                         while( lua_next(L , -2 ) != 0 )
                         {
@@ -260,7 +263,6 @@ static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorDat
                                 data[i->second].directions.push_back( Direction( v[0], v[1] ) );
                                 lua_pop( L, 1 ); // anon vector
                             } else std::cout << "Error reading actor path data" << std::endl;
-                            index++;
                         }
                         lua_pop( L, 1 ); // "path" table
                     }
@@ -342,7 +344,7 @@ static std::vector<ItemData> initializeItemData = []() -> std::vector<ItemData> 
     return data;
 }( );
 
-static std::vector<ParticleData> initializeParticleData = []() -> std::vector<ParticleData> {
+static std::vector<ParticleData> initializeParticleData = []( ) -> std::vector<ParticleData> {
     std::vector<ParticleData> data( ParticleMap.size( ) );
 
         /*
@@ -397,7 +399,7 @@ static std::vector<ParticleData> initializeParticleData = []() -> std::vector<Pa
                 */
     return data;
 }( ); // initializeParticleData
-static std::vector<AnimationData> initializeAnimationData = []() -> std::vector<AnimationData> {
+static std::vector<AnimationData> initializeAnimationData = []( ) -> std::vector<AnimationData> {
     std::vector<AnimationData> data( AnimationMap.size( ) );
     /*
     lua_State* L = luaL_newstate();
@@ -455,5 +457,82 @@ static std::vector<AnimationData> initializeAnimationData = []() -> std::vector<
 */
     return data;
 }( ); // initializeAnimationData
+
+static std::vector<ConversationData> initializeConversationData = []( ) -> std::vector<ConversationData> {
+        std::vector<ConversationData> data( ConversationMap.size( ) );
+        lua_State* L = luaL_newstate( );
+        luaL_openlibs(L);
+        lua_getglobal( L, "debug" );
+        lua_getfield( L, -1, "traceback" );
+        lua_replace( L, -2 );
+        luaL_loadfile( L, "Game/Resources/Conversations.lua" );
+        if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+            luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+            std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+            throw( lua_tostring( L, -1 ) );
+        }
+        if( lua_istable( L, -1 ) ) // Anon table
+        {
+            for( auto i = ConversationMap.begin( ); i != ConversationMap.end( ); ++i )
+            {
+                lua_getfield( L, -1, i->first.c_str( ) );
+                if( lua_istable( L, -1 ) ) // Conversation Definition
+                {
+                    // Get Conversation node Array.
+                    std::vector<DialogNode> v;
+
+                    lua_pushnil( L );
+                    while( lua_next(L , -2 ) != 0 )
+                    {
+                        std::string text;
+                        std::vector<std::pair<std::string, int>> responses;
+                        if( lua_istable( L, -1 ) )
+                        {
+                            lua_getfield( L, -1, "dialog" );
+                            if( lua_isstring( L, -1 ) ) text = lua_tostring( L, -1 ); else text = "ERROR1";
+                            lua_pop( L, 1 ); // text
+                            lua_getfield( L, -1, "responses" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                // Read in anon response table array
+                                lua_pushnil( L );
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    if( lua_istable( L, -1 ) )
+                                    {
+                                        std::pair<std::string, int> data;
+
+                                        lua_getfield( L, -1, "text" );
+                                        if( lua_isstring( L, -1 ) ) data.first = lua_tostring( L, -1 ); else data.first = "ERROR2";
+                                        lua_pop( L, 1 ); // text
+
+                                        lua_getfield( L, -1, "link" );
+                                        if( lua_isnumber( L, -1 ) ) data.second = (int)lua_tonumber( L, -1 );
+                                        lua_pop( L, 1 ); // link
+
+                                        responses.push_back( data );
+                                    }
+                                    lua_pop( L, 1 ); // data pair object.
+                                }
+                            }
+                            else std::cout << "ERROR reading responses for: " << i->first.c_str( ) << std::endl;
+                            lua_pop( L, 1 ); // Responses table
+                        } else std::cout << "Error reading ConversationData" << std::endl;
+                        lua_pop( L, 1 ); // DialogNode
+                        v.push_back( DialogNode( text, responses ) );
+                    }
+
+                    data[i->second].conversationBranches = v;
+
+                    lua_pop( L, 1 ); // nil value to traverse convo Links
+                }
+                lua_pop( L, 1 ); // defintion table
+            }
+
+        }else std::cout << "Error reading Conversations.lua" << std::endl;
+        lua_pop( L, 1 ); // anon table
+        lua_close( L );
+        return data;
+}( ); // initializeConversationData
 
 #endif // DATATABLES_HPP

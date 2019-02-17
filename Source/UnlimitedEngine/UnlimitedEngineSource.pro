@@ -65,7 +65,6 @@ SOURCES += \
     Core/TextNode.cpp \
     Core/Utility.cpp \
     Core/Utility.inl \
-    Core/World.cpp \
     States/GameState.cpp \
     States/LoadingState.cpp \
     States/MenuState.cpp \
@@ -83,7 +82,10 @@ SOURCES += \
     Objects/Item.cpp \
     Objects/Wall.cpp \
     Objects/Warp.cpp \
-    Core/RectangleShapeNode.cpp
+    Core/RectangleShapeNode.cpp \
+    Gui/MessageBoxNode.cpp \
+    Gui/ResponseSelector.cpp \
+    States/MessageBoxState.cpp
 
 HEADERS += \
     lua/lapi.h \
@@ -138,7 +140,6 @@ HEADERS += \
     Core/StateStack.hpp \
     Core/TextNode.hpp \
     Core/Utility.hpp \
-    Core/World.hpp \
     States/GameState.hpp \
     States/LoadingState.hpp \
     States/MenuState.hpp \
@@ -158,7 +159,11 @@ HEADERS += \
     Objects/Item.hpp \
     Objects/Wall.hpp \
     Objects/Warp.hpp \
-    Core/RectangleShapeNode.hpp
+    Core/RectangleShapeNode.hpp \
+    Gui/MessageBoxNode.hpp \
+    Core/DialogNode.hpp \
+    Gui/ResponseSelector.hpp \
+    States/MessageBoxState.hpp
 
 DISTFILES += \
     Media/Sansation.ttf \
@@ -211,4 +216,5 @@ DISTFILES += \
     Game/Levels/Greenville.lua \
     Game/Resources/Actors.lua \
     Game/Resources/Items.lua \
-    Game/Resources/Warps.lua
+    Game/Resources/Warps.lua \
+    Game/Resources/Conversations.lua

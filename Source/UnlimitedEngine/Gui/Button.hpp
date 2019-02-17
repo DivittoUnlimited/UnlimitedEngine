@@ -23,23 +23,24 @@ public:
     typedef std::shared_ptr<Button>		Ptr;
     typedef std::function<void()>		Callback;
 
-    Button(const FontManager& fonts, const TextureManager& textures);
+    Button( const FontManager& fonts, const TextureManager& textures );
 
-    void	 setCallback(Callback callback);
-    void	 setText(const std::string& text);
-    void	 setToggle(bool flag);
+    void	 setCallback( Callback callback );
+    void	 setText( const std::string& text );
+    void	 setToggle( bool flag );
 
-    virtual bool isSelectable() const;
-    virtual void select();
-    virtual void deselect();
+    virtual bool isSelectable( void ) const;
+    virtual void select( void );
+    virtual void deselect( void );
 
-    virtual void activate();
-    virtual void deactivate();
+    virtual void activate( void );
+    virtual void deactivate( void );
 
-    virtual void handleEvent(const sf::Event& event);
+    virtual void handleEvent( const sf::Event& event );
 
 private:
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    virtual void draw( sf::RenderTarget& target, sf::RenderStates states ) const;
+
     //## Attributes
     Callback           mCallback;
     const sf::Texture& mTexture;

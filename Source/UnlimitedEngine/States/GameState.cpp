@@ -33,7 +33,7 @@ GameState::~GameState( )
     lua_getglobal( L, "debug" );
     lua_getfield( L, -1, "traceback" );
     lua_replace( L, -2 );
-    luaL_loadfile( L, CurrentLuaFile.c_str() );
+    luaL_loadfile( L, "Game/Game.lua" );
     if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
         luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
         std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
@@ -82,7 +82,7 @@ GameState::~GameState( )
                 lua_pop( L ,1 );
             }
         }
-    } else std::cout << "Error reading " << CurrentLuaFile.c_str( ) << " data table" << std::endl;
+    } else std::cout << "Error reading Game.lua data table" << std::endl;
     lua_close( L );
 }
 
@@ -116,7 +116,6 @@ bool GameState::update( sf::Time dt )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     mSceneGraph.update( dt, mCommandQueue );
     handleCollisions( );
-
 
     mPlayer.handleRealtimeInput( mCommandQueue );
 
@@ -184,17 +183,16 @@ void GameState::handleCollisions( )
             auto& player = static_cast<Actor&>( *pair.first );
             auto& npc = static_cast<Actor&>( *pair.second );
 
-            ///
-            /// Need to add timer or something so that when you exit the dialog state the fact that the player and the npc are still colliding does not cause another dialog state to pop up!!!!
-            ///
-
             if( npc.speak( ) )
             {
+
                 npc.speak( false );
-                requestStackPush( States::Dialog );
+
+                npc.setVelocity( 0.0f, 0.0f );
+                player.setVelocity( 0.0f, 0.0f );
+
+                requestStackPush( States::MessageBox );
             }
-
-
         }
         else {
             std::cout << "Error occured while checking Collision something is being checked that shouldn't be!" << std::endl;

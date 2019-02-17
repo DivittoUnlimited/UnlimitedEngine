@@ -19,10 +19,10 @@ void Container::pack( Component::Ptr component )
     mChildren.push_back( component );
 
     if( !hasSelection( ) && component->isSelectable( ) )
-        select(mChildren.size( ) - 1 );
+        select( mChildren.size( ) - 1 );
 }
 
-bool Container::isSelectable( ) const
+bool Container::isSelectable( void ) const
 {
     return false;
 }
@@ -32,10 +32,10 @@ void Container::handleEvent( const sf::Event& event )
     // If we have selected a child then give it events
     if( hasSelection( ) && mChildren[mSelectedChild]->isActive( ) )
         mChildren[mSelectedChild]->handleEvent( event );
-	else if (event.type == sf::Event::KeyReleased)
+    else if( event.type == sf::Event::KeyReleased )
 	{
         if( event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up )
-            selectPrevious();
+            selectPrevious( );
         else if( event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down )
             selectNext( );
         else if( event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Space )
@@ -47,7 +47,7 @@ void Container::handleEvent( const sf::Event& event )
         if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 ) // up
             selectNext( );
         else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
-            selectPrevious();
+            selectPrevious( );
     }
     else if( event.type == sf::Event::JoystickButtonPressed )
         if( hasSelection( ) )
@@ -79,7 +79,7 @@ void Container::select( std::size_t index )
 	}
 }
 
-void Container::selectNext( )
+void Container::selectNext( void )
 {
     if( !hasSelection( ) )
 		return;
@@ -94,7 +94,7 @@ void Container::selectNext( )
     select( next );
 }
 
-void Container::selectPrevious( )
+void Container::selectPrevious( void )
 {
     if( !hasSelection( ) )
 		return;
@@ -107,6 +107,12 @@ void Container::selectPrevious( )
 
 	// Select that component
     select( prev );
+}
+
+void Container::clear( void )
+{
+    this->mChildren.clear( );
+    this->mSelectedChild = -1;
 }
 
 }

@@ -13,6 +13,7 @@ Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, con
     , mName( data.name )
     , mDirectionIndex( 0 )
     , mCanSpeak( true )
+    , mCanMove( true )
 {
     // std::cout << "Actor name: " << mName << std::endl;
     centerOrigin( mSprite );
@@ -25,7 +26,7 @@ Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, con
     this->attachChild( std::move( name ) );
 
     this->setPosition( data.x, data.y );
-    this->mSpeed = 20;
+    this->mSpeed = 2;
 
     // ActorsMap data here!!
 
@@ -62,7 +63,8 @@ void Actor::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) con
 
 void Actor::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
-    updateMovementPattern( dt );
+    if( mCanMove )
+        updateMovementPattern( dt );
     Entity::updateCurrent( dt, commands );
 }
 

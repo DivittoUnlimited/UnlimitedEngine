@@ -38,6 +38,8 @@ public:
 
     bool speak( void ) { return mCanSpeak; }
     void speak( bool flag ) { mCanSpeak = flag; }
+    bool canMove( void ) { return mCanMove; }
+    void canMove( bool canMove ) { this->mCanMove = canMove; }
 
     std::string type( void ) { return mType; }
     float speed( void ) { return mSpeed; }
@@ -52,7 +54,7 @@ private:
     TextNode*       mLabel;
     float           mSpeed;
     bool            mCanSpeak;
-
+    bool            mCanMove;
 };
 
 #endif // ACTOR_HPP

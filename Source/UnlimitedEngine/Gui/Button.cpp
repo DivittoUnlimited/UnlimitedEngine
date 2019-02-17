@@ -19,7 +19,7 @@ Button::Button( const FontManager& fonts, const TextureManager& textures )
 , mPressed(  0, 100, 200, 50 )
 , mSprite()
 , mText( "", fonts.get( FontMap.at( "Default" ) ), 16 )
-, mIsToggle(false)
+, mIsToggle( false )
 {
     mSprite.setTexture( mTexture );
     mSprite.setTextureRect( mNormal );
