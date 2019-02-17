@@ -81,7 +81,8 @@ SOURCES += \
     Objects/Warp.cpp \
     Core/RectangleShapeNode.cpp \
     Core/VertexArrayNode.cpp \
-    States/DialogState.cpp
+    Gui/MessageBoxNode.cpp \
+    Gui/ResponseNode.cpp
 
 HEADERS += \
     Core/Animation.hpp \
@@ -155,7 +156,8 @@ HEADERS += \
     Objects/Warp.hpp \
     Core/RectangleShapeNode.hpp \
     Core/VertexArrayNode.hpp \
-    States/DialogState.hpp
+    Gui/MessageBoxNode.hpp \
+    Gui/ResponseNode.hpp
 
 DISTFILES += \
     Game/Application.lua \

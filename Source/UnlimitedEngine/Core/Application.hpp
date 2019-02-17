@@ -29,20 +29,18 @@ private:
     //## Attributes
     static const sf::Time TimePerFrame;
 
-
     // Engine Resources
     sf::RenderWindow	  mWindow;
 
     TextureManager		  mTextures;
     FontManager  		  mFonts;
-    Player				  mPlayer;
+    Player   			  mPlayer;
     MusicPlayer           mMusic;
     SoundPlayer           mSoundEffects;
 
     // Game FSM
     State::Context        mContext;
     StateStack			  mStateStack;
-
 
     // Debuging info
     std::size_t			  mStatisticsNumFrames;
@@ -55,12 +53,14 @@ private:
     /// \brief processInput
     /// Handle any user input or other world events that occur.
     void processInput( );
+
     ///
     /// \brief update
     /// update the world logic for this frame in the game loop
     /// \param elapsedTime
     /// the time since the last time this method was called.
     void update( sf::Time dt );
+
     ///
     /// \brief render
     /// Clear the screen, draw the world to buffer, and then display to screen.
@@ -71,6 +71,7 @@ private:
     /// \param elapsedTime
     /// The time since the last time this method was called.
     void updateStatistics( sf::Time dt );
+
     ///
     /// \brief registerStates
     /// Register all possible states for later use

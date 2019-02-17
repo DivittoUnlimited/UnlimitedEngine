@@ -14,20 +14,20 @@ class Container : public Component
 public:
     typedef std::shared_ptr<Container> Ptr;
 
-    Container();
+    Container( void );
 
-    void         pack(Component::Ptr component);
+    void pack(Component::Ptr component);
 
-    virtual bool isSelectable() const;
-    virtual void handleEvent(const sf::Event& event);
+    virtual bool isSelectable( void ) const;
+    virtual void handleEvent( const sf::Event& event );
+    bool hasSelection( void ) const;
+    void select( std::size_t index );
+    void selectNext( void );
+    void selectPrevious( void );
+    void clear( void );
 
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
-    bool hasSelection() const;
-    void select(std::size_t index);
-    void selectNext();
-    void selectPrevious();
 
     //## Attributes
     std::vector<Component::Ptr>	mChildren;

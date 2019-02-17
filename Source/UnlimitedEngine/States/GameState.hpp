@@ -21,6 +21,8 @@
 #include "Objects/Warp.hpp"
 #include "Objects/Wall.hpp"
 
+#include "Gui/MessageBoxNode.hpp"
+
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>

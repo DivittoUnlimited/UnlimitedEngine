@@ -19,7 +19,7 @@ LoadingState::LoadingState( States::ID id, StateStack& stack, Context context )
     mLoadingText->setPosition( WINDOW_WIDTH / 2, 300 );
     centerOrigin( *mLoadingText );
 
-    mLoadingTask.execute( context, CurrentLuaFile.c_str() );
+    mLoadingTask.execute( context, "Game/Game.lua" );
 }
 
 void LoadingState::draw( )

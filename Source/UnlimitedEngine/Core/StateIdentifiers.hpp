@@ -15,9 +15,9 @@ namespace States
         Settings,
         GameOver,
         Loading,
-        Dialog,
         HighScoreState,
         GetNameState,
+        MessageBox,
         StartLevelState
 	};
 }

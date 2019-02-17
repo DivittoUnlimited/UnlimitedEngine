@@ -55,10 +55,10 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStateClear( );
 	});
 
-    mGUIContainer.pack( playButton );
-    //mGUIContainer.pack( settingsButton );
-    mGUIContainer.pack( exitButton );
 
+    //mGUIContainer.pack( settingsButton );
+    mGUIContainer.pack( playButton );
+    mGUIContainer.pack( exitButton );
 }
 
 MenuState::~MenuState()

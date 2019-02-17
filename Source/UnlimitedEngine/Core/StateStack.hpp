@@ -33,26 +33,26 @@ public:
 
     //## Interface
     template <typename T>
-    void registerState(States::ID stateID );
+    void registerState( States::ID stateID );
 
     void update(sf::Time dt);
-    void draw();
-    void handleEvent(const sf::Event& event);
+    void draw( );
+    void handleEvent( const sf::Event& event );
 
-    void pushState(States::ID stateID);
-    void popState();
-    void clearStates();
+    void pushState( States::ID stateID );
+    void popState( );
+    void clearStates( );
 
-    bool isEmpty() const;
+    bool isEmpty( ) const;
 
 private:
     //## Behaviors
-    State::Ptr	createState(States::ID stateID);
-    void		applyPendingChanges();
+    State::Ptr	createState( States::ID stateID );
+    void		applyPendingChanges( );
 
     struct PendingChange
     {
-        explicit PendingChange(Action action, States::ID stateID = States::None);
+        explicit PendingChange( Action action, States::ID stateID = States::None );
 
         Action	   action;
         States::ID stateID;
@@ -66,11 +66,11 @@ private:
 };
 
 template <typename T>
-void StateStack::registerState(States::ID stateID )
+void StateStack::registerState( States::ID stateID )
 {
-    mFactories[stateID] = [=] ()
+    mFactories[stateID] = [=] ( )
 	{
-        return State::Ptr(new T( stateID, *this, mContext ) );
+        return State::Ptr( new T( stateID, *this, mContext ) );
 	};
 }
 
