@@ -46,6 +46,7 @@ public:
     virtual sf::FloatRect	getBoundingRect( ) const;
     virtual bool			isMarkedForRemoval( ) const;
     virtual bool			isDestroyed( ) const;
+    void                    buildList( std::vector<SceneNode*>& objs );
 
 private:
     virtual void			updateCurrent( sf::Time dt, CommandQueue& commands );

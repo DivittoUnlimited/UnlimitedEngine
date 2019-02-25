@@ -15,6 +15,7 @@
 #include "Core/BloomEffect.hpp"
 #include "Core/Globals.hpp"
 #include "Core/Player.hpp"
+#include "Core/CollisionMan.hpp"
 
 #include "Objects/Actor.hpp"
 #include "Objects/Item.hpp"
