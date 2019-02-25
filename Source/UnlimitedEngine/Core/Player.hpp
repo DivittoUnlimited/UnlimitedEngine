@@ -4,22 +4,13 @@
 #include "Command.hpp"
 #include <SFML/Window/Event.hpp>
 #include <map>
-#include "Gui/Container.hpp"
 
 class CommandQueue;
 
 class Player
 {
 public:
-    /// \brief The InputMode enum
-    /// The seperate schemes of input that the player uses to control the game/world.
-    enum InputMode
-    {
-        AvatarController,
-        MenuNavogator,
-        MessageBoxInput,
-        InputCount
-    };
+    ///
     /// \brief The Action enum
     /// All possible Actions the user can make in the game world. These are linked with the button map the user uses as well as the engine
     /// event system.
@@ -29,16 +20,13 @@ public:
         MoveRight,
         MoveUp,
         MoveDown,
-        ActionButton,
+        Fire,
+        TurnAround,
+        LaunchMissile,
         ActionCount
     };
 
-    struct InputData {
-        std::map<sf::Keyboard::Key, Action>	mKeyBinding;    // user modifiable map of key inputs and their corresponding game action
-        std::map<Action, Command>			mActionBinding; // a map that links game actions and the Commands (events) they invoke.
-    };
-
-    Player( void );
+    Player();
     ///
     /// \brief handleEvent
     /// Translate user input into game useable commands
@@ -62,6 +50,7 @@ public:
     /// The action that requires a new key
     /// \param key
     /// the new key that will invoke the given action
+    ///
     void assignKey(Action action, sf::Keyboard::Key key);
     ///
     /// \brief getAssignedKey
@@ -71,19 +60,12 @@ public:
     /// \return
     /// sf::Keyboard enum
     sf::Keyboard::Key getAssignedKey( Action action ) const;
-    ///
-    /// \brief changeInputMode
-    /// Switch between the controller setup for moving the avatar or a menu etc..
-    /// \param input
-    /// the type of input to switch to all possible inputs listed in the InputMode ennum above.
-    void changeInputMode( InputMode input = InputMode::AvatarController );
 
-    InputMode getInputMode( void ) const { return mSchemeName; }
 private:
     ///
     /// \brief initializeActions
     /// Links Game commands to the players keybinded actions. i.e MoveLeft: AircraftMover( -speed, 0 )
-    void initializeActions( InputMode mode, InputData& data );
+    void initializeActions( );
     ///
     /// \brief isRealtimeAction
     /// Checks if the given action can be read in real time and returns result.
@@ -91,12 +73,11 @@ private:
     /// the action in query
     /// \return
     /// bool result
-    bool isRealtimeAction( Action action );
+    static bool	isRealtimeAction( Action action );
 
     //## Attributes
-    InputData*              mCurrentScheme;
-    std::vector<InputData>  mSchemes;
-    InputMode               mSchemeName;
+    std::map<sf::Keyboard::Key, Action>	mKeyBinding;    // user modifiable map of key inputs and their corresponding game action
+    std::map<Action, Command>			mActionBinding; // a map that links game actions and the Commands (events) they invoke.
 };
-
 #endif // PLAYER_HPP
+

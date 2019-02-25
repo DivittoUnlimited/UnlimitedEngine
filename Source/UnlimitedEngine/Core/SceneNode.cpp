@@ -173,6 +173,16 @@ bool SceneNode::isDestroyed( void ) const
     return false;
 }
 
+void SceneNode::buildList( std::vector<SceneNode*>& objs )
+{
+    for( const Ptr& child : mChildren )
+    {
+        child->buildList( objs );
+    }
+    objs.push_back( this );
+}
+
+
 bool collision( const SceneNode& lhs, const SceneNode& rhs )
 {
     return lhs.getBoundingRect( ).intersects( rhs.getBoundingRect ( ) );

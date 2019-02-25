@@ -85,7 +85,8 @@ SOURCES += \
     Core/RectangleShapeNode.cpp \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
-    States/MessageBoxState.cpp
+    States/MessageBoxState.cpp \
+    Core/CollisionMan.cpp
 
 HEADERS += \
     lua/lapi.h \
@@ -163,7 +164,8 @@ HEADERS += \
     Gui/MessageBoxNode.hpp \
     Core/DialogNode.hpp \
     Gui/ResponseSelector.hpp \
-    States/MessageBoxState.hpp
+    States/MessageBoxState.hpp \
+    Core/CollisionMan.hpp
 
 DISTFILES += \
     Media/Sansation.ttf \

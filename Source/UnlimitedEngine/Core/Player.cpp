@@ -1,22 +1,10 @@
-
-
-///
-/// IF YOU CAN READ THIS YOU STILL NEED TO REVERT INPUT BACK TO ONLY AVATAR CONTROLLER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/// DO IT!
-
 #include "Player.hpp"
 #include "CommandQueue.hpp"
-
 
 #include <map>
 #include <string>
 #include <algorithm>
 #include "Objects/Actor.hpp"
-#include "Gui/MessageBoxNode.hpp"
-
-
-//static const unsigned int maxSpeed = 10;
-
 
 ///
 /// \brief The ActorMover struct
@@ -25,57 +13,45 @@ struct ActorMover
 {
     ActorMover( float vx, float vy )
     : velocity( vx, vy )
-	{
-	}
+    {
+    }
     void operator( )( Actor& actor, sf::Time ) const
     {
         actor.accelerate( velocity * actor.speed( ) );
-	}
-	sf::Vector2f velocity;
+    }
+    sf::Vector2f velocity;
 };
 
 Player::Player( )
-    : mCurrentScheme( )
-    , mSchemes( )
 {
+    // Set initial key bindings
+    mKeyBinding[sf::Keyboard::Left]     = MoveLeft;
+    mKeyBinding[sf::Keyboard::Right]    = MoveRight;
+    mKeyBinding[sf::Keyboard::Up]       = MoveUp;
+    mKeyBinding[sf::Keyboard::Down]     = MoveDown;
+    //mKeyBinding[sf::Keyboard::Space]    = Fire;
+    //mKeyBinding[sf::Keyboard::M]        = LaunchMissile;
+    //mKeyBinding[sf::Keyboard::LShift]   = TurnAround;
 
-    for( unsigned int i = 0; i < Player::InputMode::InputCount; ++i )
-    {
-        InputData data;
+    // Set initial action bindings
+    initializeActions( );
 
-        // Set initial key bindings
-        data.mKeyBinding[sf::Keyboard::Left]     = MoveLeft;
-        data.mKeyBinding[sf::Keyboard::Right]    = MoveRight;
-        data.mKeyBinding[sf::Keyboard::Up]       = MoveUp;
-        data.mKeyBinding[sf::Keyboard::Down]     = MoveDown;
-        data.mKeyBinding[sf::Keyboard::Space]    = ActionButton;
-        //mKeyBinding[sf::Keyboard::M]        = LaunchMissile;
-        //mKeyBinding[sf::Keyboard::LShift]   = TurnAround;
+    // Assign all categories to player's aircraft
 
-        // Set initial action bindings
-        initializeActions( (InputMode)i, data );
-
-        // Assign all categories to player's aircraft
-
-        for( auto& pair : data.mActionBinding )
-            pair.second.category = Category::Player;
-
-        mSchemes.push_back( data );
-    }
-    mCurrentScheme = &mSchemes[InputMode::AvatarController];
-    mSchemeName = InputMode::AvatarController;
+    for( auto& pair : mActionBinding )
+        pair.second.category = Category::Player;
 }
 
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
-{  
+{
     if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 )
-        commands.push( mCurrentScheme->mActionBinding[MoveUp] );
+        commands.push( mActionBinding[MoveUp] );
     else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
-        commands.push( mCurrentScheme->mActionBinding[MoveDown] );
+        commands.push( mActionBinding[MoveDown] );
     if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position > 0 )
-        commands.push( mCurrentScheme->mActionBinding[MoveRight] );
+        commands.push( mActionBinding[MoveRight] );
     else if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position < 0 )
-        commands.push( mCurrentScheme->mActionBinding[MoveLeft] );
+        commands.push( mActionBinding[MoveLeft] );
 
     if( event.type == sf::Event::JoystickButtonReleased )
     {
@@ -90,7 +66,7 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
             //std::cout << "button 1(A) activated" << std::endl;
             break;
         case 2:
-             commands.push( mCurrentScheme->mActionBinding[ActionButton] );
+            // commands.push( mActionBinding[Fire] );
              //std::cout << "button 2(B) activated" << std::endl;
             break;
         case 3:
@@ -125,40 +101,40 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
     else if( event.type == sf::Event::KeyPressed )
     {
         // Check if pressed key appears in key binding, trigger command if so
-        auto found = mCurrentScheme->mKeyBinding.find( event.key.code );
-        if( found != mCurrentScheme->mKeyBinding.end( ) && !isRealtimeAction( found->second ) )
-            commands.push(mCurrentScheme-> mActionBinding[found->second] );
+        auto found = mKeyBinding.find( event.key.code );
+        if( found != mKeyBinding.end( ) && !isRealtimeAction( found->second ) )
+            commands.push( mActionBinding[found->second] );
     }
 }
 
 void Player::handleRealtimeInput( CommandQueue& commands )
 {
     // Traverse all assigned keys and check if they are pressed
-    for( auto pair : mCurrentScheme->mKeyBinding )
+    for( auto pair : mKeyBinding )
     {
         // If key is pressed, lookup action and trigger corresponding command
         if( sf::Keyboard::isKeyPressed( pair.first ) && isRealtimeAction( pair.second ) )
-            commands.push( mCurrentScheme->mActionBinding[pair.second] );
-    }    
+            commands.push( mActionBinding[pair.second] );
+    }
 }
 
 void Player::assignKey( Action action, sf::Keyboard::Key key )
 {
     // Remove all keys that already map to action
-    for( auto itr = mCurrentScheme->mKeyBinding.begin( ); itr != mCurrentScheme->mKeyBinding.end( ); )
+    for( auto itr = mKeyBinding.begin( ); itr != mKeyBinding.end( ); )
     {
         if( itr->second == action )
-            mCurrentScheme->mKeyBinding.erase( itr++ );
+            mKeyBinding.erase( itr++ );
         else
             ++itr;
     }
     // Insert new binding
-    mCurrentScheme->mKeyBinding[key] = action;
+    mKeyBinding[key] = action;
 }
 
 sf::Keyboard::Key Player::getAssignedKey( Action action ) const
 {
-    for( auto pair : mCurrentScheme->mKeyBinding )
+    for( auto pair : mKeyBinding )
     {
         if( pair.second == action )
             return pair.first;
@@ -166,55 +142,29 @@ sf::Keyboard::Key Player::getAssignedKey( Action action ) const
     return sf::Keyboard::Unknown;
 }
 
-void Player::changeInputMode( InputMode input  )
+void Player::initializeActions( )
 {
-    // Debug only remove whole switch
-    this->mCurrentScheme = &mSchemes[input];
-    this->mSchemeName = input;
-    switch( input ) {
-        case AvatarController: std::cout << "InputMode set to: AvatarController"   << std::endl; break;
-        case MenuNavogator:    std::cout << "InputMode set to: MennuNavigator"     << std::endl; break;
-        case MessageBoxInput:  std::cout << "InputMode set to: MessageBox"         << std::endl; break;
-        default:               std::cout << "Invalid input mode has been selectd!" << std::endl; break;
-    }
-}
-
-void Player::initializeActions( InputMode mode, InputData& data )
-{
-    switch( mode )
-    {
-        case AvatarController:
-            data.mActionBinding[MoveLeft].action      = derivedAction<Actor>( ActorMover( -1,  0 ) );
-            data.mActionBinding[MoveRight].action     = derivedAction<Actor>( ActorMover( +1,  0 ) );
-            data.mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0, -1 ) );
-            data.mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, +1 ) );
-            data.mActionBinding[ActionButton].action  = derivedAction<Actor>( [] ( Actor& a, sf::Time) { a.handleAction( ); } );
-        break;
-        case MenuNavogator:
-            data.mActionBinding[ActionButton].action  = derivedAction<Actor>( [] ( Actor&, sf::Time) { std::cout << "MenuNavigator action button in use!" << std::endl; } );
-        break;
-        case MessageBoxInput:
-
-        break;
-        case InputCount:
-        default:
-        std::cout << "Invalid Input Scheme Attempted. Player::initializeActions( )" << std::endl;
-    }
+    mActionBinding[MoveLeft].action      = derivedAction<Actor>( ActorMover( -1,  0 ) );
+    mActionBinding[MoveRight].action     = derivedAction<Actor>( ActorMover( +1,  0 ) );
+    mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0, +1 ) );
+    mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, -1 ) );
+    // mActionBinding[Fire].action          = derivedAction<Aircraft>( [] ( Aircraft& a, sf::Time) { a.fire( ); } );
+    // mActionBinding[LaunchMissile].action = derivedAction<Aircraft>( [] ( Aircraft& a, sf::Time ) { a.launchMissile( ); } );
+    // mActionBinding[TurnAround].action    = derivedAction<Aircraft>( []( Aircraft&, sf::Time ) { if( FLIP_GAMEPLAY ) FLIP_GAMEPLAY = false; else FLIP_GAMEPLAY = true; } );
 }
 
 bool Player::isRealtimeAction( Action action )
 {
-    if( mSchemeName == InputMode::AvatarController )
-        switch( action )
-        {
-            case MoveLeft:
-            case MoveRight:
-            case MoveDown:
-            case MoveUp:
-            case ActionButton:
-                return true;
-            default:
-                return false;
-        }
-    return false;
+    switch( action )
+    {
+        case MoveLeft:
+        case MoveRight:
+        case MoveDown:
+        case MoveUp:
+        //case Fire:
+        //case TurnAround:
+            return true;
+        default:
+            return false;
+    }
 }

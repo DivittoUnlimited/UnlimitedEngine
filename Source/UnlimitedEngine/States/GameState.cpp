@@ -94,7 +94,7 @@ void GameState::draw( )
 
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
-
+        //mSceneTexture.draw( mQuadTree ); DELETE ME ONCE COLLISIONMAN WORKS!!!!!
         mSceneTexture.display( );
 
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
@@ -162,8 +162,8 @@ bool GameState::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders,
 
 void GameState::handleCollisions( )
 {
-    std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs;
-    mSceneGraph.checkSceneCollision( *mSceneLayers[LayerMap.at( "ObjectLayer" )], collisionPairs );
+    CollisionMan::QUAD_TREE.setRootRect( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT ); // mod this to move with player!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs = CollisionMan::update( mSceneLayers[LayerMap.at( "ObjectLayer" )] );
 
     for( std::pair<SceneNode*, SceneNode*> pair : collisionPairs )
     {
@@ -183,14 +183,11 @@ void GameState::handleCollisions( )
             auto& player = static_cast<Actor&>( *pair.first );
             auto& npc = static_cast<Actor&>( *pair.second );
 
-            if( npc.speak( ) )
+            if( npc.speak( ) ) /// This still needs a LOT of love but im trying to fix QuadTree first, this works as decent  test for that for now
             {
-
                 npc.speak( false );
-
                 npc.setVelocity( 0.0f, 0.0f );
                 player.setVelocity( 0.0f, 0.0f );
-
                 requestStackPush( States::MessageBox );
             }
         }
