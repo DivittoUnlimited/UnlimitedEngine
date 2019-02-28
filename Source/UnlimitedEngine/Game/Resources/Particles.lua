@@ -1,11 +1,17 @@
 
 return {
     Map = {
+          PortalEffect        = 0;
         --MissilePropellant   = 0;
         --AircraftPropellant  = 1;
         --MissileSmoke        = 2;
         --AircraftSmoke       = 3;
         --DamageSmoke         = 4;
+    };
+
+    PortalEffect = {
+        color          = { 0, 0, 255 }; -- does not need alpha value
+        lifetime       = 5000;          -- millisecs
     };
 --    MissilePropellant   = {
 --        color           = { 255, 150, 0 };

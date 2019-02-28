@@ -16,6 +16,7 @@
 #include "Core/Globals.hpp"
 #include "Core/Player.hpp"
 #include "Core/CollisionMan.hpp"
+#include "Core/EmitterNode.hpp"
 
 #include "Objects/Actor.hpp"
 #include "Objects/Item.hpp"

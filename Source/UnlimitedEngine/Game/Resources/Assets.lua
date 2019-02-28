@@ -4,10 +4,11 @@ return {
     Textures = {
         DivittoUnlimitedLogo = 0;
         Default              = 1;
-        Buttons              = 2;
+        Particle             = 2;
+        Buttons              = 3;
         -- Demo
-        tiles                = 3;
-        trainers             = 4;
+        tiles                = 4;
+        trainers             = 5;
     };
 
     SoundEffects = {

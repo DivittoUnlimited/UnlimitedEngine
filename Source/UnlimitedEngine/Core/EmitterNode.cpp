@@ -1,14 +1,14 @@
 #include "Core/EmitterNode.hpp"
-//#include "Core/ParticleNode.hpp"
+#include "Core/ParticleNode.hpp"
 #include "Core/CommandQueue.hpp"
 #include "Core/Command.hpp"
 #include <iostream> // debuggin only
 
-EmitterNode::EmitterNode( unsigned int type)
+EmitterNode::EmitterNode( unsigned int type )
 : SceneNode(  )
 , mAccumulatedTime(sf::seconds( 5.f ) )
-, mType(type)
-, mParticleSystem(nullptr)
+, mType( type )
+, mParticleSystem( nullptr )
 {
 }
 
@@ -23,7 +23,7 @@ void EmitterNode::updateCurrent( sf::Time dt, CommandQueue& commands )
 		// Find particle node with the same type as emitter node
         auto finder = [this] ( ParticleNode& container, sf::Time )
 		{
-            if( container.getParticleType() == mType )
+            if( container.getParticleType( ) == mType )
 				mParticleSystem = &container;
 		};
 
@@ -45,6 +45,6 @@ void EmitterNode::emitParticles( sf::Time dt )
     while( mAccumulatedTime > interval )
     {
         mAccumulatedTime -= interval;
-        //mParticleSystem->addParticle( getWorldPosition( ) );
+        mParticleSystem->addParticle( getWorldPosition( ) );
     }
 }

@@ -6,6 +6,7 @@ return {
     };
 
     Red = {
+        walkUp = "RedWalkUp";
         path = { };
     };
 

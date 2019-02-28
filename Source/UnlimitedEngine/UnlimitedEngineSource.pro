@@ -219,4 +219,6 @@ DISTFILES += \
     Game/Resources/Actors.lua \
     Game/Resources/Items.lua \
     Game/Resources/Warps.lua \
-    Game/Resources/Conversations.lua
+    Game/Resources/Conversations.lua \
+    Media/Textures/trainers.png \
+    Media/Textures/tiles.png
