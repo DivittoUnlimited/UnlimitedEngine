@@ -2,6 +2,7 @@ return {
     Textures = {
                     [0] = "DivittoUnlimitedLogo"
                     ,     "Default"
+                    ,     "Particle"
                     ,     "tiles"
                     ,     "trainers"
     };
@@ -14,6 +15,7 @@ return {
     SoundEffects        = {
     };
     Particles = {
+        [0] = "PortalEffect"
     };
 
     PlayerTexture       = "Default";

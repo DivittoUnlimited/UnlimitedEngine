@@ -13,20 +13,18 @@
 class ParticleNode : public SceneNode
 {
 	public:
-                                ParticleNode(unsigned int type, const TextureManager& textures);
+                                ParticleNode( unsigned int type, const TextureManager& textures );
 
-		void					addParticle(sf::Vector2f position);
-        unsigned int			getParticleType() const;
-		virtual unsigned int	getCategory() const;
-
+        void					addParticle( sf::Vector2f position );
+        unsigned int			getParticleType( ) const;
+        virtual unsigned int	getCategory( ) const;
 
 	private:
-		virtual void			updateCurrent(sf::Time dt, CommandQueue& commands);
-		virtual void			drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
+        virtual void			updateCurrent( sf::Time dt, CommandQueue& commands );
+        virtual void			drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
 		
-		void					addVertex(float worldX, float worldY, float texCoordX, float texCoordY, const sf::Color& color) const;
-		void					computeVertices() const;
-
+        void					addVertex( float worldX, float worldY, float texCoordX, float texCoordY, const sf::Color& color ) const;
+        void					computeVertices( ) const;
 
 	private:
 		std::deque<Particle>	mParticles;
@@ -37,4 +35,4 @@ class ParticleNode : public SceneNode
 		mutable bool			mNeedsVertexUpdate;
 };
 
-#endif // BOOK_PARTICLENODE_HPP
+#endif // PARTICLENODE_HPP

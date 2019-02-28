@@ -118,14 +118,6 @@ void CollisionMan::Node::clear( void ) {
 }
 // ===========================================================================
 // ===========================================================================
-/// QuadTree
-
-///
-
-/// Bust out the good book and learn smart pointers for all these nodss this is cuaseing a memory leak!
-
-///
-
 
 //## Constructor
 CollisionMan::QuadTree::QuadTree( float x, float y, float width, float height ) {

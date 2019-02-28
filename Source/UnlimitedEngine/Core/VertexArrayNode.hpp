@@ -12,7 +12,7 @@
 class VertexArrayNode : public SceneNode
 {
 public:
-    explicit VertexArrayNode( void );
+    explicit VertexArrayNode( Category::Type = Category::TileLayer );
     bool load( sf::Texture tex, sf::Vector2u tileSize, std::vector<unsigned int> tiles, unsigned int width, unsigned int height );
 
 private:

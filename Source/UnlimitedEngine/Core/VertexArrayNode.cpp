@@ -1,7 +1,8 @@
 #include "VertexArrayNode.hpp"
 #include <SFML/Graphics/RenderTarget.hpp>
 
-VertexArrayNode::VertexArrayNode( void )
+VertexArrayNode::VertexArrayNode( Category::Type type )
+    : SceneNode( type )
 {
 }
 

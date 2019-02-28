@@ -346,8 +346,6 @@ static std::vector<ItemData> initializeItemData = []() -> std::vector<ItemData> 
 
 static std::vector<ParticleData> initializeParticleData = []( ) -> std::vector<ParticleData> {
     std::vector<ParticleData> data( ParticleMap.size( ) );
-
-        /*
         lua_State* L = luaL_newstate();
         luaL_openlibs(L);
         lua_getglobal( L, "debug" );
@@ -396,12 +394,10 @@ static std::vector<ParticleData> initializeParticleData = []( ) -> std::vector<P
         }else std::cout << "Error reading Projectiles.lua" << std::endl;
 
         lua_close( L );
-                */
     return data;
 }( ); // initializeParticleData
 static std::vector<AnimationData> initializeAnimationData = []( ) -> std::vector<AnimationData> {
     std::vector<AnimationData> data( AnimationMap.size( ) );
-    /*
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
     lua_getglobal( L, "debug" );
@@ -454,7 +450,7 @@ static std::vector<AnimationData> initializeAnimationData = []( ) -> std::vector
         lua_pop( L, 1 ); // anon table
     }else std::cout << "Error reading Projectiles.lua" << std::endl;
     lua_close( L );
-*/
+
     return data;
 }( ); // initializeAnimationData
 

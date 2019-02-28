@@ -10,6 +10,7 @@ return {
     Textures = {
         [Tex.DivittoUnlimitedLogo]  = "Media/Textures/DivittoUnlimitedLogo1024X768.png";
         [Tex.Default]               = "Media/Textures/Default.png";
+        [Tex.Particle]              = "Media/Textures/Particle.png";
         [Tex.Buttons]               = "Media/Textures/Buttons.png";
 
         -- Demo

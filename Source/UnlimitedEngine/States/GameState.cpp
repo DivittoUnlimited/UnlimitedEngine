@@ -94,13 +94,12 @@ void GameState::draw( )
 
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
-        //mSceneTexture.draw( mQuadTree ); DELETE ME ONCE COLLISIONMAN WORKS!!!!!
         mSceneTexture.display( );
 
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
 
         mTarget.draw( sf::Sprite( mWindowSprite ) );
-        // mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
+        mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
     }
     else
     {
@@ -199,6 +198,12 @@ void GameState::handleCollisions( )
 
 void GameState::buildScene( )
 {
+    ///
+    ///
+    /// Where does the level init happen??
+    ///     - refering to when there are more then one level and not just a single "world"
+    ///     - See flow chart on your phone.
+
     // load TiledMap
     std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
     Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/Greenville.lua" ); //mContext.TiledMapFilePath );
@@ -244,12 +249,25 @@ void GameState::buildScene( )
         if( map.layers[i].type == "tilelayer" )
         {
             auto tileSets = map.tileSets[0];
-            std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( ) );
-            if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
-                std::cout << "ERROR loading TiledMap! BuildScene ln: 155" << std::endl;
-            else {
-                mSceneLayers.push_back( layer.get( ) );
-                mSceneGraph.attachChild( std::move( layer ) );
+            if( map.layers[i].name == "TileLayer3" )
+            {
+                std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( Category::ParticleLayer ) );
+                if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
+                    std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
+                else {
+                    mSceneLayers.push_back( layer.get( ) );
+                    mSceneGraph.attachChild( std::move( layer ) );
+                }
+            }
+            else
+            {
+                std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( Category::TileLayer ) );
+                if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
+                    std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
+                else {
+                    mSceneLayers.push_back( layer.get( ) );
+                    mSceneGraph.attachChild( std::move( layer ) );
+                }
             }
         }
         else if( map.layers[i].type == "objectgroup" )
@@ -272,7 +290,7 @@ void GameState::buildScene( )
                      node.get( )->attachChild( std::move( wall ) );
                  }else if( object.type == "Warp" )
                  {
-                     std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mFonts ) );
+                     std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mTextures, mFonts ) );
                      node.get( )->attachChild( std::move( warp ) );
                  }else if( object.type == "Actor" )
                  {
@@ -304,23 +322,6 @@ void GameState::buildScene( )
             mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
         }
     }
-    ///
-    ///
-    /// Where does the level init happen??
-    ///     - refering to when there are more then one level and not just a single "world"
-    ///     - See flow chart on your phone.
-
-
-    /*
-    /// READ ME!!!!!
-    ///
-    ///
-    ///
-    /// Why is this done here and not with the rest of the assets in the load state?
-    /// This needs to be handled way better!!!!
-    ///
-    ///
-    ///
     lua_State* L = luaL_newstate( );
     luaL_openlibs( L );
 
@@ -342,14 +343,14 @@ void GameState::buildScene( )
             lua_pushnil( L );
             while( lua_next( L, -2 ) != 0 )
             {
-                //std::unique_ptr<ParticleNode> node( new ParticleNode( ParticleMap.at( lua_tostring( L, -1 ) ), mTextures ) );
-                //mSceneLayers[LowerAir]->attachChild( std::move( node ) );
+                std::unique_ptr<ParticleNode> node( new ParticleNode( ParticleMap.at( lua_tostring( L, -1 ) ), mTextures ) );
+                mSceneLayers[LayerMap.at( "TileLayer2" )]->attachChild( std::move( node ) );
                 lua_pop( L, 1 );
             }
         }
         lua_pop( L, 1 ); // Particles table
     }
     lua_close( L );
-    */
+
 }
 

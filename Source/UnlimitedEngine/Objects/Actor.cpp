@@ -30,6 +30,10 @@ Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, con
 
     // ActorsMap data here!!
 
+    // Animation data
+    /// make data structure to hold all possible animations this
+    /// actor might have and then load them from the AnimationsMap/Table
+
 }
 
 unsigned int Actor::getCategory( ) const
@@ -53,6 +57,7 @@ bool Actor::isMarkedForRemoval( ) const
 bool Actor::isDestroyed( void ) const
 {
     // By default, scene node needn't be removed
+    /// return hitPoints > 0 or something........
     return false;
 }
 

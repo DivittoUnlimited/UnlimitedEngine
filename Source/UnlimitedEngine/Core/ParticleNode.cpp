@@ -13,14 +13,15 @@ namespace
     const std::vector<ParticleData> Table = initializeParticleData;
 }
 
-ParticleNode::ParticleNode( unsigned int type, const TextureManager& textures)
-: SceneNode()
-, mParticles()
-, mTexture(textures.get( TextureMap.at( "Particle" ) ) )
-, mType(type)
+ParticleNode::ParticleNode( unsigned int type, const TextureManager& textures )
+: SceneNode( )
+, mParticles( )
+, mTexture( textures.get( TextureMap.at( "Particle" ) ) )
+, mType( type )
 , mVertexArray( sf::Quads )
 , mNeedsVertexUpdate( true )
 {
+
 }
 
 void ParticleNode::addParticle( sf::Vector2f position )
@@ -30,20 +31,20 @@ void ParticleNode::addParticle( sf::Vector2f position )
 	particle.color = Table[mType].color;
     particle.lifetime = Table[mType].lifetime;
 
-	mParticles.push_back(particle);
+    mParticles.push_back( particle );
 }
 
-unsigned int ParticleNode::getParticleType() const
+unsigned int ParticleNode::getParticleType( ) const
 {
 	return mType;
 }
 
-unsigned int ParticleNode::getCategory() const
+unsigned int ParticleNode::getCategory( ) const
 {
 	return Category::ParticleSystem;	
 }
 
-void ParticleNode::updateCurrent(sf::Time dt, CommandQueue&)
+void ParticleNode::updateCurrent( sf::Time dt, CommandQueue& )
 {
 	// Remove expired particles at beginning
     while( !mParticles.empty( ) && mParticles.front( ).lifetime <= sf::Time::Zero )
@@ -57,11 +58,11 @@ void ParticleNode::updateCurrent(sf::Time dt, CommandQueue&)
 	mNeedsVertexUpdate = true;
 }
 
-void ParticleNode::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
+void ParticleNode::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
-	if (mNeedsVertexUpdate)
+    if( mNeedsVertexUpdate )
 	{
-		computeVertices();
+        computeVertices( );
 		mNeedsVertexUpdate = false;
 	}
 
@@ -69,20 +70,20 @@ void ParticleNode::drawCurrent(sf::RenderTarget& target, sf::RenderStates states
 	states.texture = &mTexture;
 	
 	// Draw vertices
-	target.draw(mVertexArray, states);
+    target.draw( mVertexArray, states );
 }
 
-void ParticleNode::addVertex(float worldX, float worldY, float texCoordX, float texCoordY, const sf::Color& color) const
+void ParticleNode::addVertex( float worldX, float worldY, float texCoordX, float texCoordY, const sf::Color& color ) const
 {
 	sf::Vertex vertex;
-	vertex.position = sf::Vector2f(worldX, worldY);
-	vertex.texCoords = sf::Vector2f(texCoordX, texCoordY);
+    vertex.position = sf::Vector2f( worldX, worldY );
+    vertex.texCoords = sf::Vector2f( texCoordX, texCoordY );
 	vertex.color = color;
 
-	mVertexArray.append(vertex);
+    mVertexArray.append( vertex );
 }
 
-void ParticleNode::computeVertices() const
+void ParticleNode::computeVertices( ) const
 {
     sf::Vector2f size( mTexture.getSize( ) );
 	sf::Vector2f half = size / 2.f;

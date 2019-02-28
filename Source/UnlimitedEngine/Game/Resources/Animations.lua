@@ -2,8 +2,17 @@ local textures = require( "Game/Resources/Assets" ).Textures;
 
 return {
     Map = {
-        --Explosion             = 0;
+        RedWalkUp = 0;
     };
+
+RedWalkUp = {
+    texture         = textures.trainers;
+    frameSize       = { 32, 32 };
+    numFrames       = 3;
+    currentFrame    = 0;
+    duration        = 1000; -- millisecs
+    isRepeated      = true;
+};
 
 --Explosion = {
 --    texture         = textures.Explosion;

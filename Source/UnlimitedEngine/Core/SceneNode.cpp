@@ -177,9 +177,11 @@ void SceneNode::buildList( std::vector<SceneNode*>& objs )
 {
     for( const Ptr& child : mChildren )
     {
-        child->buildList( objs );
+        if( child->getCategory() != Category::ParticleSystem )
+            child->buildList( objs );
     }
-    objs.push_back( this );
+    if( this->getCategory() != Category::ParticleSystem )
+        objs.push_back( this );
 }
 
 

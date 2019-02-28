@@ -26,7 +26,8 @@ public:
         ActionCount
     };
 
-    Player();
+    Player( void );
+
     ///
     /// \brief handleEvent
     /// Translate user input into game useable commands
@@ -34,7 +35,6 @@ public:
     /// a system event such as a key press or window resize
     /// \param commands
     /// The list of game commands to be handled this frame. Gets generated from system events.
-    ///
     void handleEvent( const sf::Event& event, CommandQueue& commands );
     ///
     /// \brief handleRealtimeInput

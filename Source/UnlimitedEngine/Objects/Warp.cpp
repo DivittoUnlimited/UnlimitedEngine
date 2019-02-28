@@ -1,12 +1,14 @@
 #include "Warp.hpp"
 #include "Core/Utility.hpp"
 
+#include "Core/EmitterNode.hpp"
+
 namespace
 {
     const auto Table = initializeWarpData; // Gives access to the data in Warps.lua
 }
 
-Warp::Warp( Tiled::Object data, sf::RectangleShape sprite, const FontManager& fonts )
+Warp::Warp( Tiled::Object data, sf::RectangleShape sprite, const TextureManager& textures, const FontManager& fonts )
     : mName( data.name )
     , mSprite( sprite )
 {
@@ -20,6 +22,16 @@ Warp::Warp( Tiled::Object data, sf::RectangleShape sprite, const FontManager& fo
     this->mLabel->getText( )->setCharacterSize( 10 );
     this->mLabel->setPosition( 27, 20 );
     this->attachChild( std::move( name ) );
+
+    mCreateParticleEffectCommand.category = Category::ParticleLayer;
+    mCreateParticleEffectCommand.action = [this, &textures] ( SceneNode& node, sf::Time )
+    {
+        /// \brief propellant
+        /// This shit causes major frame rate issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        std::unique_ptr<EmitterNode> propellant( new EmitterNode( ParticleMap.at( "PortalEffect" ) ) );
+        propellant->setPosition( this->getBoundingRect().left, this->getBoundingRect().top  );
+        node.attachChild( std::move( propellant ) );
+    };
 
     // WarpsMap data here!! i.e where to warp to...
     mNewPosition = sf::Vector2f( Table[WarpMap.at( mName )].x, Table[WarpMap.at( mName )].y );
@@ -45,7 +57,9 @@ void Warp::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
     target.draw( mSprite, states );
 }
 
-void Warp::updateCurrent( sf::Time, CommandQueue& )
+void Warp::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
+    this->move( 10 * dt.asSeconds(), 0 );
+    commands.push( mCreateParticleEffectCommand );
 }
 

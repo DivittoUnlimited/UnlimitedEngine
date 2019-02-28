@@ -14,8 +14,9 @@ enum Type
     ImageLayer          = 1 << 5,
     TileLayer           = 1 << 6,
     ObjectLayer         = 1 << 7,
-    ParticleSystem		= 1 << 8,
-    SoundEffect			= 1 << 9
+    ParticleSystem      = 1 << 8,
+    ParticleLayer		= 1 << 9,
+    SoundEffect			= 1 << 10
 };
 
 }

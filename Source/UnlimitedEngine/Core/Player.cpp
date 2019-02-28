@@ -22,7 +22,7 @@ struct ActorMover
     sf::Vector2f velocity;
 };
 
-Player::Player( )
+Player::Player( void )
 {
     // Set initial key bindings
     mKeyBinding[sf::Keyboard::Left]     = MoveLeft;
@@ -45,9 +45,9 @@ Player::Player( )
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 {
     if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 )
-        commands.push( mActionBinding[MoveUp] );
-    else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
         commands.push( mActionBinding[MoveDown] );
+    else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
+        commands.push( mActionBinding[MoveUp] );
     if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position > 0 )
         commands.push( mActionBinding[MoveRight] );
     else if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position < 0 )
@@ -146,8 +146,8 @@ void Player::initializeActions( )
 {
     mActionBinding[MoveLeft].action      = derivedAction<Actor>( ActorMover( -1,  0 ) );
     mActionBinding[MoveRight].action     = derivedAction<Actor>( ActorMover( +1,  0 ) );
-    mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0, +1 ) );
-    mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, -1 ) );
+    mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0, -1 ) );
+    mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, +1 ) );
     // mActionBinding[Fire].action          = derivedAction<Aircraft>( [] ( Aircraft& a, sf::Time) { a.fire( ); } );
     // mActionBinding[LaunchMissile].action = derivedAction<Aircraft>( [] ( Aircraft& a, sf::Time ) { a.launchMissile( ); } );
     // mActionBinding[TurnAround].action    = derivedAction<Aircraft>( []( Aircraft&, sf::Time ) { if( FLIP_GAMEPLAY ) FLIP_GAMEPLAY = false; else FLIP_GAMEPLAY = true; } );
