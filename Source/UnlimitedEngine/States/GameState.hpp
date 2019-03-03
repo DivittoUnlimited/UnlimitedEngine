@@ -22,6 +22,7 @@
 #include "Objects/Item.hpp"
 #include "Objects/Warp.hpp"
 #include "Objects/Wall.hpp"
+#include "Objects/Cowboy.hpp"
 
 #include "Gui/MessageBoxNode.hpp"
 

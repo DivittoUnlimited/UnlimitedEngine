@@ -3,8 +3,10 @@ return {
                     [0] = "DivittoUnlimitedLogo"
                     ,     "Default"
                     ,     "Particle"
-                    ,     "tiles"
                     ,     "trainers"
+                    ,     "tiles"
+                    ,     "cowboy"
+                    ,     "SevenSunSetDemoTexture"
     };
 
 
@@ -19,6 +21,6 @@ return {
     };
 
     PlayerTexture       = "Default";
-    TiledMapFilePath    = "Game/Levels/Greenville.lua";
+    TiledMapFilePath    = "Game/Levels/SevenSunsetDemo.lua";
 
 };

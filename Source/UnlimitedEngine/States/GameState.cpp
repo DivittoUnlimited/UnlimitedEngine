@@ -206,7 +206,7 @@ void GameState::buildScene( )
 
     // load TiledMap
     std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
-    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/Greenville.lua" ); //mContext.TiledMapFilePath );
+    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/SevenSunsetDemo.lua" ); //mContext.TiledMapFilePath );
 
     struct Tile {
         std::string texID;
@@ -227,7 +227,8 @@ void GameState::buildScene( )
         unsigned int tileHeight =  map.tileSets[i].tileHeight;
         std::string name = map.tileSets[i].name;
 
-        while( y < ( map.tileSets[i].imageHeight - tileHeight) )
+        // if your map GID is not lining up you might need to manipulate how many times these loops run to get the number of tiles to run properly.
+        while( y < ( map.tileSets[i].imageHeight ) )
         {
             while( x < map.tileSets[i].imageWidth )
             {
@@ -248,7 +249,13 @@ void GameState::buildScene( )
     {
         if( map.layers[i].type == "tilelayer" )
         {
+            ///
+            /// \brief tileSets
+            /// DO NOT REMOVE ME UNTILL IT HAS BEEN DONE!!!!
+            /// This is a really lazy way to avoid having to deal with multiple image sources to build maps. It doen't work and it needs to be removed!!!!!!
+            /// there needs to be a universal way to use as many images as needed to build maps.
             auto tileSets = map.tileSets[0];
+
             if( map.layers[i].name == "TileLayer3" )
             {
                 std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( Category::ParticleLayer ) );
@@ -261,7 +268,7 @@ void GameState::buildScene( )
             }
             else
             {
-                std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( Category::TileLayer ) );
+                std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode(  ) );
                 if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
                     std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
                 else {
@@ -280,7 +287,8 @@ void GameState::buildScene( )
                  auto object = layer.objects.at( i );
                  if( object.type == "Player" )
                  {
-                     std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                     std::cout << "Tiles.size( ) " << tiles.size() << std::endl;
+                     std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
                      this->mRed = actor.get( );
                      node.get( )->attachChild( std::move( actor ) );
                  }
@@ -296,7 +304,12 @@ void GameState::buildScene( )
                  {
                     std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
                     node.get( )->attachChild( std::move( actor ) );
-                 }else if( object.type == "Item" )
+                 }else if( object.type == "Cowboy" )
+                 {
+                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                    node.get( )->attachChild( std::move( actor ) );
+                 }
+                 else if( object.type == "Item" )
                  {
                      // std::unique_ptr<Item> item( new Item( ) );
                      // node.get( )->attachChild( std::move( item ) );

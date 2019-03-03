@@ -9,6 +9,9 @@ return {
         -- Demo
         tiles                = 4;
         trainers             = 5;
+        cowboy               = 6;
+        woodTexture          = 7;
+        SevenSunSetDemoTexture   = 8;
     };
 
     SoundEffects = {

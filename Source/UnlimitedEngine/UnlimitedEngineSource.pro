@@ -86,7 +86,8 @@ SOURCES += \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
     States/MessageBoxState.cpp \
-    Core/CollisionMan.cpp
+    Core/CollisionMan.cpp \
+    Objects/Cowboy.cpp
 
 HEADERS += \
     lua/lapi.h \
@@ -165,7 +166,8 @@ HEADERS += \
     Core/DialogNode.hpp \
     Gui/ResponseSelector.hpp \
     States/MessageBoxState.hpp \
-    Core/CollisionMan.hpp
+    Core/CollisionMan.hpp \
+    Objects/Cowboy.hpp
 
 DISTFILES += \
     Media/Sansation.ttf \
@@ -221,4 +223,9 @@ DISTFILES += \
     Game/Resources/Warps.lua \
     Game/Resources/Conversations.lua \
     Media/Textures/trainers.png \
-    Media/Textures/tiles.png
+    Media/Textures/tiles.png \
+    Game/Levels/SevenSunsetDemo.lua \
+    Media/Textures/wagonWheel.png \
+    Media/Textures/woodTexture.png \
+    Media/Textures/cowboy.png \
+    Media/Textures/SevenSunSetDemoTexture.png

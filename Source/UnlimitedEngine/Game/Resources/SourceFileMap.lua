@@ -14,8 +14,11 @@ return {
         [Tex.Buttons]               = "Media/Textures/Buttons.png";
 
         -- Demo
-        [Tex.tiles]                 = "Media/Textures/tiles.png";
-        [Tex.trainers]             = "Media/Textures/trainers.png";
+        [Tex.tiles]                  = "Media/Textures/tiles.png";
+        [Tex.trainers]               = "Media/Textures/trainers.png";
+        [Tex.cowboy]                 = "Media/Textures/cowboy.png";
+        [Tex.woodTexture]            = "Media/Textures/woodTexture.png";
+        [Tex.SevenSunSetDemoTexture] = "Media/Textures/SevenSunSetDemoTexture.png";
     };
     Fonts = {
         [Font.Default]              = "Media/Sansation.ttf";

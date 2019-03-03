@@ -82,7 +82,8 @@ SOURCES += \
     Core/RectangleShapeNode.cpp \
     Core/VertexArrayNode.cpp \
     Gui/MessageBoxNode.cpp \
-    Gui/ResponseNode.cpp
+    Gui/MessageBoxNode.cpp \
+    Gui/ResponseSelector.cpp
 
 HEADERS += \
     Core/Animation.hpp \
@@ -157,7 +158,8 @@ HEADERS += \
     Core/RectangleShapeNode.hpp \
     Core/VertexArrayNode.hpp \
     Gui/MessageBoxNode.hpp \
-    Gui/ResponseNode.hpp
+    Gui/MessageBoxNode.hpp \
+    Gui/ResponseSelector.hpp
 
 DISTFILES += \
     Game/Application.lua \

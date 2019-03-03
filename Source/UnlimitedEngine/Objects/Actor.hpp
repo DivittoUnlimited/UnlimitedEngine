@@ -45,7 +45,7 @@ public:
     float speed( void ) { return mSpeed; }
     void speed( float speed ) { this->mSpeed = speed; }
 
-private:
+protected:
     std::string     mType;
     sf::Sprite      mSprite;
     std::string     mName;
