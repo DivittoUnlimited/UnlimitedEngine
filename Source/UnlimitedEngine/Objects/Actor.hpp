@@ -14,7 +14,7 @@
 #include "Core/EmitterNode.hpp"
 #include "Core/SoundNode.hpp"
 #include "Core/SoundPlayer.hpp"
-#include "Core/SpriteNode.hpp"
+//#include "Core/SpriteNode.hpp"
 
 #include "Tiled/TiledManager.hpp"
 

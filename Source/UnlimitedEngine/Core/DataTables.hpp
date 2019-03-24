@@ -44,6 +44,28 @@ struct AnimationData  {
     sf::Time duration;
     bool isRepeated;
 };
+struct Limb {
+    sf::Vector2f pos;
+    float radius;
+    sf::Color    color;
+};
+
+struct AnimationFrame {
+    AnimationFrame( void )
+    {
+    }
+    unsigned int            duration;
+    Limb                    leftArm;
+    Limb                    rightArm;
+    Limb                    leftLeg;
+    Limb                    rightLeg;
+    std::pair<float, float> spritePos; // relative to it's origin
+};
+
+struct ScriptedAnimationData {
+    std::vector<AnimationFrame> frames;
+};
+
 struct ParticleData
 {
     sf::Vector2i position;
@@ -216,12 +238,13 @@ static std::map<std::string, unsigned  int> buildResourceMap( std::string fileNa
     return t;
 }
 
-static std::map<std::string, unsigned int> ParticleMap      = buildResourceMap( "Game/Resources/Particles.lua" );
-static std::map<std::string, unsigned int> AnimationMap     = buildResourceMap( "Game/Resources/Animations.lua" );
-static std::map<std::string, unsigned int> ActorMap         = buildResourceMap( "Game/Resources/Actors.lua" );
-static std::map<std::string, unsigned int> WarpMap          = buildResourceMap( "Game/Resources/Warps.lua" );
-static std::map<std::string, unsigned int> ItemMap          = buildResourceMap( "Game/Resources/Items.lua" );
-static std::map<std::string, unsigned int> ConversationMap  = buildResourceMap( "Game/Resources/Conversations.lua" );
+static std::map<std::string, unsigned int> ParticleMap          = buildResourceMap( "Game/Resources/Particles.lua" );
+static std::map<std::string, unsigned int> AnimationMap         = buildResourceMap( "Game/Resources/Animations.lua" );
+static std::map<std::string, unsigned int> ScriptedAnimationMap = buildResourceMap( "Game/Resources/ScriptedAnimations.lua" );
+static std::map<std::string, unsigned int> ActorMap             = buildResourceMap( "Game/Resources/Actors.lua" );
+static std::map<std::string, unsigned int> WarpMap              = buildResourceMap( "Game/Resources/Warps.lua" );
+static std::map<std::string, unsigned int> ItemMap              = buildResourceMap( "Game/Resources/Items.lua" );
+static std::map<std::string, unsigned int> ConversationMap      = buildResourceMap( "Game/Resources/Conversations.lua" );
 
 static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorData> {
         std::vector<ActorData> data( ActorMap.size( ) );
@@ -275,7 +298,6 @@ static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorDat
     lua_close( L );
     return data;
 }( );
-
 static std::vector<WarpData> initializeWarpData = []() -> std::vector<WarpData> {
     std::vector<WarpData> data( WarpMap.size( ) );
     lua_State* L = luaL_newstate();
@@ -312,7 +334,6 @@ static std::vector<WarpData> initializeWarpData = []() -> std::vector<WarpData> 
     lua_close( L );
     return data;
 }( );
-
 static std::vector<ItemData> initializeItemData = []() -> std::vector<ItemData> {
     std::vector<ItemData> data( ItemMap.size( ) );
     lua_State* L = luaL_newstate();
@@ -343,7 +364,6 @@ static std::vector<ItemData> initializeItemData = []() -> std::vector<ItemData> 
     lua_close( L );
     return data;
 }( );
-
 static std::vector<ParticleData> initializeParticleData = []( ) -> std::vector<ParticleData> {
     std::vector<ParticleData> data( ParticleMap.size( ) );
         lua_State* L = luaL_newstate();
@@ -454,6 +474,186 @@ static std::vector<AnimationData> initializeAnimationData = []( ) -> std::vector
     return data;
 }( ); // initializeAnimationData
 
+static std::vector<ScriptedAnimationData> initializeScriptedAnimationData = []( ) -> std::vector<ScriptedAnimationData> {
+    std::vector<ScriptedAnimationData> data( ScriptedAnimationMap.size( ) );
+    lua_State* L = luaL_newstate( );
+    luaL_openlibs( L );
+    lua_getglobal( L, "debug" );
+    lua_getfield( L, -1, "traceback" );
+    lua_replace( L, -2 );
+    luaL_loadfile( L, "Game/Resources/ScriptedAnimations.lua" );
+    if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+        luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+        std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+        throw( lua_tostring( L, -1 ) );
+    }
+    if( lua_istable( L, -1 ) ) // Anon table
+    {        
+        for( auto i = ScriptedAnimationMap.begin( ); i != ScriptedAnimationMap.end( ); ++i )
+        {
+            lua_getfield( L, -1, i->first.c_str( ) );
+            if( lua_istable( L, -1 ) ) // ScriptedAnimation Definition
+            {
+                lua_pushnil( L );
+                while( lua_next( L, -2 ) != 0 )
+                {
+                    AnimationFrame frame = AnimationFrame( );
+                    if( lua_istable( L, -1 ) )
+                    {
+                        lua_getfield( L, -1, "duration" );
+                        if( lua_isnumber( L, -1 ) ) frame.duration = (unsigned int)lua_tonumber( L, -1 );
+                        lua_pop( L, 1 ); // duration
+                        lua_getfield( L, -1, "leftArm" );
+                        if( lua_istable( L, -1 ) )
+                        {
+                            lua_getfield( L, -1, "x" );
+                            if( lua_isnumber( L, -1 ) ) frame.leftArm.pos.x = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // x value
+                            lua_getfield( L, -1, "y" );
+                            if( lua_isnumber( L, -1 ) ) frame.leftArm.pos.y = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // y value
+                            lua_getfield( L, -1, "radius" );
+                            if( lua_isnumber( L, -1 ) ) frame.leftArm.radius = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // radius
+                            lua_getfield( L, -1, "color" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                lua_getfield( L, -1, "r" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftArm.color.r = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color red
+                                lua_getfield( L, -1, "g" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftArm.color.g = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color green
+                                lua_getfield( L, -1, "b" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftArm.color.b = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color blue
+                                lua_getfield( L, -1, "a" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftArm.color.a = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color alpha
+                            }
+                            lua_pop( L, 1 ); // color
+                        }
+                        lua_pop( L, 1 ); // leftArm
+                        lua_getfield( L, -1, "rightArm" );
+                        if( lua_istable( L, -1 ) )
+                        {
+                            lua_getfield( L, -1, "x" );
+                            if( lua_isnumber( L, -1 ) ) frame.rightArm.pos.x = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // x value
+                            lua_getfield( L, -1, "y" );
+                            if( lua_isnumber( L, -1 ) ) frame.rightArm.pos.y = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // y value
+                            lua_getfield( L, -1, "radius" );
+                            if( lua_isnumber( L, -1 ) ) frame.rightArm.radius = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // radius
+                            lua_getfield( L, -1, "color" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                lua_getfield( L, -1, "r" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightArm.color.r = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color red
+                                lua_getfield( L, -1, "g" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightArm.color.g = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color green
+                                lua_getfield( L, -1, "b" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightArm.color.b = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color blue
+                                lua_getfield( L, -1, "a" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightArm.color.a = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color alpha
+                            }
+                            lua_pop( L, 1 ); // color
+                        }
+                        lua_pop( L, 1 ); // rightArm
+                        lua_getfield( L, -1, "leftLeg" );
+                        if( lua_istable( L, -1 ) )
+                        {
+                            lua_getfield( L, -1, "x" );
+                            if( lua_isnumber( L, -1 ) ) frame.leftLeg.pos.x = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // x value
+                            lua_getfield( L, -1, "y" );
+                            if( lua_isnumber( L, -1 ) ) frame.leftLeg.pos.y = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // y value
+                            lua_getfield( L, -1, "radius" );
+                            if( lua_isnumber( L, -1 ) ) frame.leftLeg.radius = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // radius
+                            lua_getfield( L, -1, "color" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                lua_getfield( L, -1, "r" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftLeg.color.r = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color red
+                                lua_getfield( L, -1, "g" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftLeg.color.g =(float) lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color green
+                                lua_getfield( L, -1, "b" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftLeg.color.b = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color blue
+                                lua_getfield( L, -1, "a" );
+                                if( lua_isnumber( L, -1 ) ) frame.leftLeg.color.a = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color alpha
+                            }
+                            lua_pop( L, 1 ); // color
+                        }
+                        lua_pop( L, 1 ); // leftArm
+                        lua_getfield( L, -1, "rightLeg" );
+                        if( lua_istable( L, -1 ) )
+                        {
+                            lua_getfield( L, -1, "x" );
+                            if( lua_isnumber( L, -1 ) ) frame.rightLeg.pos.x = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // x value
+                            lua_getfield( L, -1, "y" );
+                            if( lua_isnumber( L, -1 ) ) frame.rightLeg.pos.y = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // y value
+                            lua_getfield( L, -1, "radius" );
+                            if( lua_isnumber( L, -1 ) ) frame.rightLeg.radius = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // radius
+                            lua_getfield( L, -1, "color" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                lua_getfield( L, -1, "r" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightLeg.color.r = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color red
+                                lua_getfield( L, -1, "g" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightLeg.color.g = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color green
+                                lua_getfield( L, -1, "b" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightLeg.color.b = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color blue
+                                lua_getfield( L, -1, "a" );
+                                if( lua_isnumber( L, -1 ) ) frame.rightLeg.color.a = (float)lua_tonumber( L, -1 );
+                                lua_pop( L, 1 ); // color alpha
+                            }
+                            lua_pop( L, 1 ); // color
+                        }
+                        lua_pop( L, 1 ); // rightLeg
+                        lua_getfield( L, -1, "body" );
+                        if( lua_istable( L, -1 ) )
+                        {
+                            lua_getfield( L, -1, "x" );
+                            if( lua_isnumber( L, -1 ) ) frame.spritePos.first = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // x value
+                            lua_getfield( L, -1, "y" );
+                            if( lua_isnumber( L, -1 ) ) frame.spritePos.second = (float)lua_tonumber( L, -1 );
+                            lua_pop( L, 1 ); // y value
+                        }
+                        lua_pop( L, 1 ); // body
+                    }
+                    else std::cout << "Invalid Frame data found in ScriptedAnimations.lua" << std::endl;
+                    data[i->second].frames.push_back( frame );
+                    lua_pop( L, 1 ); // frameData table
+                 }
+            }
+            lua_pop( L, 1 ); // ScriptedAnimation Definition
+        }
+
+    }
+    else std::cout << "Error reading ScriptedAnimations.lua" << std::endl;
+    lua_pop( L, 1 );
+    lua_close( L );
+    return data;
+}( ); // initialize ScriptedAnimationData
+
 static std::vector<ConversationData> initializeConversationData = []( ) -> std::vector<ConversationData> {
         std::vector<ConversationData> data( ConversationMap.size( ) );
         lua_State* L = luaL_newstate( );
@@ -532,3 +732,39 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
 }( ); // initializeConversationData
 
 #endif // DATATABLES_HPP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

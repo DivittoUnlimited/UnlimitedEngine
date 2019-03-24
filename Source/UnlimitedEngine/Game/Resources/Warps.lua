@@ -1,16 +1,15 @@
 
 return {
     Map = {
-        Warp1        = 0;
-        Warp2        = 1;
+        HouseEntryWarp        = 0;
+        HouseExitWarp         = 1;
     };
-    Warp1 = {
-        x = 200;
-        y = 300;
+    HouseEntryWarp = {
+        x = 850;
+        y = 925;
     };
-    Warp2 = {
-        x = 300;
-        y = 200;
+    HouseExitWarp = {
+        x = 470;
+        y = 180;
     };
-
 };

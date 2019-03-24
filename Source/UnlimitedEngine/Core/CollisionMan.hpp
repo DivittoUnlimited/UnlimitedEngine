@@ -24,12 +24,6 @@ namespace CollisionMan {
         Obj( SceneNode* id, sf::Rect<float> boundingRect )
             : id( id ), rect( boundingRect ) { }
     };
-    /// OUTDATED DELETE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    /// \brief objRects
-    /// static member that gets built each frame by lua so that all its nodes can
-    /// be checked for collision at the end of the check this dataStructure is wiped for the next
-    /// frame where lua will do it again.
-    //////////static std::map<std::string, std::vector<Obj>> objRects = std::map<std::string, std::vector<CollisionMan::Obj>>();
 
     /// \brief LayerDiminsions
     /// simple map to contain the area of all the layers of the grid so that

@@ -228,4 +228,5 @@ DISTFILES += \
     Media/Textures/wagonWheel.png \
     Media/Textures/woodTexture.png \
     Media/Textures/cowboy.png \
-    Media/Textures/SevenSunSetDemoTexture.png
+    Media/Textures/SevenSunSetDemoTexture.png \
+    Game/Resources/ScriptedAnimations.lua
