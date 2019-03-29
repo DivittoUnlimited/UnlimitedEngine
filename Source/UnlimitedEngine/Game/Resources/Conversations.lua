@@ -1,69 +1,51 @@
+-- Displayed in MessageBox starting at link 0. The link given with each answer tells where to direct the conversation a link with a negative value ends the conversation.
+-- As many characters can be used in dialog as well as response text, as well as any number of responses can be given to the player to choose from. The only limits are how the game displays
+-- this information (i.e Pokemon's Text box w/ 4 answers, Bioware's Dialog selection wheel, etc... ).
+
 return {
 	Map = {
-		ProffessorDialog1 = 0;
+                CowboyBobIntro = 0;
 	};
 	
-	ProffessorDialog1 = {
+        CowboyBobIntro = {
                 { -- Link 0
-                        dialog = "Hello There! You look new around here!";
+                        dialog = "WWWeeeeelllll' Howdy Partner!!!";
 			responses = {
                                 {
-					text = "Yes, where am i?";
-					link = 1;
+                                        text = "Well' Howdy!";
+                                        link = -1;
                                 },
 				{
-					text = "No way! I come here all the time!";
-					link = 2;
+                                        text = "You talkin' to me?";
+                                        link = 1;
                                 }
                         };
 		},
 		{ -- Link 1
-                        dialog = "This is Greenville, All sorts of strange things happen here.\nThese portals just apeared! Want to check them out?";
+                        dialog = "yes sir' my names Bob an' i reckon' you look a little lost there patner.";
 			responses = {
                                 {
-					text = "Sounds great!";
-                                        link = 3;
+                                        text = "I ain't lost i jus' don't like yer face!";
+                                        link = 2;
                                 },
 				{
-					text = "No thanks, that sounds WAAAY to dangerous!";
-					link = 4;
+                                        text = "Actually patner you migh' be right.";
+                                        link = 3;
                                 }
                         };
 		},
                 { -- Link 2
-                        dialog = "Really? Well i can't always be right, with the way things always change around here, who knows.\nHave you scene these crazy warp portals?\nWant to try them out with me?";
+                        dialog = "Is tha' so? Draw! ya yella' belly!";
 			responses = {
                                 {
-                                        text = "Wow those are new!";
-                                        link = 3;
-                                },
-				{
-					text = "Actually I invented those.";
-					link = 5;
+                                        text = "...";
+                                        link = -1;
                                 }
                         };
 		},
                 { -- Link 3
-                        dialog = "Awesome follow me!";
+                        dialog = "Well follo' me!";
 			responses = {
-                                {
-                                        text = "Continue...";
-                                        link = -1;
-                                }
-                        };
-		},
-                { -- Link 4
-                        dialog = "It's not dangerous at all watch this!";
-			responses = {
-                                {
-                                        text = "Continue...";
-                                        link = -1;
-                                }
-                        };
-                },
-                { -- Link 5
-                        dialog = "What!? yeah right. Suite yourself i wont show you around.";
-                        responses = {
                                 {
                                         text = "Continue...";
                                         link = -1;

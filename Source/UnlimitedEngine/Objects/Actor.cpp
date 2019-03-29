@@ -22,7 +22,7 @@ Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, con
     this->mLabel = name.get( );
     this->mLabel->setColor( sf::Color( 255, 0, 255, 255 ) );
     this->mLabel->getText( )->setCharacterSize( 10 );
-    this->mLabel->setPosition( 8, -20 );
+    this->mLabel->setPosition( 8, -40 );
     this->attachChild( std::move( name ) );
 
     this->setPosition( data.x, data.y );

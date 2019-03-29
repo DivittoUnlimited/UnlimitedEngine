@@ -99,7 +99,7 @@ void GameState::draw( )
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
 
         mTarget.draw( sf::Sprite( mWindowSprite ) );
-        mBloomEffect.apply( mSceneTexture, mTarget ); // When u re-add bloom effects remove the window sprite scale in the cinstructor for some reason bloom effect messes with that
+        // mBloomEffect.apply( mSceneTexture, mTarget );
     }
     else
     {
@@ -161,7 +161,7 @@ bool GameState::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders,
 
 void GameState::handleCollisions( )
 {
-    CollisionMan::QUAD_TREE.setRootRect( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT ); // mod this to move with player!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    CollisionMan::QUAD_TREE.setRootRect( 0, 0, 1024, 1024 ); // mod this to move with player/Camera!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs = CollisionMan::update( mSceneLayers[LayerMap.at( "ObjectLayer" )] );
 
     for( std::pair<SceneNode*, SceneNode*> pair : collisionPairs )
@@ -189,6 +189,10 @@ void GameState::handleCollisions( )
                 player.setVelocity( 0.0f, 0.0f );
                 requestStackPush( States::MessageBox );
             }
+        }
+        else if( matchesCategories( pair, Category::Wall, Category::Wall ) )
+        {
+            // do nothing
         }
         else {
             std::cout << "Error occured while checking Collision something is being checked that shouldn't be!" << std::endl;
@@ -287,7 +291,6 @@ void GameState::buildScene( )
                  auto object = layer.objects.at( i );
                  if( object.type == "Player" )
                  {
-                     std::cout << "Tiles.size( ) " << tiles.size() << std::endl;
                      std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
                      this->mRed = actor.get( );
                      node.get( )->attachChild( std::move( actor ) );
@@ -300,16 +303,11 @@ void GameState::buildScene( )
                  {
                      std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mTextures, mFonts ) );
                      node.get( )->attachChild( std::move( warp ) );
-                 }else if( object.type == "Actor" )
-                 {
-                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                    node.get( )->attachChild( std::move( actor ) );
                  }else if( object.type == "Cowboy" )
                  {
-                    std::unique_ptr<Actor> actor( new Actor( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                    node.get( )->attachChild( std::move( actor ) );
-                 }
-                 else if( object.type == "Item" )
+                     std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
+                     node.get( )->attachChild( std::move( actor ) );
+                 }else if( object.type == "Item" )
                  {
                      // std::unique_ptr<Item> item( new Item( ) );
                      // node.get( )->attachChild( std::move( item ) );

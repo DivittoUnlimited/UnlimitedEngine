@@ -4,5 +4,5 @@ return {
 
     };
 
-    -- No Items have been added to tehe game yet!!!
+    -- No Items have been added to the game yet!!!
 };

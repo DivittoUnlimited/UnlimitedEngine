@@ -17,6 +17,7 @@
 
 // Debugging only!!
 #include <iostream>
+#include <exception>
 
 const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 
@@ -56,6 +57,7 @@ void Application::run( )
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
     while( mWindow.isOpen( ) )
 	{
+        try{
         sf::Time dt = clock.restart( );
 		timeSinceLastUpdate += dt;
         while( timeSinceLastUpdate > TimePerFrame )
@@ -71,6 +73,10 @@ void Application::run( )
 		}
         updateStatistics( dt );
         render( );
+        }catch( std::exception& e )
+        {
+            std::cout << e.what() << std::endl;
+        }
 	}
 }
 
@@ -106,7 +112,6 @@ void Application::updateStatistics( sf::Time dt )
     if( mStatisticsUpdateTime >= sf::seconds( 1.0f ) )
 	{
         mStatisticsText.setString( "FPS: " + toString( mStatisticsNumFrames ) );
-
         mStatisticsUpdateTime -= sf::seconds( 1.0f );
 		mStatisticsNumFrames = 0;
 	}

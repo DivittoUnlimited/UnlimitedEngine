@@ -14,7 +14,7 @@
 
 MessageBoxState::MessageBoxState( States::ID id, StateStack& stack, Context context )
 : State( id, stack, context )
-, mMessageBox( new MessageBoxNode( "ProffessorDialog1", *context.fonts ) )
+, mMessageBox( new MessageBoxNode( "CowboyBobIntro", *context.fonts ) )
 {
     ///
     /// NEED TO SOLVE HARD CODED VALUE ASAP!!!!!!!!!
