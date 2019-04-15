@@ -63,7 +63,7 @@ void Cowboy::updateCurrent( sf::Time dt, CommandQueue& commands )
     mCurrentFrameTime += dt;
 
     auto frame = Table[ScriptedAnimationMap.at( mCurrentAnimation )].frames[mCurrentAnimationFrame];
-    if( mCurrentFrameTime.asMilliseconds( ) > frame.duration )
+    if( mCurrentFrameTime.asMilliseconds( ) > (int32_t)frame.duration )
     {
         mCurrentFrameTime = sf::Time::Zero;
         // run next animation frame
