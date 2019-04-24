@@ -17,11 +17,10 @@ GameState::GameState( States::ID id, StateStack& stack, Context context )
 , mSceneLayers( )
 , mPlayer( *context.player )
 {
-    mWorldView.zoom( .70 );
+    mWorldView.zoom( 1.5 );
     if( !mSceneTexture.create( mTarget.getView().getSize().x, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
     buildScene( );
-    mWorldView.setCenter( mRed->getPosition() );
 }
 
 GameState::~GameState( )
@@ -99,7 +98,7 @@ void GameState::draw( )
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
 
         mTarget.draw( sf::Sprite( mWindowSprite ) );
-        // mBloomEffect.apply( mSceneTexture, mTarget );
+        mBloomEffect.apply( mSceneTexture, mTarget );
     }
     else
     {
@@ -110,7 +109,6 @@ void GameState::draw( )
 
 bool GameState::update( sf::Time dt )
 {
-    mWorldView.setCenter( mRed->getPosition() );
     while( !mCommandQueue.isEmpty( ) )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     mSceneGraph.update( dt, mCommandQueue );
@@ -177,19 +175,6 @@ void GameState::handleCollisions( )
              auto& warp = static_cast<Warp&>( *pair.second );
              player.setPosition( warp.getNewPosition( ) );
         }
-        else if( matchesCategories( pair, Category::Player, Category::NPC ) )
-        {
-            auto& player = static_cast<Actor&>( *pair.first );
-            auto& npc = static_cast<Actor&>( *pair.second );
-
-            if( npc.speak( ) ) /// This still needs a LOT of love but im trying to fix QuadTree first, this works as decent  test for that for now
-            {
-                npc.speak( false );
-                npc.setVelocity( 0.0f, 0.0f );
-                player.setVelocity( 0.0f, 0.0f );
-                requestStackPush( States::MessageBox );
-            }
-        }
         else if( matchesCategories( pair, Category::Wall, Category::Wall ) )
         {
             // do nothing
@@ -210,7 +195,7 @@ void GameState::buildScene( )
 
     // load TiledMap
     std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
-    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/SevenSunsetDemo.lua" ); //mContext.TiledMapFilePath );
+    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/TenGallonTombstone.lua" ); //mContext.TiledMapFilePath );
 
     struct Tile {
         std::string texID;
@@ -218,9 +203,9 @@ void GameState::buildScene( )
     };
 
     std::vector<Tile> tiles = std::vector<Tile>( );
-    tiles.push_back( Tile() );
+    tiles.push_back( Tile( ) );
     tiles[0].texID = "NONE";
-    tiles[0].rect = sf::Rect<int>( 0, 0, 16, 16 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
+    tiles[0].rect = sf::Rect<int>( 0, 0, 256, 192 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
 
     for( unsigned int i = 0; i < map.tileSets.size(); ++i )
     {
@@ -260,7 +245,8 @@ void GameState::buildScene( )
             /// there needs to be a universal way to use as many images as needed to build maps.
             auto tileSets = map.tileSets[0];
 
-            if( map.layers[i].name == "TileLayer3" )
+
+            if( map.layers[i].name == "TileLayer3" ) // this is here becuase i needed to attach the particleNode to something that would be rendered above the objects.
             {
                 std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( Category::ParticleLayer ) );
                 if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
@@ -297,14 +283,15 @@ void GameState::buildScene( )
                  }
                  else if( object.type == "Wall" )
                  {
-                     std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
-                     node.get( )->attachChild( std::move( wall ) );
+                     // std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
+                     // node.get( )->attachChild( std::move( wall ) );
                  }else if( object.type == "Warp" )
                  {
-                     std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mTextures, mFonts ) );
-                     node.get( )->attachChild( std::move( warp ) );
+                     // std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mTextures, mFonts ) );
+                     // node.get( )->attachChild( std::move( warp ) );
                  }else if( object.type == "Cowboy" )
                  {
+                     assert( TextureMap.find( tiles[object.gid].texID ) != TextureMap.end( ) );
                      std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
                      node.get( )->attachChild( std::move( actor ) );
                  }else if( object.type == "Item" )
@@ -354,8 +341,8 @@ void GameState::buildScene( )
             lua_pushnil( L );
             while( lua_next( L, -2 ) != 0 )
             {
-                std::unique_ptr<ParticleNode> node( new ParticleNode( ParticleMap.at( lua_tostring( L, -1 ) ), mTextures ) );
-                mSceneLayers[LayerMap.at( "TileLayer2" )]->attachChild( std::move( node ) );
+                //std::unique_ptr<ParticleNode> node( new ParticleNode( ParticleMap.at( lua_tostring( L, -1 ) ), mTextures ) );
+                //mSceneLayers[LayerMap.at( "TileLayer1" )]->attachChild( std::move( node ) );
                 lua_pop( L, 1 );
             }
         }

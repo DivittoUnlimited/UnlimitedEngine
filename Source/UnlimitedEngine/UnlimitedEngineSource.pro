@@ -87,7 +87,8 @@ SOURCES += \
     Gui/ResponseSelector.cpp \
     States/MessageBoxState.cpp \
     Core/CollisionMan.cpp \
-    Objects/Cowboy.cpp
+    Objects/Cowboy.cpp \
+    Objects/Bullet.cpp
 
 HEADERS += \
     lua/lapi.h \
@@ -167,7 +168,8 @@ HEADERS += \
     Gui/ResponseSelector.hpp \
     States/MessageBoxState.hpp \
     Core/CollisionMan.hpp \
-    Objects/Cowboy.hpp
+    Objects/Cowboy.hpp \
+    Objects/Bullet.hpp
 
 DISTFILES += \
     Media/Sansation.ttf \
@@ -217,16 +219,15 @@ DISTFILES += \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Notes.txt \
     TiledMapReader.lua \
-    Game/Levels/Greenville.lua \
     Game/Resources/Actors.lua \
     Game/Resources/Items.lua \
     Game/Resources/Warps.lua \
     Game/Resources/Conversations.lua \
-    Media/Textures/trainers.png \
-    Media/Textures/tiles.png \
-    Game/Levels/SevenSunsetDemo.lua \
     Media/Textures/wagonWheel.png \
     Media/Textures/woodTexture.png \
-    Media/Textures/cowboy.png \
-    Media/Textures/SevenSunSetDemoTexture.png \
-    Game/Resources/ScriptedAnimations.lua
+    Game/Resources/ScriptedAnimations.lua \
+    Media/Textures/Bullet.jpg \
+    Media/Textures/Dirt.png \
+    Media/Textures/Hat.png \
+    Game/Levels/TenGallonTombstone.lua \
+    Media/Textures/Default.png

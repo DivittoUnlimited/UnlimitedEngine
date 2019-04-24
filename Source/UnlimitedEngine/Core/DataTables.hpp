@@ -732,39 +732,3 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
 }( ); // initializeConversationData
 
 #endif // DATATABLES_HPP
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

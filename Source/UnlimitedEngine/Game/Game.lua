@@ -3,13 +3,10 @@ return {
                     [0] = "DivittoUnlimitedLogo"
                     ,     "Default"
                     ,     "Particle"
-                    ,     "trainers"
-                    ,     "tiles"
-                    ,     "cowboy"
-                    ,     "SevenSunSetDemoTexture"
+                    ,     "Hat"
+                    ,     "Bullet"
+                    ,     "Dirt"
     };
-
-
     Fonts               = {
     };
     Music               = {
@@ -20,7 +17,7 @@ return {
         [0] = "PortalEffect"
     };
 
-    PlayerTexture       = "Default";
-    TiledMapFilePath    = "Game/Levels/SevenSunsetDemo.lua";
+    PlayerTexture       = "Hat";
+    TiledMapFilePath    = "Game/Levels/TenGallonTombstone.lua";
 
 };

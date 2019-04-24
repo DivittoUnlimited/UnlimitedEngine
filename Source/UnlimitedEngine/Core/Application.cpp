@@ -75,7 +75,7 @@ void Application::run( )
         render( );
         }catch( std::exception& e )
         {
-            std::cout << e.what() << std::endl;
+            std::cout << "Exception in main loop! " << e.what() << std::endl;
         }
 	}
 }

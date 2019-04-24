@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="4" height="4" tilewidth="256" tileheight="192" infinite="0" nextlayerid="3" nextobjectid="3">
+ <tileset firstgid="1" source="Dirt.tsx"/>
+ <tileset firstgid="2" source="Hat.tsx"/>
+ <layer id="1" name="TileLayer1" width="4" height="4">
+  <data encoding="csv">
+1,1,1,1,
+1,1,1,1,
+1,1,1,1,
+1,1,1,1
+</data>
+ </layer>
+ <objectgroup id="2" name="ObjectLayer">
+  <object id="1" name="GoodGuy" type="Player" gid="2" x="512" y="662" width="200" height="192"/>
+  <object id="2" name="BadGuy" type="Cowboy" gid="2" x="512" y="112" width="200" height="192"/>
+ </objectgroup>
+</map>

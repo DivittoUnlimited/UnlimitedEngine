@@ -7,11 +7,9 @@ return {
         Particle             = 2;
         Buttons              = 3;
         -- Demo
-        tiles                = 4;
-        trainers             = 5;
-        cowboy               = 6;
-        woodTexture          = 7;
-        SevenSunSetDemoTexture   = 8;
+        Hat                  = 4;
+        Bullet               = 5;
+        Dirt                 = 6;
     };
 
     SoundEffects = {
@@ -30,9 +28,7 @@ return {
 
     Layers = {
         TileLayer1          = 0;
-        TileLayer2          = 1;
-        ObjectLayer         = 2;
-        TileLayer3          = 3;
+        ObjectLayer         = 1;
     };
 
 -- maybe usefull in World::buildScene dont delete yet
@@ -46,7 +42,7 @@ return {
     Shaders = {
         BrightnessPass      = 0;
         DownSamplePass      = 1;
-        GaussianBlurPass    = 3;
-        addPass             = 4;
+        GaussianBlurPass    = 2;
+        addPass             = 3;
     };
 };

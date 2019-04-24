@@ -28,6 +28,11 @@ Actor::Actor( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, con
     this->setPosition( data.x, data.y );
     this->mSpeed = 2;
 
+    if( this->mType == "Cowboy" )
+    {
+        this->mSprite.setRotation( 180 );
+    }
+
     // ActorsMap data here!!
 
     // Animation data
@@ -77,15 +82,10 @@ void Actor::handleAction( void )
 {
     // call actions in order of there priority in the game world
             // i.e speaking to NPC will be triggered before opening a warp
-
-
-    // For now just start a DialogState if within range of npc
-    std::cout << "This could have been a dialog state!" << std::endl;
 }
 
 void Actor::updateMovementPattern( sf::Time dt )
 {
-    // Enemy airplane: Movement pattern
     const std::vector<Direction>& directions = Table[ActorMap.at( mName )].directions;
     if( !directions.empty( ) )
     {
@@ -95,7 +95,6 @@ void Actor::updateMovementPattern( sf::Time dt )
             mDirectionIndex = ( mDirectionIndex + 1 ) % directions.size( );
             mTravelledDistance = 0.f;
         }
-
         // Compute velocity from direction
         float radians = toRadian( directions[mDirectionIndex].angle );
         float vx = speed( ) * std::cos( radians );

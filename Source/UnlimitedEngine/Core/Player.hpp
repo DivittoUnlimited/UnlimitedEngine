@@ -77,6 +77,7 @@ private:
     //## Attributes
     std::map<sf::Keyboard::Key, Action>	mKeyBinding;    // user modifiable map of key inputs and their corresponding game action
     std::map<Action, Command>			mActionBinding; // a map that links game actions and the Commands (events) they invoke.
+    bool                                mHasInput;
 };
 #endif // PLAYER_HPP
 

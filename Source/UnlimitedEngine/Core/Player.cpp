@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include "Objects/Actor.hpp"
+#include "Objects/Cowboy.hpp"
 
 ///
 /// \brief The ActorMover struct
@@ -23,13 +24,14 @@ struct ActorMover
 };
 
 Player::Player( void )
+    : mHasInput( false )
 {
     // Set initial key bindings
     mKeyBinding[sf::Keyboard::Left]     = MoveLeft;
     mKeyBinding[sf::Keyboard::Right]    = MoveRight;
-    mKeyBinding[sf::Keyboard::Up]       = MoveUp;
-    mKeyBinding[sf::Keyboard::Down]     = MoveDown;
-    //mKeyBinding[sf::Keyboard::Space]    = Fire;
+    // mKeyBinding[sf::Keyboard::Up]       = MoveUp;
+    // mKeyBinding[sf::Keyboard::Down]     = MoveDown;
+    mKeyBinding[sf::Keyboard::Space]    = Fire;
 
     // Set initial action bindings
     initializeActions( );
@@ -42,14 +44,20 @@ Player::Player( void )
 
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 {
-    if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 )
-        commands.push( mActionBinding[MoveDown] );
-    else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
-        commands.push( mActionBinding[MoveUp] );
+    // if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 )
+    //     commands.push( mActionBinding[MoveDown] );
+    // else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
+    //     commands.push( mActionBinding[MoveUp] );
     if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position > 0 )
+    {
+        mHasInput = true;
         commands.push( mActionBinding[MoveRight] );
+    }
     else if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position < 0 )
+    {
+        mHasInput = true;
         commands.push( mActionBinding[MoveLeft] );
+    }
 
     if( event.type == sf::Event::JoystickButtonReleased )
     {
@@ -72,12 +80,12 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
            // std::cout << "button 3(X) activated" << std::endl;
             break;
         case 4:
-            //commands.push( mActionBinding[TurnAround] );
-            //std::cout << "button 4 (LeftTrigger) activated" << std::endl;
+            commands.push( mActionBinding[Fire] );
+            std::cout << "button 4 (LeftTrigger) activated" << std::endl;
             break;
         case 5:
-            //commands.push( mActionBinding[LaunchMissile] );
-            //std::cout << "button 5 (RightTrigger) activated" << std::endl;
+            commands.push( mActionBinding[Fire] );
+            std::cout << "button 5 (RightTrigger) activated" << std::endl;
             break;
         case 6:
             //commands.push( mActionBinding[Fire] );
@@ -107,7 +115,7 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 
 void Player::handleRealtimeInput( CommandQueue& commands )
 {
-    bool noInput = true;
+    mHasInput = false;
     // Traverse all assigned keys and check if they are pressed
     for( auto pair : mKeyBinding )
     {
@@ -115,11 +123,12 @@ void Player::handleRealtimeInput( CommandQueue& commands )
         if( sf::Keyboard::isKeyPressed( pair.first ) && isRealtimeAction( pair.second ) )
         {
             commands.push( mActionBinding[pair.second] );
-            noInput = false;
+            mHasInput = true;
         }
     }
-    if( noInput )
+    if( !mHasInput )
         commands.push( mActionBinding[StopMoving] );
+
 }
 
 void Player::assignKey( Action action, sf::Keyboard::Key key )
@@ -148,11 +157,12 @@ sf::Keyboard::Key Player::getAssignedKey( Action action ) const
 
 void Player::initializeActions( )
 {
-    mActionBinding[MoveLeft].action      = derivedAction<Actor>( ActorMover( -1,  0 ) );
-    mActionBinding[MoveRight].action     = derivedAction<Actor>( ActorMover(  1,  0 ) );
-    mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0,  1 ) );
-    mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, -1 ) );
-    mActionBinding[StopMoving].action    = derivedAction<Actor>( [] ( Actor& a, sf::Time ){ a.setVelocity( 0.0f, 0.0f ); } );
+    mActionBinding[MoveLeft].action     = derivedAction<Actor>( ActorMover( -1,  0 ) );
+    mActionBinding[MoveRight].action    = derivedAction<Actor>( ActorMover(  1,  0 ) );
+    // mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0,  1 ) );
+    // mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, -1 ) );
+    mActionBinding[StopMoving].action   = derivedAction<Actor>( [] ( Actor& a, sf::Time ) { a.setVelocity( 0.0f, 0.0f ); } );
+    mActionBinding[Fire].action         = derivedAction<Cowboy>( [] ( Cowboy& a, sf::Time ) { a.fire( ); } );
 }
 
 bool Player::isRealtimeAction( Action action )
@@ -161,8 +171,8 @@ bool Player::isRealtimeAction( Action action )
     {
         case MoveLeft:
         case MoveRight:
-        case MoveDown:
-        case MoveUp:
+        // case MoveDown:
+        // case MoveUp:
             return true;
         default:
             return false;

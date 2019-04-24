@@ -36,16 +36,16 @@ Resource& ResourceManager<Resource>::get( unsigned int id )
 }
 
 template <typename Resource>
-const Resource& ResourceManager<Resource>::get( unsigned int id) const
+const Resource& ResourceManager<Resource>::get( unsigned int id ) const
 {
-    auto found = mResourceMap.find(id);
-    assert(found != mResourceMap.end());
+    auto found = mResourceMap.find( id );
+    assert( found != mResourceMap.end( ) );
 
     return *found->second;
 }
 
 template <typename Resource>
-void ResourceManager<Resource>::insertResource( unsigned int id, std::unique_ptr<Resource> resource)
+void ResourceManager<Resource>::insertResource( unsigned int id, std::unique_ptr<Resource> resource )
 {
     // Insert and check success
     auto inserted = mResourceMap.insert( std::make_pair( id, std::move( resource ) ) );

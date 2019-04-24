@@ -1,4 +1,8 @@
 #include "Cowboy.hpp"
+#include "Objects/Bullet.hpp"
+#include "Core/CommandQueue.hpp"
+#include <memory>
+
 
 namespace
 {
@@ -7,34 +11,17 @@ namespace
 
 Cowboy::Cowboy( Tiled::Object data, unsigned int texID, sf::Rect<int> texRect, const TextureManager& textures, SoundPlayer* soundPlayer, const FontManager& fonts )
     : Actor( data, texID, texRect, textures, soundPlayer, fonts )
-    , mLeftArm(  sf::CircleShape( 0 ) )
-    , mRightArm( sf::CircleShape( 0 ) )
-    , mLeftLeg(  sf::CircleShape( 0 ) )
-    , mRightLeg( sf::CircleShape( 0 ) )
-    , mCurrentAnimationFrame( 0 )
-    , mCurrentFrameTime( sf::Time::Zero )
+    , mReloadTimer( sf::Time::Zero )
+    , mFireCommand( )
+    , mPullTrigger( false )
 {
-    if( mType == "Player" )
-        mCurrentAnimation = "walkRight";
-    else if( mType == "Cowboy" )
-        mCurrentAnimation = "standing";
-
-    auto frame = Table[ScriptedAnimationMap.at(mCurrentAnimation)].frames[mCurrentAnimationFrame];
-
-    mLeftArm.setPosition(  frame.leftArm.pos  );
-    mRightArm.setPosition( frame.rightArm.pos );
-    mRightLeg.setPosition( frame.rightLeg.pos );
-    mLeftLeg.setPosition(  frame.leftLeg.pos  );
-
-    mLeftArm.setRadius(  frame.leftArm.radius );
-    mRightArm.setRadius( frame.rightArm.radius );
-    mLeftLeg.setRadius(  frame.leftLeg.radius );
-    mRightLeg.setRadius( frame.rightLeg.radius );
-
-    mLeftArm.setFillColor(  frame.leftArm.color );
-    mRightArm.setFillColor( frame.rightArm.color );
-    mLeftLeg.setFillColor(  frame.leftLeg.color );
-    mRightLeg.setFillColor( frame.rightLeg.color );
+    mFireCommand.category = Category::TileLayer;
+    mFireCommand.action   = [this, &textures] ( SceneNode& node, sf::Time )
+    {
+        std::unique_ptr<Bullet> bullet( new Bullet( textures ) );
+        bullet->setPosition( this->getWorldPosition( ).x, this->getWorldPosition().y - 100 );
+        node.attachChild( std::move( bullet ) );
+    };
 }
 
 bool Cowboy::isMarkedForRemoval( ) const
@@ -49,44 +36,44 @@ bool Cowboy::isDestroyed( void ) const
 
 void Cowboy::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
-    target.draw( mLeftArm,  states );
-    target.draw( mLeftLeg,  states );
     target.draw( mSprite,   states );
-    target.draw( mRightArm, states );
-    target.draw( mRightLeg, states );
 }
 
 void Cowboy::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
     if( mCanMove )
        updateMovementPattern( dt );
-    mCurrentFrameTime += dt;
 
-    auto frame = Table[ScriptedAnimationMap.at( mCurrentAnimation )].frames[mCurrentAnimationFrame];
-    if( mCurrentFrameTime.asMilliseconds( ) > (int32_t)frame.duration )
+
+    if( mPullTrigger )
     {
-        mCurrentFrameTime = sf::Time::Zero;
-        // run next animation frame
-        if( mCurrentAnimationFrame < Table[ScriptedAnimationMap.at( mCurrentAnimation )].frames.size( ) - 1 )
-            mCurrentAnimationFrame++;
-        else
-            mCurrentAnimationFrame = 0;
-
-        mLeftArm.setPosition(  frame.leftArm.pos  );
-        mRightArm.setPosition( frame.rightArm.pos );
-        mRightLeg.setPosition( frame.rightLeg.pos );
-        mLeftLeg.setPosition(  frame.leftLeg.pos  );
-
-        mLeftArm.setRadius(  frame.leftArm.radius );
-        mRightArm.setRadius( frame.rightArm.radius );
-        mLeftLeg.setRadius(  frame.leftLeg.radius );
-        mRightLeg.setRadius( frame.rightLeg.radius );
-
-        mLeftArm.setFillColor(  frame.leftArm.color );
-        mRightArm.setFillColor( frame.rightArm.color );
-        mLeftLeg.setFillColor(  frame.leftLeg.color );
-        mRightLeg.setFillColor( frame.rightLeg.color );
+        mPullTrigger = false;
+        commands.push( mFireCommand );
     }
+
+    if( mType == "Player" )
+    {
+        if( !mCanShoot )
+        {
+            mReloadTimer -= dt;
+            if( mReloadTimer <= sf::Time::Zero )
+            {
+                mCanShoot = true;
+            }
+        }
+    }
+
+
     Actor::updateCurrent( dt, commands );
+}
+
+void Cowboy::fire( void )
+{
+    if( mCanShoot )
+    {
+        mPullTrigger = true;
+        mCanShoot = false;
+        mReloadTimer += sf::milliseconds( 3000 );
+    }
 }
 

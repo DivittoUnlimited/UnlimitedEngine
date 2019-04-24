@@ -3,7 +3,9 @@
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/System/Time.hpp>
 
+#include "Core/Command.hpp"
 #include "Objects/Actor.hpp"
 
 class Cowboy : public Actor
@@ -15,16 +17,14 @@ public:
 
     virtual void drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
     virtual void updateCurrent( sf::Time dt, CommandQueue& commands );
+
+    void fire( void );
+
 private:
-    sf::CircleShape mLeftArm;
-    sf::CircleShape mRightArm;
-
-    sf::CircleShape mLeftLeg;
-    sf::CircleShape mRightLeg;
-
-    std::string     mCurrentAnimation;
-    unsigned int    mCurrentAnimationFrame;
-    sf::Time        mCurrentFrameTime;
+    sf::Time mReloadTimer;
+    bool mCanShoot;
+    bool mPullTrigger;
+    Command mFireCommand;
 };
 
 #endif // COWBOY_HPP
