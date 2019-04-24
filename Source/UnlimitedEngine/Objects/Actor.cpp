@@ -68,9 +68,14 @@ void Actor::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) con
 
 void Actor::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
+    try{
     if( mCanMove )
         updateMovementPattern( dt );
     Entity::updateCurrent( dt, commands );
+    throw( std::exception() );
+    } catch( std::exception& e ) {
+        std::cout << "Exception caught: " << e.what() << " Occured during update of Actor with category: " << this->getCategory( ) << std::endl;
+    }
 }
 
 void Actor::handleAction( void )

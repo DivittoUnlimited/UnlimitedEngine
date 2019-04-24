@@ -113,11 +113,19 @@ bool GameState::update( sf::Time dt )
     mWorldView.setCenter( mRed->getPosition() );
     while( !mCommandQueue.isEmpty( ) )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
-    mSceneGraph.update( dt, mCommandQueue );
-    handleCollisions( );
 
-    mPlayer.handleRealtimeInput( mCommandQueue );
-
+    try{ mSceneGraph.update( dt, mCommandQueue ); }
+    catch( std::exception& e ) {
+        std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl;
+    }
+    try{ handleCollisions( ); }
+    catch( std::exception& e ) {
+        std::cout << "There was an exception during the collision update: " << e.what( ) << "\nDo all your map layer names in lua match from tiled?" << std::endl;
+    }
+    try { mPlayer.handleRealtimeInput( mCommandQueue ); }
+    catch( std::exception& e ) {
+        std::cout << "There was an exception during the PlayerInput update: " << e.what( ) << std::endl;
+    }
     return true;
 }
 
@@ -260,7 +268,8 @@ void GameState::buildScene( )
             /// there needs to be a universal way to use as many images as needed to build maps.
             auto tileSets = map.tileSets[0];
 
-            if( map.layers[i].name == "TileLayer3" )
+            std::cout << "Particle Effects are being attached in a hardcoded way, NEEDS TO BE IMPROVED!" << std::endl;
+            if( map.layers[i].name == "TileLayer3" ) // this is here becuase i needed to attach the particleNode to something that would be rendered above the objects.
             {
                 std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( Category::ParticleLayer ) );
                 if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
