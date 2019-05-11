@@ -44,7 +44,7 @@ Application::Application( )
     mStatisticsText.setCharacterSize( 10u );
 
     registerStates( );
-    mStateStack.pushState( States::Loading );
+    mStateStack.pushState( States::Game );
 }
 
 Application::~Application( void )

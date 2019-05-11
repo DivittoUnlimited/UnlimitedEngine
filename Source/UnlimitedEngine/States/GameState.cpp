@@ -2,6 +2,10 @@
 #include "Core/MusicPlayer.hpp"
 #include "Core/Globals.hpp"
 
+enum Layers {
+    ObjectLayer = 0
+};
+
 GameState::GameState( States::ID id, StateStack& stack, Context context )
 : State( id, stack, context )
 , mTarget( *context.window )
@@ -16,16 +20,19 @@ GameState::GameState( States::ID id, StateStack& stack, Context context )
 , mSceneGraph( )
 , mSceneLayers( )
 , mPlayer( *context.player )
+, mTeamAScore( 3 )
+, mTeamBScore( 3 )
 {
-    mWorldView.zoom( .70 );
     if( !mSceneTexture.create( mTarget.getView().getSize().x, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
+    for( unsigned int i = 0; i < StarShips::Count; ++i )
+        mStarShips.push_back( new StarShip( ) );
     buildScene( );
-    mWorldView.setCenter( mRed->getPosition() );
 }
 
 GameState::~GameState( )
 {
+    /*
     lua_State* L = luaL_newstate( );
     luaL_openlibs( L );
 
@@ -84,6 +91,7 @@ GameState::~GameState( )
         }
     } else std::cout << "Error reading Game.lua data table" << std::endl;
     lua_close( L );
+    */
 }
 
 void GameState::draw( )
@@ -110,7 +118,6 @@ void GameState::draw( )
 
 bool GameState::update( sf::Time dt )
 {
-    mWorldView.setCenter( mRed->getPosition() );
     while( !mCommandQueue.isEmpty( ) )
         mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
 
@@ -118,6 +125,7 @@ bool GameState::update( sf::Time dt )
     catch( std::exception& e ) {
         std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl;
     }
+
     try{ handleCollisions( ); }
     catch( std::exception& e ) {
         std::cout << "There was an exception during the collision update: " << e.what( ) << "\nDo all your map layer names in lua match from tiled?" << std::endl;
@@ -126,6 +134,8 @@ bool GameState::update( sf::Time dt )
     catch( std::exception& e ) {
         std::cout << "There was an exception during the PlayerInput update: " << e.what( ) << std::endl;
     }
+
+    mSceneGraph.removeWrecks();
     return true;
 }
 
@@ -170,207 +180,109 @@ bool GameState::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders,
 void GameState::handleCollisions( )
 {
     CollisionMan::QUAD_TREE.setRootRect( 0, 0, 1024, 1024 ); // mod this to move with player/Camera!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs = CollisionMan::update( mSceneLayers[LayerMap.at( "ObjectLayer" )] );
+    std::set<std::pair<SceneNode*, SceneNode*>> collisionPairs = CollisionMan::update( mSceneLayers[0] );
 
     for( std::pair<SceneNode*, SceneNode*> pair : collisionPairs )
     {
-        if( matchesCategories( pair, Category::Player, Category::Wall ) )
+        /// ATTENTIION!!! CAN NOT LEAVE PLAYER HERE NEEDS TO BE STARSHIP_A
+        if( matchesCategories( pair, Category::Player, Category::FlagB ) || matchesCategories( pair, Category::StarShipB, Category::FlagA ) )
         {
-              auto& player = static_cast<Actor&>( *pair.first );
-              player.setVelocity( 0, 0 );
+              auto& player = static_cast<StarShip&>( *pair.first );
+              if( !player.getHasFlag( ) )
+              {
+                    auto& flag = static_cast<Flag&>( *pair.second );
+                    player.attachChild( mSceneLayers[0]->detachChild( flag ) );
+                    flag.setStarShip( &player );
+                    flag.setPosition(  0, 45 );
+                    player.setHasFlag( true );
+              }
         }
-        else if( matchesCategories( pair, Category::Player, Category::Warp ) )
+        else if( matchesCategories( pair, Category::FlagA, Category::GoalB ) )
         {
-             auto& player = static_cast<Actor&>( *pair.first );
-             auto& warp = static_cast<Warp&>( *pair.second );
-             player.setPosition( warp.getNewPosition( ) );
-        }
-        else if( matchesCategories( pair, Category::Player, Category::NPC ) )
-        {
-            auto& player = static_cast<Actor&>( *pair.first );
-            auto& npc = static_cast<Actor&>( *pair.second );
+            auto& flag = static_cast<Flag&>( *pair.first );
 
-            if( npc.speak( ) ) /// This still needs a LOT of love but im trying to fix QuadTree first, this works as decent  test for that for now
-            {
-                npc.speak( false );
-                npc.setVelocity( 0.0f, 0.0f );
-                player.setVelocity( 0.0f, 0.0f );
-                requestStackPush( States::MessageBox );
+            StarShip* starShip = flag.getStarShip();
+            starShip->setHasFlag( false );
+            mSceneLayers[0]->attachChild( starShip->detachChild( flag ) ); // removes flag from player reattaches to layer
+            flag.setPosition( flag.getStartingPos( ) );
+            mGoalA->scale( .5, 1 );
+            mGoalB->scale( 1.5, 1 );
+            if( mTeamAScore > 0 ) mTeamAScore--;
+            else {
+                std::cout << "Team B Wins!" << std::endl;
             }
         }
-        else if( matchesCategories( pair, Category::Wall, Category::Wall ) )
+        else if( matchesCategories( pair, Category::FlagB, Category::GoalA ) )
         {
-            // do nothing
+            auto& flag = static_cast<Flag&>( *pair.first );
+
+            StarShip* starShip = flag.getStarShip();
+            starShip->setHasFlag( false );
+            mSceneLayers[0]->attachChild( starShip->detachChild( flag ) ); // removes flag from player reattaches to layer
+            flag.setPosition( flag.getStartingPos( ) );
+            mGoalB->scale( .5, 1 );
+            mGoalA->scale( 1.5, 1 );
+            if( mTeamBScore > 0 ) mTeamBScore--;
+            else {
+                std::cout << "Team A Wins!" << std::endl;
+            }
         }
-        else {
-            std::cout << "Error occured while checking Collision something is being checked that shouldn't be!" << std::endl;
-        }
+
     }
 }
 
 void GameState::buildScene( )
 {
-    ///
-    ///
-    /// Where does the level init happen??
-    ///     - refering to when there are more then one level and not just a single "world"
-    ///     - See flow chart on your phone.
+    // Create layers...
 
-    // load TiledMap
-    std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
-    Tiled::TiledMap map = Tiled::loadFromFile( "Game/Levels/SevenSunsetDemo.lua" ); //mContext.TiledMapFilePath );
+    // Object layer
+    std::unique_ptr<SceneNode> objectLayer( new SceneNode( Category::ObjectLayer ) );
+    mSceneLayers.push_back( objectLayer.get( ) );
+    mSceneGraph.attachChild( std::move( objectLayer ) );
 
-    struct Tile {
-        std::string texID;
-        sf::Rect<int> rect;
-    };
 
-    std::vector<Tile> tiles = std::vector<Tile>( );
-    tiles.push_back( Tile() );
-    tiles[0].texID = "NONE";
-    tiles[0].rect = sf::Rect<int>( 0, 0, 16, 16 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
+    // Create objects in the world
+    // Goals
+    std::unique_ptr<Goal> teamAGoal( new Goal( Owner::TeamA ) );
+    mGoalA = teamAGoal.get( );
+    mSceneLayers[0]->attachChild( std::move( teamAGoal ) );
+    std::unique_ptr<Goal> teamBGoal( new Goal( Owner::TeamB ) );
+    mGoalB = teamBGoal.get( );
+    mSceneLayers[0]->attachChild( std::move( teamBGoal ) );
 
-    for( unsigned int i = 0; i < map.tileSets.size(); ++i )
-    {
-        // define loops to divide up image
-        unsigned int y = 0;
-        unsigned int x = 0;
-        unsigned int tileWidth = map.tileSets[i].tileWidth;
-        unsigned int tileHeight =  map.tileSets[i].tileHeight;
-        std::string name = map.tileSets[i].name;
+    // player 1
+    std::unique_ptr<StarShip> blue( new StarShip( true ) );
+    mStarShips.at( StarShips::TeamAShip1 ) = blue.get();
+    mStarShips.at( StarShips::TeamAShip1 )->setPosition( WINDOW_WIDTH / 2, 500 );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue ) );
 
-        // if your map GID is not lining up you might need to manipulate how many times these loops run to get the number of tiles to run properly.
-        while( y < ( map.tileSets[i].imageHeight ) )
-        {
-            while( x < map.tileSets[i].imageWidth )
-            {
-                // Create tile
-                Tile tile;
-                tile.texID = name;
-                tile.rect = sf::Rect<int>( x, y, tileWidth, tileHeight );
-                // add tile to set of possible tiles to use later it's index in vector is it's id as found in testMap.lua
-                tiles.push_back( tile );
-                x += tileWidth;
-            }
-            x = 0;
-            y += tileHeight;
-        }
-    }
+    //(Player 2)
+    std::unique_ptr<StarShip> red( new StarShip() );
+    mStarShips.at( StarShips::TeamAShip1 ) = red.get();
+    mStarShips.at( StarShips::TeamAShip1 )->setPosition( WINDOW_WIDTH / 2, 200 );
+    mStarShips.at( StarShips::TeamAShip1 )->setRotation( 180 );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( red ) );
 
-    for( unsigned int i = 0; i < map.layers.size(); ++i )
-    {
-        if( map.layers[i].type == "tilelayer" )
-        {
-            ///
-            /// \brief tileSets
-            /// DO NOT REMOVE ME UNTILL IT HAS BEEN DONE!!!!
-            /// This is a really lazy way to avoid having to deal with multiple image sources to build maps. It doen't work and it needs to be removed!!!!!!
-            /// there needs to be a universal way to use as many images as needed to build maps.
-            auto tileSets = map.tileSets[0];
+    // Player 1's Starting flags
+    std::unique_ptr<Flag> flag3( new Flag( true, sf::Vector2f( 150, 708 ) ) );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( flag3 ) );
+    std::unique_ptr<Flag> flag4( new Flag( true, sf::Vector2f( WINDOW_WIDTH / 2, 708 ) ) );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( flag4 ) );
+    std::unique_ptr<Flag> flag6( new Flag( true, sf::Vector2f( 874, 708 ) ) );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( flag6 ) );
 
-            std::cout << "Particle Effects are being attached in a hardcoded way, NEEDS TO BE IMPROVED!" << std::endl;
-            if( map.layers[i].name == "TileLayer3" ) // this is here becuase i needed to attach the particleNode to something that would be rendered above the objects.
-            {
-                std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode( Category::ParticleLayer ) );
-                if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
-                    std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
-                else {
-                    mSceneLayers.push_back( layer.get( ) );
-                    mSceneGraph.attachChild( std::move( layer ) );
-                }
-            }
-            else
-            {
-                std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode(  ) );
-                if( !layer.get()->load( mTextures.get( TextureMap.at( tileSets.name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
-                    std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
-                else {
-                    mSceneLayers.push_back( layer.get( ) );
-                    mSceneGraph.attachChild( std::move( layer ) );
-                }
-            }
-        }
-        else if( map.layers[i].type == "objectgroup" )
-        {
-            auto layer = map.layers[i];
-            SceneNode::Ptr node( new SceneNode( Category::ObjectLayer ) );
-            // Build loop through all objects
-            for( unsigned int i = 0; i < layer.objects.size(); ++i )
-            {
-                 auto object = layer.objects.at( i );
-                 if( object.type == "Player" )
-                 {
-                     std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                     this->mRed = actor.get( );
-                     node.get( )->attachChild( std::move( actor ) );
-                 }
-                 else if( object.type == "Wall" )
-                 {
-                     std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
-                     node.get( )->attachChild( std::move( wall ) );
-                 }else if( object.type == "Warp" )
-                 {
-                     std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mTextures, mFonts ) );
-                     node.get( )->attachChild( std::move( warp ) );
-                 }else if( object.type == "Cowboy" )
-                 {
-                     std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                     node.get( )->attachChild( std::move( actor ) );
-                 }else if( object.type == "Item" )
-                 {
-                     // std::unique_ptr<Item> item( new Item( ) );
-                     // node.get( )->attachChild( std::move( item ) );
-                 }else
-                     std::cout << "Invalid object being loaded from tile map" << std::endl;
-            }
-                mSceneLayers.push_back( node.get( ) );
-                mSceneGraph.attachChild( std::move( node ) );
-        }
-        else if( map.layers[i].type == "imageLayer" )
-        {
-            // Create Layer
-            SceneNode::Ptr node( new SceneNode( Category::ImageLayer ) );
-            mSceneLayers[i] = node.get( );
-            mSceneGraph.attachChild( std::move( node ) );
+    // Player 2's starting flags
+    std::unique_ptr<Flag> flag1( new Flag( false, sf::Vector2f( 150, 60 ) ) );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( flag1 ) );
+    std::unique_ptr<Flag> flag2( new Flag( false, sf::Vector2f( WINDOW_WIDTH / 2, 60 ) ) );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( flag2 ) );
+    std::unique_ptr<Flag> flag5( new Flag( false, sf::Vector2f( 874, 60 ) ) );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( flag5 ) );
 
-            // load texture for use by SpriteNode
-            sf::Texture& texture = mTextures.get( TextureMap.at( map.tileSets[i].name ) );
-            texture.setSmooth( true );
 
-            // Create SpriteNode to hold image attach to layer node
-            std::unique_ptr<SpriteNode> backgroundImage( new SpriteNode( texture ) );
-            mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
-        }
-    }
-    lua_State* L = luaL_newstate( );
-    luaL_openlibs( L );
+    // Bumpers
 
-    // call with error checking
-    lua_getglobal( L, "debug" );
-    lua_getfield( L, -1, "traceback" );
-    lua_replace( L, -2 );
-
-    luaL_loadfile( L, "Game/Game.lua" );
-    if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
-        luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
-        std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
-    }
-    if( lua_istable( L, -1 ) )
-    {
-        lua_getfield( L, -1, "Particles" );
-        if( lua_istable( L, -1 ) )
-        {
-            lua_pushnil( L );
-            while( lua_next( L, -2 ) != 0 )
-            {
-                std::unique_ptr<ParticleNode> node( new ParticleNode( ParticleMap.at( lua_tostring( L, -1 ) ), mTextures ) );
-                mSceneLayers[LayerMap.at( "TileLayer2" )]->attachChild( std::move( node ) );
-                lua_pop( L, 1 );
-            }
-        }
-        lua_pop( L, 1 ); // Particles table
-    }
-    lua_close( L );
+    // AI Bots
 
 }
 

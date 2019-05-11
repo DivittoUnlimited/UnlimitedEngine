@@ -7,16 +7,17 @@ enum Type
 {
     None				= 0,
     Player        		= 1 << 0,
-    Wall          		= 1 << 1,
-    NPC            		= 1 << 2,
-    Item				= 1 << 3,
-    Warp                = 1 << 4,
+    GoalA          		= 1 << 1,
+    StarShipA      		= 1 << 2,
+    FlagA				= 1 << 3,
+    FlagB               = 1 << 4,
     ImageLayer          = 1 << 5,
-    TileLayer           = 1 << 6,
+    GoalB               = 1 << 6,
     ObjectLayer         = 1 << 7,
     ParticleSystem      = 1 << 8,
     ParticleLayer		= 1 << 9,
-    SoundEffect			= 1 << 10
+    SoundEffect			= 1 << 10,
+    StarShipB           = 1 << 11
 };
 
 }

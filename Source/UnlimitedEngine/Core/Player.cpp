@@ -4,20 +4,22 @@
 #include <map>
 #include <string>
 #include <algorithm>
-#include "Objects/Actor.hpp"
+#include <math.h>
+
+#include "Objects/StarShip.hpp"
 
 ///
 /// \brief The ActorMover struct
 /// Functor to move the player based on velocity and the delta time for this frame.
-struct ActorMover
+struct StarShipMover
 {
-    ActorMover( float vx, float vy )
+    StarShipMover( float vx, float vy )
     : velocity( vx, vy )
     {
     }
-    void operator( )( Actor& actor, sf::Time ) const
+    void operator( )( StarShip& starShip, sf::Time ) const
     {
-        actor.accelerate( velocity * actor.speed( ) );
+        starShip.accelerate( velocity * starShip.speed( ) );
     }
     sf::Vector2f velocity;
 };
@@ -46,6 +48,7 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
         commands.push( mActionBinding[MoveDown] );
     else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
         commands.push( mActionBinding[MoveUp] );
+
     if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position > 0 )
         commands.push( mActionBinding[MoveRight] );
     else if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position < 0 )
@@ -107,7 +110,6 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 
 void Player::handleRealtimeInput( CommandQueue& commands )
 {
-    bool noInput = true;
     // Traverse all assigned keys and check if they are pressed
     for( auto pair : mKeyBinding )
     {
@@ -115,11 +117,8 @@ void Player::handleRealtimeInput( CommandQueue& commands )
         if( sf::Keyboard::isKeyPressed( pair.first ) && isRealtimeAction( pair.second ) )
         {
             commands.push( mActionBinding[pair.second] );
-            noInput = false;
         }
     }
-    if( noInput )
-        commands.push( mActionBinding[StopMoving] );
 }
 
 void Player::assignKey( Action action, sf::Keyboard::Key key )
@@ -148,11 +147,43 @@ sf::Keyboard::Key Player::getAssignedKey( Action action ) const
 
 void Player::initializeActions( )
 {
-    mActionBinding[MoveLeft].action      = derivedAction<Actor>( ActorMover( -1,  0 ) );
-    mActionBinding[MoveRight].action     = derivedAction<Actor>( ActorMover(  1,  0 ) );
-    mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0,  1 ) );
-    mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, -1 ) );
-    mActionBinding[StopMoving].action    = derivedAction<Actor>( [] ( Actor& a, sf::Time ){ a.setVelocity( 0.0f, 0.0f ); } );
+    mActionBinding[MoveLeft].action      = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){ a.rotate( -1 * a.speed( ) ); } );
+    mActionBinding[MoveRight].action     = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){ a.rotate( a.speed( ) ); } );
+
+    mActionBinding[MoveUp].action        = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){
+            // break down angle to x and y
+            double angle = a.getRotation() * (3.14 / 180);
+            sf::Vector2f force;
+            force.x = sin( angle );
+            force.y = -cos( angle );
+            // apply speed to components seperatly
+            force *= a.speed( );
+            // accellerate the ship with the results
+            a.accelerate( force );
+
+            // Validate ship isnt going to fast and correct if needed.
+            float totalVelocity = (float)std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) );
+            if( totalVelocity > a.maximumVelocity( ) )
+                a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
+    } );
+/*
+    mActionBinding[MoveDown].action      = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){
+            // break down angle to x and y
+            double angle = a.getRotation() * (3.14 / 180);
+            sf::Vector2f force;
+            force.x = sin( angle );
+            force.y = -cos( angle );
+            // apply speed to components seperatly
+            force *= -a.speed( );
+            // accellerate the ship with the results
+            a.accelerate( force );
+
+            // Validate ship isnt going to fast and correct if needed.
+            float totalVelocity = (float)std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) );
+            if( totalVelocity > a.maximumVelocity( ) )
+                a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
+    } );
+*/
 }
 
 bool Player::isRealtimeAction( Action action )

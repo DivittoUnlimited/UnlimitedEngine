@@ -5,6 +5,9 @@
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/ConvexShape.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include <sstream>
 
@@ -24,6 +27,9 @@ std::string	toString( sf::Keyboard::Key key );
 
 // Call setOrigin() with the center of the object
 void centerOrigin( sf::Sprite& sprite );
+void centerOrigin( sf::ConvexShape& sprite );
+void centerOrigin( sf::CircleShape& circle );
+void centerOrigin( sf::RectangleShape& rectangle );
 void centerOrigin( sf::Text& text );
 void centerOrigin( Animation& animation );
 

@@ -57,9 +57,11 @@ private:
     void					drawChildren( sf::RenderTarget& target, sf::RenderStates states ) const;
     void					drawBoundingRect( sf::RenderTarget& target, sf::RenderStates states ) const;
 
+    Category::Type			mDefaultCategory; // Still Needed?
+protected:
     std::vector<Ptr>		mChildren;
     SceneNode*				mParent;
-    Category::Type			mDefaultCategory;
+
 };
 
 bool	collision( const SceneNode& lhs, const SceneNode& rhs );

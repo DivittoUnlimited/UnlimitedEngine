@@ -96,7 +96,7 @@ void ParallelTask::runTask()
             lua_getfield( L, -1, "TiledMapFilePath" );
             if( lua_isstring( L, -1 ) ) mContext.tiledMapFilePath = lua_tostring( L, -1 );
             else std::cout << "Error reading TiledMap from Game.lua" << std::endl;
-            std::cout << "ParalledTask ln:99 received " << mContext.tiledMapFilePath << " as current level to load." << std::endl;
+            // std::cout << "ParalledTask ln:99 received " << mContext.tiledMapFilePath << " as current level to load." << std::endl;
             lua_pop( L, 1 );
         }
     } else std::cout << "Error reading " << mFileName.c_str( ) << " data table" << std::endl;

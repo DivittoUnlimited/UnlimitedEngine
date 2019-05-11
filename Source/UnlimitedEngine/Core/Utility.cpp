@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/ConvexShape.hpp>
 
 #include <random>
 #include <cmath>
@@ -140,18 +141,35 @@ void centerOrigin( sf::Sprite& sprite )
     sprite.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor(bounds.top + bounds.height / 2.f ) );
 }
 
+void centerOrigin( sf::ConvexShape& sprite )
+{
+    sf::FloatRect bounds = sprite.getLocalBounds( );
+    sprite.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor(bounds.top + bounds.height / 2.f ) );
+}
+
+void centerOrigin( sf::CircleShape& circle )
+{
+    sf::FloatRect bounds = circle.getLocalBounds( );
+    circle.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor(bounds.top + bounds.height / 2.f ) );
+}
+
 void centerOrigin(sf::Text& text)
 {
     sf::FloatRect bounds = text.getLocalBounds();
     text.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
 }
-
+void centerOrigin( sf::RectangleShape& rectangle )
+{
+    sf::FloatRect bounds = rectangle.getLocalBounds();
+    rectangle.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
+}
+/*
 void centerOrigin( Animation& animation )
 {
     sf::FloatRect bounds = animation.getLocalBounds( );
     animation.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
 }
-
+*/
 float toDegree( float radian )
 {
     return 180.f / 3.141592653589793238462643383f * radian;

@@ -8,6 +8,11 @@ CONFIG += c++11
 LIBS += -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-window -lsfml-system
 
 SOURCES += \
+    Objects/AIStarShipController.cpp \
+    Objects/Bumper.cpp \
+    Objects/Flag.cpp \
+    Objects/Goal.cpp \
+    Objects/StarShip.cpp \
         main.cpp \
     lua/lapi.c \
     lua/lauxlib.c \
@@ -43,7 +48,6 @@ SOURCES += \
     lua/lutf8lib.c \
     lua/lvm.c \
     lua/lzio.c \
-    Core/Animation.cpp \
     Core/Application.cpp \
     Core/BloomEffect.cpp \
     Core/Command.cpp \
@@ -77,19 +81,18 @@ SOURCES += \
     Gui/Button.cpp \
     States/SettingsState.cpp \
     Core/ParticleNode.cpp \
-    Core/VertexArrayNode.cpp \
-    Objects/Actor.cpp \
-    Objects/Item.cpp \
-    Objects/Wall.cpp \
-    Objects/Warp.cpp \
     Core/RectangleShapeNode.cpp \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
     States/MessageBoxState.cpp \
-    Core/CollisionMan.cpp \
-    Objects/Cowboy.cpp
+    Core/CollisionMan.cpp
 
 HEADERS += \
+    Objects/AIController.hpp \
+    Objects/Bumper.hpp \
+    Objects/Flag.hpp \
+    Objects/Goal.hpp \
+    Objects/StarShip.hpp \
     lua/lapi.h \
     lua/lauxlib.h \
     lua/lcode.h \
@@ -116,7 +119,6 @@ HEADERS += \
     lua/lundump.h \
     lua/lvm.h \
     lua/lzio.h \
-    Core/Animation.hpp \
     Core/Application.hpp \
     Core/BloomEffect.hpp \
     Core/Category.hpp \
@@ -156,20 +158,15 @@ HEADERS += \
     Core/Particle.hpp \
     Core/ParticleNode.hpp \
     Tiled/TiledManager.hpp \
-    Core/VertexArrayNode.hpp \
-    Objects/Actor.hpp \
-    Objects/Item.hpp \
-    Objects/Wall.hpp \
-    Objects/Warp.hpp \
     Core/RectangleShapeNode.hpp \
     Gui/MessageBoxNode.hpp \
     Core/DialogNode.hpp \
     Gui/ResponseSelector.hpp \
     States/MessageBoxState.hpp \
-    Core/CollisionMan.hpp \
-    Objects/Cowboy.hpp
+    Core/CollisionMan.hpp
 
 DISTFILES += \
+    Game/Resources/Actors.lua \
     Media/Sansation.ttf \
     Media/Shaders/Add.frag \
     Media/Shaders/Brightness.frag \
@@ -208,7 +205,6 @@ DISTFILES += \
     Media/Textures/soldier.png \
     Media/Textures/trees.png \
     Media/Textures/Wall.png \
-    Game/Resources/Animations.lua \
     Game/Resources/Assets.lua \
     Game/Resources/Particles.lua \
     Game/Resources/SourceFileMap.lua \
@@ -216,16 +212,11 @@ DISTFILES += \
     Game/Game.lua \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Notes.txt \
-    Game/Levels/Greenville.lua \
-    Game/Resources/Actors.lua \
-    Game/Resources/Items.lua \
     Game/Resources/Warps.lua \
     Game/Resources/Conversations.lua \
     Media/Textures/trainers.png \
     Media/Textures/tiles.png \
-    Game/Levels/SevenSunsetDemo.lua \
     Media/Textures/wagonWheel.png \
     Media/Textures/woodTexture.png \
     Media/Textures/cowboy.png \
-    Media/Textures/SevenSunSetDemoTexture.png \
-    Game/Resources/ScriptedAnimations.lua
+    Media/Textures/SevenSunSetDemoTexture.png
