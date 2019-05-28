@@ -1,9 +1,20 @@
 
-FURTHER TESTING NEEDED:
-MUSIC
-SOUND_EFFECTS
+Feature ideas:
+Power up astroids
+Turrets
+    -team bullets
+    -hurt everyone
+Bumper Speed based on it's health
+    health regens over time
+Ships slow down when they get hit
+    Health regens over time
 
-MINOR ENGINE COMPONENTS HAVE NOT BEEN ENABLED
-PARTICLES
-ANIMATIONS
-
+fix joystick
+stocks per team
+bullet radius bigger with charge up
+bullet radius and damage smaller over time
+Shooting energy bar that takes longer to regen if fully depleted
+bigger bullets cost more energy
+bullets auto fire when bullet has consumed all energy available to shoot
+bar not shown but will be obvious in gameplay.
+where/how to show health?

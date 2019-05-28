@@ -41,6 +41,14 @@ int Entity::getHitpoints( ) const
     return mHitpoints;
 }
 
+void Entity::setHitpoints( int hp )
+{
+    if( hp > 0 )
+        this->mHitpoints = hp;
+    else {
+        this->mHitpoints = 0;
+    }
+}
 
 void Entity::damage( unsigned int points )
 {

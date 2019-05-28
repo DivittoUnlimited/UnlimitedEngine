@@ -8,7 +8,7 @@
 class Flag : public SceneNode
 {
 public:
-    Flag( bool isTeamAFlag, sf::Vector2f startingPos );
+    Flag( Category::Type category, sf::Vector2f startingPos );
 
     virtual unsigned int  getCategory( ) const;
     virtual sf::FloatRect getBoundingRect( ) const;
@@ -23,7 +23,7 @@ public:
 
 private:
     sf::ConvexShape mSprite;
-    bool            misTeamAFlag;
+    Category::Type  mCategory;
     StarShip*       mStarShip;
     sf::Vector2f    mStartingPos;
 };

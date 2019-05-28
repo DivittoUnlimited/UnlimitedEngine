@@ -16,7 +16,12 @@ CollisionMan::Node::Node( Node* parent, float x, float y, float width, float hei
     debugRect.setFillColor( sf::Color( 0,0,0,0 ) );
     debugRect.setOutlineColor( sf::Color( 0, 0, 255, 255 ) );
 }
-CollisionMan::Node::~Node( void ) {  }
+CollisionMan::Node::~Node( void ) {
+    delete NW;
+    delete NE;
+    delete SW;
+    delete SE;
+}
 //## Interface
 
 /// \brief addObj

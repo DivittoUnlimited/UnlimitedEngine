@@ -24,7 +24,7 @@ unsigned int SceneNode::attachChild( Ptr child )
     return (unsigned int)mChildren.size( ) - 1; // index of new child
 }
 
-SceneNode::Ptr SceneNode::detachChild(const SceneNode& node)
+SceneNode::Ptr SceneNode::detachChild( const SceneNode& node )
 {
     auto found = std::find_if( mChildren.begin( ), mChildren.end(), [&] (Ptr& p) { return p.get() == &node; });
     assert(found != mChildren.end( ) );

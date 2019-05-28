@@ -4,21 +4,26 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
+/*
+class Goal;
+class StarShip;
+class Bumper;
+*/
+
+class Arena;
+
 //const static int WINDOW_WIDTH = sf::VideoMode::getDesktopMode().width;
 //const static int WINDOW_HEIGHT = sf::VideoMode::getDesktopMode().height;
 const static int   WINDOW_HEIGHT = 768;
 const static int   WINDOW_WIDTH  = 1024;
 const static float FRAMES_PER_SECOND = 1.0f / 60.0f;
 
-extern float GAME_SPEED;
-extern unsigned int   WALL_DEPTH;
-extern bool  FLIP_SCREEN;
-extern bool  FLIP_GAMEPLAY;
-extern bool  ALREADY_FLIPPED;
-extern int   PLAYER_SCORE;
-extern float BASE_SPEED;
-extern int GAME_LEVEL;
-extern int PLAYER_LIVES;
-extern int TOTAL_PLAYER_SCORE;
+/*
+extern StarShip* Blue;
+extern StarShip* Red;
 
+extern Goal* GoalBlue;
+extern Goal* GoalRed;
+*/
+extern Arena* ARENA;
 #endif // GLOBALS_HPP

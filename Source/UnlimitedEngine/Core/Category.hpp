@@ -7,17 +7,25 @@ enum Type
 {
     None				= 0,
     Player        		= 1 << 0,
-    GoalA          		= 1 << 1,
-    StarShipA      		= 1 << 2,
-    FlagA				= 1 << 3,
-    FlagB               = 1 << 4,
-    ImageLayer          = 1 << 5,
-    GoalB               = 1 << 6,
-    ObjectLayer         = 1 << 7,
-    ParticleSystem      = 1 << 8,
-    ParticleLayer		= 1 << 9,
-    SoundEffect			= 1 << 10,
-    StarShipB           = 1 << 11
+    Player2       		= 1 << 1,
+    PlayerShip          = 1 << 2,
+    StarShipBlue  		= 1 << 3,
+    FlagBlue			= 1 << 4,
+    FlagRed             = 1 << 5,
+    ImageLayer          = 1 << 6,
+    GoalRed             = 1 << 7,
+    ObjectLayer         = 1 << 8,
+    ParticleSystem      = 1 << 9,
+    ParticleLayer		= 1 << 10,
+    SoundEffect			= 1 << 11,
+    StarShipRed         = 1 << 12,
+    BumperBlue          = 1 << 13,
+    BumperRed           = 1 << 14,
+    GoalBlue            = 1 << 15,
+    Bullet              = 1 << 16,
+    Network             = 1 << 17,
+    RedTeam             = 1 << 18,
+    BlueTeam            = 1 << 19
 };
 
 }

@@ -4,30 +4,28 @@
 
 #include "Core/Globals.hpp"
 
-Goal::Goal( Owner owner )
+Goal::Goal( Category::Type category )
     : SceneNode( )
-    , mOwner( owner )
+    , mCategory( category )
     , mSprite( sf::RectangleShape( sf::Vector2f( 200.0f, 30.0f ) ) )
 {
     centerOrigin( mSprite );
     mSprite.setOutlineThickness( 2 );
     mSprite.setOutlineColor( sf::Color::White );
-    if( mOwner == Owner::TeamA )
+    if( mCategory == Category::GoalBlue )
     {
         mSprite.setFillColor( sf::Color( 0, 0, 255, 100 ) );
-        this->setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT - 20 );
+        this->setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT - 30 );
     }
     else {
         mSprite.setFillColor( sf::Color( 255, 0, 0, 100 ) );
-        this->setPosition( WINDOW_WIDTH / 2, 20 );
+        this->setPosition( WINDOW_WIDTH / 2, 30 );
     }
 }
 
 unsigned int  Goal::getCategory( ) const
 {
-    if( mOwner == Owner::TeamA )
-        return Category::GoalA;
-    return Category::GoalB;
+    return mCategory;
 }
 
 sf::FloatRect Goal::getBoundingRect( ) const

@@ -7,7 +7,7 @@
 #include "States/MenuState.hpp"
 #include "States/PauseState.hpp"
 #include "States/LoadingState.hpp"
-#include "States/SettingsState.hpp"
+#include "States/MultiplayerGameState.hpp"
 #include "States/GameState.hpp"
 #include "States/SplashScreen.hpp"
 #include "States/MessageBoxState.hpp"
@@ -23,15 +23,15 @@ const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 
 Application::Application( )
     : mWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default )
-, mTextures( )
-, mFonts( )
-, mPlayer( )
-, mMusic( )
-, mContext( State::Context( States::None, mWindow, mTextures, mFonts, mMusic, mSoundEffects, mPlayer, new std::vector<std::pair<std::string, int>>( ) ) )
-, mStateStack( mContext )
-, mStatisticsNumFrames( 0 )
-, mStatisticsText( )
-, mStatisticsUpdateTime( )
+    , mTextures( )
+    , mFonts( )
+    , mMusic( )
+    , mKeyBinding1(1)
+    , mKeyBinding2(2)
+    , mStateStack(State::Context(States::None, mWindow, mTextures, mFonts, mMusic, mSoundEffects,  new std::vector<std::pair<std::string, int>>(), mKeyBinding1, mKeyBinding2))
+    , mStatisticsNumFrames(0)
+    , mStatisticsText()
+    , mStatisticsUpdateTime( sf::Time::Zero )
 {
     mWindow.setKeyRepeatEnabled( false );
     mWindow.setVerticalSyncEnabled( true );
@@ -44,7 +44,7 @@ Application::Application( )
     mStatisticsText.setCharacterSize( 10u );
 
     registerStates( );
-    mStateStack.pushState( States::Game );
+    mStateStack.pushState( States::Menu );
 }
 
 Application::~Application( void )
@@ -119,13 +119,14 @@ void Application::updateStatistics( sf::Time dt )
 
 void Application::registerStates( )
 {
-    mStateStack.registerState<SplashScreen>     ( States::SplashScreen      );
-    mStateStack.registerState<TitleState>       ( States::Title             );
-    mStateStack.registerState<LoadingState>     ( States::Loading           );
-    mStateStack.registerState<MenuState>        ( States::Menu              );
-    mStateStack.registerState<GameState>        ( States::Game              );
-    mStateStack.registerState<PauseState>       ( States::Pause             );
-    mStateStack.registerState<SettingsState>    ( States::Settings          );
-    mStateStack.registerState<MessageBoxState>  ( States::MessageBox        );
+    mStateStack.registerState<SplashScreen>         ( States::SplashScreen         );
+    mStateStack.registerState<TitleState>           ( States::Title                );
+    mStateStack.registerState<LoadingState>         ( States::Loading              );
+    mStateStack.registerState<MenuState>            ( States::Menu                 );
+    mStateStack.registerState<GameState>            ( States::SinglePlayer         );
+    mStateStack.registerState<MultiplayerGameState> ( States::HostGame,      true  );
+    mStateStack.registerState<MultiplayerGameState> ( States::JoinGame,      false );
+    mStateStack.registerState<PauseState>           ( States::Pause                );
+    mStateStack.registerState<MessageBoxState>      ( States::MessageBox           );
 }
 

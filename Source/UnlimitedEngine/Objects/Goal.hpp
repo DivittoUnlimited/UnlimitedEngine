@@ -4,15 +4,10 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include "Core/SceneNode.hpp"
 
-enum Owner {
-      TeamA = 0
-    , TeamB
-};
-
 class Goal : public SceneNode
 {
 public:
-    Goal( Owner owner );
+    Goal( Category::Type category );
     virtual unsigned int  getCategory( ) const;
     virtual sf::FloatRect getBoundingRect( ) const;
     virtual bool 		  isMarkedForRemoval( ) const;
@@ -21,7 +16,7 @@ public:
     void                  drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
 
 private:
-    Owner mOwner;
+    Category::Type mCategory;
     sf::RectangleShape mSprite;
 };
 

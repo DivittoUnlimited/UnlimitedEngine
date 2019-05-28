@@ -9,7 +9,9 @@ namespace States
         SplashScreen,
 		Title,
 		Menu,
-        Game,
+        SinglePlayer,
+        HostGame,
+        JoinGame,
         DeathState,
         Pause,
         Settings,
@@ -18,7 +20,8 @@ namespace States
         HighScoreState,
         GetNameState,
         MessageBox,
-        StartLevelState
+        StartLevelState,
+        NetworkPause
 	};
 }
 

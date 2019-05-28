@@ -1,6 +1,9 @@
 #include "Player.hpp"
 #include "CommandQueue.hpp"
 
+#include "NetworkProtocol.hpp"
+
+#include <SFML/Network/Packet.hpp>
 #include <map>
 #include <string>
 #include <algorithm>
@@ -24,178 +27,200 @@ struct StarShipMover
     sf::Vector2f velocity;
 };
 
-Player::Player( void )
+struct AircraftFireTrigger
 {
-    // Set initial key bindings
-    mKeyBinding[sf::Keyboard::Left]     = MoveLeft;
-    mKeyBinding[sf::Keyboard::Right]    = MoveRight;
-    mKeyBinding[sf::Keyboard::Up]       = MoveUp;
-    mKeyBinding[sf::Keyboard::Down]     = MoveDown;
-    //mKeyBinding[sf::Keyboard::Space]    = Fire;
+    AircraftFireTrigger(int identifier)
+    : ID(identifier)
+    {
+    }
 
-    // Set initial action bindings
-    initializeActions( );
+    void operator( ) ( StarShip& starShip, sf::Time ) const
+    {
+        if( starShip.getIdentifier( ) == ID )
+            starShip.fire( );
+    }
 
-    // Assign all categories to player's aircraft
+    int ID;
+};
 
-    for( auto& pair : mActionBinding )
-        pair.second.category = Category::Player;
-}
+Player::Player( sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding )
+    : mKeyBinding( binding )
+    , mIdentifier( identifier )
+    , mSocket( socket )
+    {
+        // Set initial action bindings
+        initializeActions( );
+
+        // Assign all categories to player's aircraft
+        if( mIdentifier == Category::Player )
+            for( auto& pair : mActionBinding )
+                pair.second.category = Category::Player;
+        else if( mIdentifier == Category::Player2 ) {
+            for( auto& pair : mActionBinding )
+                pair.second.category = Category::Player2;
+        }
+
+    }
 
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 {
-    if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 )
-        commands.push( mActionBinding[MoveDown] );
-    else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
-        commands.push( mActionBinding[MoveUp] );
-
-    if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position > 0 )
-        commands.push( mActionBinding[MoveRight] );
-    else if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position < 0 )
-        commands.push( mActionBinding[MoveLeft] );
-
-    if( event.type == sf::Event::JoystickButtonReleased )
+    if( event.type == sf::Event::KeyPressed )
     {
-        switch( event.joystickButton.button )
+        PlayerAction::Type action;
+        if( mKeyBinding && mKeyBinding->checkAction( event.key.code, action ) && !isRealtimeAction( action ) )
         {
-        case 0:
-            //commands.push( mActionBinding[LaunchMissile] );
-            // std::cout << "Coin button (Y) activated" << std::endl;
-            break;
-        case 1:
-            // commands.push( mActionBinding[TurnAround] );
-            //std::cout << "button 1(A) activated" << std::endl;
-            break;
-        case 2:
-            // commands.push( mActionBinding[Fire] );
-             //std::cout << "button 2(B) activated" << std::endl;
-            break;
-        case 3:
-            //commands.push( mActionBinding[Fire] );
-           // std::cout << "button 3(X) activated" << std::endl;
-            break;
-        case 4:
-            //commands.push( mActionBinding[TurnAround] );
-            //std::cout << "button 4 (LeftTrigger) activated" << std::endl;
-            break;
-        case 5:
-            //commands.push( mActionBinding[LaunchMissile] );
-            //std::cout << "button 5 (RightTrigger) activated" << std::endl;
-            break;
-        case 6:
-            //commands.push( mActionBinding[Fire] );
-            //std::cout << "button 6 activated" << std::endl;
-            break;
-        case 7:
-            //commands.push( mActionBinding[Fire] );
-            //std::cout << "button 7 activated" << std::endl;
-        break;
-        case 8:
-            //commands.push( mActionBinding[Fire] );
-            // std::cout << "button 8 activated(SELECT BUTTON pause game)" << std::endl;
-        break;
-        case 9:
-            std::cout << "button 9 activated(START BUTTON pause game!!)" << std::endl;
-        break;
+            // Network connected -> send event over network
+            if( mSocket )
+            {
+                sf::Packet packet;
+                packet << static_cast<sf::Int32>( Client::PlayerEvent );
+                packet << mIdentifier;
+                packet << static_cast<sf::Int32>( action );
+                mSocket->send( packet );
+            }
+
+            // Network disconnected -> local event
+            else
+            {
+                commands.push( mActionBinding[action] );
+            }
+        }
+        // Realtime change (network connected)
+        if( ( event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased ) && mSocket )
+        {
+            PlayerAction::Type action;
+            if( mKeyBinding && mKeyBinding->checkAction( event.key.code, action ) && isRealtimeAction( action ) )
+            {
+                // Send realtime change over network
+                sf::Packet packet;
+                packet << static_cast<sf::Int32>(Client::PlayerRealtimeChange);
+                packet << mIdentifier;
+                packet << static_cast<sf::Int32>(action);
+                packet << (event.type == sf::Event::KeyPressed);
+                mSocket->send(packet);
+            }
         }
     }
-    else if( event.type == sf::Event::KeyPressed )
+}
+
+bool Player::isLocal( void ) const
+{
+    // No key binding means this player is remote
+    return mKeyBinding != nullptr;
+}
+
+void Player::disableAllRealtimeActions( void )
+{
+    for( auto& action : mActionProxies )
     {
-        // Check if pressed key appears in key binding, trigger command if so
-        auto found = mKeyBinding.find( event.key.code );
-        if( found != mKeyBinding.end( ) && !isRealtimeAction( found->second ) )
-            commands.push( mActionBinding[found->second] );
+        sf::Packet packet;
+        packet << static_cast<sf::Int32>(Client::PlayerRealtimeChange);
+        packet << mIdentifier;
+        packet << static_cast<sf::Int32>(action.first);
+        packet << false;
+        mSocket->send(packet);
     }
 }
 
 void Player::handleRealtimeInput( CommandQueue& commands )
 {
-    // Traverse all assigned keys and check if they are pressed
-    for( auto pair : mKeyBinding )
+    // Check if this is a networked game and local player or just a single player game
+    if( ( mSocket && isLocal( ) ) || !mSocket )
     {
-        // If key is pressed, lookup action and trigger corresponding command
-        if( sf::Keyboard::isKeyPressed( pair.first ) && isRealtimeAction( pair.second ) )
+        //std::cout << "ERROR MESSAGE FROM PLAYER CLASS HANDLEREALTIMEINPUT" << std::endl;
+        //for( unsigned int i=0; i< sf::Joystick::Count; ++i )
+        //{
+            //if(sf::Joystick::isConnected(i))
+            //{
+                 //std::cout << "Joystick " << i << " is connected!" << std::endl;
+                 //std::cout << sf::Joystick::getIdentification( i ).name.toAnsiString() << ", " << sf::Joystick::getIdentification( i ).productId << std::endl;
+            //}
+            // else
+                 // std::cout << "Joystick " << i << " is NOT connected!" << std::endl;
+         //}
+        if( this->mIdentifier == Category::Player )
         {
-            commands.push( mActionBinding[pair.second] );
+            if( sf::Joystick::getAxisPosition( 0, sf::Joystick::Y ) < 0 ) // move forward
+                commands.push( mActionBinding[PlayerAction::MoveUp] );
+            else if( sf::Joystick::getAxisPosition( 0, sf::Joystick::X ) > 0 ) // rotate right
+                commands.push( mActionBinding[PlayerAction::MoveRight] );
+            else if( sf::Joystick::getAxisPosition( 0, sf::Joystick::X ) < 0 )
+                commands.push( mActionBinding[PlayerAction::MoveLeft] );
+
+            if( sf::Joystick::isButtonPressed( 0, 1 ) )
+                commands.push( mActionBinding[PlayerAction::Fire] );
+        }
+        else if( this->mIdentifier == Category::Player2 )
+        {
+            if( sf::Joystick::getAxisPosition( 1, sf::Joystick::Y ) < 0 ) // move forward
+                commands.push( mActionBinding[PlayerAction::MoveUp] );
+            else if( sf::Joystick::getAxisPosition( 1, sf::Joystick::X ) > 0 ) // rotate right
+                commands.push( mActionBinding[PlayerAction::MoveRight] );
+            else if( sf::Joystick::getAxisPosition( 1, sf::Joystick::X ) < 0 )
+                commands.push( mActionBinding[PlayerAction::MoveLeft] );
+            if( sf::Joystick::isButtonPressed( 1, 1 ) )
+                commands.push( mActionBinding[PlayerAction::Fire] );
+        }
+
+        // Lookup all actions and push corresponding commands to queue
+        std::vector<PlayerAction::Type> activeActions = mKeyBinding->getRealtimeActions( );
+        for( PlayerAction::Type action : activeActions )
+            commands.push( mActionBinding[action] );
+   }
+}
+
+void Player::handleRealtimeNetworkInput(CommandQueue& commands)
+{
+    if ( mSocket && !isLocal( ) )
+    {
+       // Traverse all realtime input proxies. Because this is a networked game, the input isn't handled directly
+        for( auto pair : mActionProxies )
+        {
+            if( pair.second && isRealtimeAction( pair.first ) )
+                commands.push( mActionBinding[pair.first] );
         }
     }
 }
 
-void Player::assignKey( Action action, sf::Keyboard::Key key )
+void Player::handleNetworkEvent(PlayerAction::Type action, CommandQueue& commands )
 {
-    // Remove all keys that already map to action
-    for( auto itr = mKeyBinding.begin( ); itr != mKeyBinding.end( ); )
-    {
-        if( itr->second == action )
-            mKeyBinding.erase( itr++ );
-        else
-            ++itr;
-    }
-    // Insert new binding
-    mKeyBinding[key] = action;
+    commands.push( mActionBinding[action] );
 }
 
-sf::Keyboard::Key Player::getAssignedKey( Action action ) const
+void Player::handleNetworkRealtimeChange(PlayerAction::Type action, bool actionEnabled )
 {
-    for( auto pair : mKeyBinding )
-    {
-        if( pair.second == action )
-            return pair.first;
-    }
-    return sf::Keyboard::Unknown;
+    mActionProxies[action] = actionEnabled;
 }
 
 void Player::initializeActions( )
 {
-    mActionBinding[MoveLeft].action      = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){ a.rotate( -1 * a.speed( ) ); } );
-    mActionBinding[MoveRight].action     = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){ a.rotate( a.speed( ) ); } );
-
-    mActionBinding[MoveUp].action        = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){
-            // break down angle to x and y
-            double angle = a.getRotation() * (3.14 / 180);
-            sf::Vector2f force;
-            force.x = sin( angle );
-            force.y = -cos( angle );
-            // apply speed to components seperatly
-            force *= a.speed( );
-            // accellerate the ship with the results
-            a.accelerate( force );
-
-            // Validate ship isnt going to fast and correct if needed.
-            float totalVelocity = (float)std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) );
-            if( totalVelocity > a.maximumVelocity( ) )
-                a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
+    mActionBinding[PlayerAction::MoveLeft].action      = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
+            if( this->mIdentifier == a.getIdentifier( ) )
+                a.rotate( -1 * a.speed( ) );
     } );
-/*
-    mActionBinding[MoveDown].action      = derivedAction<StarShip>( [] ( StarShip& a, sf::Time ){
-            // break down angle to x and y
-            double angle = a.getRotation() * (3.14 / 180);
-            sf::Vector2f force;
-            force.x = sin( angle );
-            force.y = -cos( angle );
-            // apply speed to components seperatly
-            force *= -a.speed( );
-            // accellerate the ship with the results
-            a.accelerate( force );
-
-            // Validate ship isnt going to fast and correct if needed.
-            float totalVelocity = (float)std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) );
-            if( totalVelocity > a.maximumVelocity( ) )
-                a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
+    mActionBinding[PlayerAction::MoveRight].action     = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
+            if( this->mIdentifier == a.getIdentifier( ) )
+                a.rotate( a.speed( ) );
     } );
-*/
-}
-
-bool Player::isRealtimeAction( Action action )
-{
-    switch( action )
-    {
-        case MoveLeft:
-        case MoveRight:
-        case MoveDown:
-        case MoveUp:
-            return true;
-        default:
-            return false;
-    }
+     mActionBinding[PlayerAction::MoveUp].action        = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
+            if( this->mIdentifier == a.getIdentifier( ) )
+            {
+                // break down angle to x and y
+                double angle = a.getRotation() * (3.14 / 180);
+                sf::Vector2f force;
+                force.x = sin( angle );
+                force.y = -cos( angle );
+                // apply speed to components seperatly
+                force *= a.speed( );
+                // accellerate the ship with the results
+                a.accelerate( force );
+                // Validate ship isnt going to fast and correct if needed.
+                float totalVelocity = (float)std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) );
+                if( totalVelocity > a.maximumVelocity( ) + a.getHitpoints( ) )
+                    a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
+            }
+    } );
+    mActionBinding[PlayerAction::Fire].action         = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ) {
+            if( this->mIdentifier == a.getIdentifier() ) a.fire( );
+    });
 }

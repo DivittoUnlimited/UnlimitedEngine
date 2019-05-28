@@ -29,12 +29,21 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 
     auto playButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
-    playButton->setText( "Play" );
+    playButton->setText( "One Player" );
     playButton->setCallback( [this] ( )
 	{
         requestStackPop( );
-        requestStackPush( States::Loading );
+        requestStackPush( States::SinglePlayer );
 	});
+
+    auto playMultiplayerButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    playMultiplayerButton->setPosition( WINDOW_WIDTH / 2 - 100, 550 );
+    playMultiplayerButton->setText( "Two Player" );
+    playMultiplayerButton->setCallback( [this] ( )
+    {
+        requestStackPop( );
+        requestStackPush( States::HostGame );
+    });
 
     /*
      * Removed for debugging
@@ -47,7 +56,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 	});
     */
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 600 );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 650 );
     exitButton->setText( "Exit" );
     exitButton->setCallback([this] ( )
 	{
@@ -55,9 +64,9 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStateClear( );
 	});
 
-
     //mGUIContainer.pack( settingsButton );
     mGUIContainer.pack( playButton );
+    mGUIContainer.pack( playMultiplayerButton );
     mGUIContainer.pack( exitButton );
 }
 

@@ -56,11 +56,11 @@ private:
     virtual void			drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
     void					drawChildren( sf::RenderTarget& target, sf::RenderStates states ) const;
     void					drawBoundingRect( sf::RenderTarget& target, sf::RenderStates states ) const;
-
-    Category::Type			mDefaultCategory; // Still Needed?
 protected:
     std::vector<Ptr>		mChildren;
     SceneNode*				mParent;
+    Category::Type			mDefaultCategory; // Still Needed?
+
 
 };
 

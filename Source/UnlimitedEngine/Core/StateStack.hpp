@@ -35,7 +35,10 @@ public:
     template <typename T>
     void registerState( States::ID stateID );
 
-    void update(sf::Time dt);
+    template <typename T, typename Param1>
+    void registerState( States::ID stateID, Param1 arg1 );
+
+    void update( sf::Time dt );
     void draw( );
     void handleEvent( const sf::Event& event );
 
@@ -68,10 +71,19 @@ private:
 template <typename T>
 void StateStack::registerState( States::ID stateID )
 {
-    mFactories[stateID] = [=] ( )
-	{
-        return State::Ptr( new T( stateID, *this, mContext ) );
-	};
+    mFactories[stateID] = [this, stateID] ( )
+    {
+        return State::Ptr( new T( stateID, *this, this->mContext ) );
+    };
+}
+
+template <typename T, typename Param1>
+void StateStack::registerState( States::ID stateID, Param1 arg1 )
+{
+    mFactories[stateID] = [this, stateID, arg1] ( )
+    {
+        return State::Ptr( new T( stateID, *this, mContext, arg1 ) );
+    };
 }
 
 #endif // STATESTACK_HPP

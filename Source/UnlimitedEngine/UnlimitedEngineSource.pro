@@ -8,11 +8,17 @@ CONFIG += c++11
 LIBS += -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-window -lsfml-system
 
 SOURCES += \
+    Core/GameServer.cpp \
+    Core/KeyBinding.cpp \
+    Core/NetworkNode.cpp \
+    Core/World.cpp \
     Objects/AIStarShipController.cpp \
+    Objects/Bullet.cpp \
     Objects/Bumper.cpp \
     Objects/Flag.cpp \
     Objects/Goal.cpp \
     Objects/StarShip.cpp \
+    States/MultiplayerGameState.cpp \
         main.cpp \
     lua/lapi.c \
     lua/lauxlib.c \
@@ -79,7 +85,6 @@ SOURCES += \
     Gui/Label.cpp \
     States/SplashScreen.cpp \
     Gui/Button.cpp \
-    States/SettingsState.cpp \
     Core/ParticleNode.cpp \
     Core/RectangleShapeNode.cpp \
     Gui/MessageBoxNode.cpp \
@@ -88,11 +93,23 @@ SOURCES += \
     Core/CollisionMan.cpp
 
 HEADERS += \
-    Objects/AIController.hpp \
+    Core/FiniteStateMachine.hpp \
+    Core/FiniteStateMachine.inl \
+    Core/GameServer.hpp \
+    Core/KeyBinding.hpp \
+    Core/NetworkNode.hpp \
+    Core/NetworkProtocol.hpp \
+    Core/World.hpp \
+    Objects/AIStarShipController.hpp \
+    Objects/Arena.hpp \
+    Objects/Bullet.hpp \
     Objects/Bumper.hpp \
     Objects/Flag.hpp \
     Objects/Goal.hpp \
     Objects/StarShip.hpp \
+    Objects/Team.hpp \
+    States/MenuState.hpp \
+    States/MultiplayerGameState.hpp \
     lua/lapi.h \
     lua/lauxlib.h \
     lua/lcode.h \
@@ -146,7 +163,6 @@ HEADERS += \
     Core/Utility.hpp \
     States/GameState.hpp \
     States/LoadingState.hpp \
-    States/MenuState.hpp \
     States/PauseState.hpp \
     States/TitleState.hpp \
     Gui/Component.hpp \
@@ -154,7 +170,6 @@ HEADERS += \
     Gui/Label.hpp \
     States/SplashScreen.hpp \
     Gui/Button.hpp \
-    States/SettingsState.hpp \
     Core/Particle.hpp \
     Core/ParticleNode.hpp \
     Tiled/TiledManager.hpp \
@@ -166,6 +181,7 @@ HEADERS += \
     Core/CollisionMan.hpp
 
 DISTFILES += \
+    Core/ip.txt \
     Game/Resources/Actors.lua \
     Media/Sansation.ttf \
     Media/Shaders/Add.frag \
@@ -213,10 +229,4 @@ DISTFILES += \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Notes.txt \
     Game/Resources/Warps.lua \
-    Game/Resources/Conversations.lua \
-    Media/Textures/trainers.png \
-    Media/Textures/tiles.png \
-    Media/Textures/wagonWheel.png \
-    Media/Textures/woodTexture.png \
-    Media/Textures/cowboy.png \
-    Media/Textures/SevenSunSetDemoTexture.png
+    Game/Resources/Conversations.lua

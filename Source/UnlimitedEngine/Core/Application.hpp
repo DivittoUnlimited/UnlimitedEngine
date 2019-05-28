@@ -34,10 +34,10 @@ private:
 
     TextureManager		  mTextures;
     FontManager  		  mFonts;
-    Player   			  mPlayer;
     MusicPlayer           mMusic;
     SoundPlayer           mSoundEffects;
-
+    KeyBinding				mKeyBinding1;
+    KeyBinding				mKeyBinding2;
     // Game FSM
     State::Context        mContext;
     StateStack			  mStateStack;
