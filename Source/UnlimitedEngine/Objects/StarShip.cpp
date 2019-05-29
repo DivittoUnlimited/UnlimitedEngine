@@ -38,7 +38,7 @@ StarShip::StarShip( Category::Type category )
     {
          std::unique_ptr<Bullet> bullet( new Bullet( this->getPosition( ), this->getVelocity( ), this->getRotation( ) ) );
 
-         bullet->setPosition( getWorldPosition( ) );
+         bullet->setPosition( getPosition( ) );
          node.attachChild( std::move( bullet ) );
     };
 }
@@ -66,7 +66,7 @@ bool StarShip::isMarkedForRemoval( ) const
 void StarShip::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
     if( mShotTimer > sf::Time::Zero ) mShotTimer -= dt;
-    else if( mFire ) {
+    if( mFire ) {
         commands.push( mFireCommand );
         mFire = false;
     }

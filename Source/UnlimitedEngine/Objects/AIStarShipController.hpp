@@ -20,7 +20,7 @@ public:
 
     void update( sf::Time, CommandQueue&, T* owner )
     {
-        owner->rotateLeft();
+        //owner->fire( );
     }
 
     void onEnter( T* )

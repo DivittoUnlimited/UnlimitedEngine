@@ -7,7 +7,8 @@
 GameState::GameState( States::ID id, StateStack& stack, Context context )
     : State( id, stack, context )
     , mWorld( *context.window, *context.fonts, *context.sounds, false, true )
-    , mPlayer( nullptr, 1, context.keys1 )
+    , mPlayer( nullptr, Category::Player, context.keys1 )
+    , mPlayer2( new Player( nullptr, Category::Player2, context.keys2 ) )
     , mBlue2( Category::Blue2 )
     , mBlue3( Category::Blue3 )
     , mRed1( Category::Red1 )
@@ -79,6 +80,7 @@ GameState::~GameState( )
     } else std::cout << "Error reading Game.lua data table" << std::endl;
     lua_close( L );
     */
+    delete mPlayer2;
 }
 
 void GameState::draw( )
@@ -106,8 +108,14 @@ bool GameState::update( sf::Time dt )
     CommandQueue& commands = mWorld.getCommandQueue( );
     try { mPlayer.handleRealtimeInput( commands ); }
     catch( std::exception& e ) {
-        std::cout << "There was an exception during the PlayerInput update: " << e.what( ) << std::endl;
+        std::cout << "There was an exception during the Player1_Input update: " << e.what( ) << std::endl;
     }
+
+    if( mPlayer2 != nullptr )
+        try { mPlayer2->handleRealtimeInput( commands ); }
+        catch( std::exception& e ) {
+            std::cout << "There was an exception during the Player2_Input update: " << e.what( ) << std::endl;
+        }
 
     mBlue2.updateCurrent( dt, commands );
     mBlue3.updateCurrent( dt, commands );

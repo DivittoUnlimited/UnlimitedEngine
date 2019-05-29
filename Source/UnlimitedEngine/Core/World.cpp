@@ -266,10 +266,6 @@ void World::buildScene( void )
         Red1->setIdentifier( Category::Player2 );
         ARENA->REDTEAM->starShips[0] = Red1.get( );
         mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
-
-        ///
-        /// You need to define a playe 2 member variable and update it like player 1!!!!!!!!!!!!!!!!!!1
-        ///
     }
     else {
         std::unique_ptr<StarShip> Red1( new StarShip( Category::Red1 ) );
