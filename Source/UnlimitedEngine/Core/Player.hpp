@@ -7,8 +7,6 @@
 #include <SFML/Network/TcpSocket.hpp>
 #include <map>
 
-class CommandQueue;
-
 class Player
 {
 public:

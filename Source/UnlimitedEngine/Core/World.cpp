@@ -13,7 +13,7 @@ StarShip* Red;
 Goal* GoalBlue = new Goal( Category::GoalBlue );
 Goal* GoalRed  = new Goal( Category::GoalRed );
 */
-World::World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked )
+World::World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked, bool isLocalMultiplayer )
     : mTarget( outputTarget )
     , mSceneTexture( )
     , mWorldView( mTarget.getDefaultView( ) )
@@ -24,6 +24,7 @@ World::World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& s
     , mSceneGraph( )
     , mSceneLayers( )
     , mNetworkedWorld( networked )
+    , mLocalMultiplayerWorld( isLocalMultiplayer )
     , mNetworkNode( nullptr )
     , mTeamAScore( 3 )
     , mTeamBScore( 3 )
@@ -145,7 +146,7 @@ void World::handleCollisions( )
 
     for( std::pair<SceneNode*, SceneNode*> pair : collisionPairs )
     {
-        if( matchesCategories( pair, Category::StarShipBlue, Category::FlagRed ) || matchesCategories( pair, Category::Player, Category::FlagRed ) )
+        if( matchesCategories( pair, Category::BlueTeam, Category::FlagRed ) || matchesCategories( pair, Category::Player, Category::FlagRed ) )
         {
               auto& player = static_cast<StarShip&>( *pair.first );
               if( !player.getHasFlag( ) )
@@ -157,7 +158,7 @@ void World::handleCollisions( )
                     player.setHasFlag( true );
               }
         }
-        else if( matchesCategories( pair, Category::StarShipRed, Category::FlagBlue ) || matchesCategories( pair, Category::Player2, Category::FlagBlue ) )
+        else if( matchesCategories( pair, Category::RedTeam, Category::FlagBlue ) || matchesCategories( pair, Category::Player2, Category::FlagBlue ) )
         {
               auto& player = static_cast<StarShip&>( *pair.first );
               if( !player.getHasFlag( ) )
@@ -246,31 +247,46 @@ void World::buildScene( void )
     ARENA->BLUETEAM->starShips[0] = blue1.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue1 ) );
 
-    std::unique_ptr<StarShip> blue2( new StarShip( Category::StarShipBlue ) );
+    std::unique_ptr<StarShip> blue2( new StarShip( Category::Blue2 ) );
     blue2->setPosition( 250, WINDOW_HEIGHT - 150 );
     ARENA->BLUETEAM->starShips[1] = blue2.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue2 ) );
 
-    std::unique_ptr<StarShip> blue3( new StarShip( Category::StarShipBlue ) );
+    std::unique_ptr<StarShip> blue3( new StarShip( Category::Blue3 ) );
     blue3->setPosition( WINDOW_WIDTH - 250, WINDOW_HEIGHT - 150 );
     ARENA->BLUETEAM->starShips[2] = blue3.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue3 ) );
 
     // Red StarShips
-    std::unique_ptr<StarShip> Red1( new StarShip( Category::Player2 ) );
-    Red1->setPosition( WINDOW_WIDTH / 2, 200 );
-    Red1->rotate( 180.0f );
-    Red1->setIdentifier( Category::Player2 );
-    ARENA->REDTEAM->starShips[0] = Red1.get( );
-    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
+    if( mLocalMultiplayerWorld )
+    {
+        std::unique_ptr<StarShip> Red1( new StarShip( Category::Player2 ) );
+        Red1->setPosition( WINDOW_WIDTH / 2, 200 );
+        Red1->rotate( 180.0f );
+        Red1->setIdentifier( Category::Player2 );
+        ARENA->REDTEAM->starShips[0] = Red1.get( );
+        mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
 
-    std::unique_ptr<StarShip> Red2( new StarShip( Category::StarShipRed ) );
-    Red2->setPosition( 250, 150 );
-    Red2->rotate( 180.0f );
-    ARENA->REDTEAM->starShips[1] = Red2.get( );
-    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red2 ) );
+        ///
+        /// You need to define a playe 2 member variable and update it like player 1!!!!!!!!!!!!!!!!!!1
+        ///
+    }
+    else {
+        std::unique_ptr<StarShip> Red1( new StarShip( Category::Red1 ) );
+        Red1->setPosition( WINDOW_WIDTH / 2, 200 );
+        Red1->rotate( 180.0f );
+        Red1->setIdentifier( Category::Player2 );
+        ARENA->REDTEAM->starShips[0] = Red1.get( );
+        mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
+    }
 
-    std::unique_ptr<StarShip> Red3( new StarShip( Category::StarShipRed ) );
+    std::unique_ptr<StarShip> red2( new StarShip( Category::Red2 ) );
+    red2->setPosition( 250, 150 );
+    red2->rotate( 180.0f );
+    ARENA->REDTEAM->starShips[1] = red2.get( );
+    mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( red2 ) );
+
+    std::unique_ptr<StarShip> Red3( new StarShip( Category::Red3 ) );
     Red3->setPosition( WINDOW_WIDTH - 250, 150 );
     Red3->rotate( 180.0f );
     ARENA->REDTEAM->starShips[2] = Red3.get( );

@@ -44,12 +44,50 @@ AIStarShipController::AIStarShipController( unsigned int identifier )
     , mMoveRightFlag( false )
     , mThrustFlag( false )
     , mFireFlag( false )
+    , mMoveLeftCommand( )
+    , mMoveRightCommand( )
+    , mThrustCommand( )
+    , mFireCommand( )
 {
     // define commands
+    mMoveLeftCommand.category = mIdentifier;
+    mMoveLeftCommand.action = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
+            if( this->mIdentifier == static_cast<unsigned int>(a.getIdentifier( ) ) )
+                a.rotate( -1 * a.speed( ) );
+    } );
+    mMoveRightCommand.category = mIdentifier;
+    mMoveRightCommand.action = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
+            if( this->mIdentifier == static_cast<unsigned int>(a.getIdentifier( ) ) )
+                a.rotate( a.speed( ) );
+    } );
+    mThrustCommand.category = mIdentifier;
+    mThrustCommand.action = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
+            if( this->mIdentifier == static_cast<unsigned int>(a.getIdentifier( ) ) )
+            {
+                // break down angle to x and y
+                float angle = a.getRotation( ) * ( 3.14f / 180.0f );
+                sf::Vector2f force;
+                force.x = static_cast<float>( sin( angle ) );
+                force.y = static_cast<float>( -cos( angle ) );
+                // apply speed to components seperatly
+                force *= a.speed( );
+                // accellerate the ship with the results
+                a.accelerate( force );
+                // Validate ship isnt going to fast and correct if needed.
+                float totalVelocity = static_cast<float>( std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) ) );
+                if( totalVelocity > a.maximumVelocity( ) + a.getHitpoints( ) )
+                    a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
+            }
+    } );
+    mFireCommand.category = mIdentifier;
+    mFireCommand.action = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ) {
+            if( this->mIdentifier == static_cast<unsigned int>( a.getIdentifier( ) ) ) a.fire( );
+    });
 }
 
 void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
+    mFsm.update( dt, commands );
     // eval commands and act accordingly
     if( mMoveLeftFlag )
     {
@@ -76,37 +114,4 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
 unsigned int AIStarShipController::getCategory( void ) const
 {
     return mIdentifier; // CHECK ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-}
-
-void AIStarShipController::initializeActions( )
-{
-    mActionBinding[PlayerAction::MoveLeft].action      = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
-            if( this->mIdentifier == (unsigned int)a.getIdentifier( ) )
-                a.rotate( -1 * a.speed( ) );
-    } );
-    mActionBinding[PlayerAction::MoveRight].action     = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
-            if( this->mIdentifier == (unsigned int)a.getIdentifier( ) )
-                a.rotate( a.speed( ) );
-    } );
-     mActionBinding[PlayerAction::MoveUp].action        = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
-            if( this->mIdentifier == (unsigned int)a.getIdentifier( ) )
-            {
-                // break down angle to x and y
-                double angle = a.getRotation() * (3.14 / 180);
-                sf::Vector2f force;
-                force.x = sin( angle );
-                force.y = -cos( angle );
-                // apply speed to components seperatly
-                force *= a.speed( );
-                // accellerate the ship with the results
-                a.accelerate( force );
-                // Validate ship isnt going to fast and correct if needed.
-                float totalVelocity = (float)std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) );
-                if( totalVelocity > a.maximumVelocity( ) + a.getHitpoints( ) )
-                    a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
-            }
-    } );
-    mActionBinding[PlayerAction::Fire].action         = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ) {
-            if( this->mIdentifier == (unsigned int)a.getIdentifier() ) a.fire( );
-    });
 }

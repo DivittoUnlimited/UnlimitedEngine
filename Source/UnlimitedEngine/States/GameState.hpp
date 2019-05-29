@@ -3,6 +3,7 @@
 
 #include "Core/World.hpp"
 #include "Core/Player.hpp"
+#include "Objects/AIStarShipController.hpp"
 
 // Forward declaration
 namespace sf
@@ -23,6 +24,12 @@ public:
 protected:
     World   mWorld;
     Player  mPlayer;
+    AIStarShipController mBlue2;
+    AIStarShipController mBlue3;
+
+    AIStarShipController mRed1;
+    AIStarShipController mRed2;
+    AIStarShipController mRed3;
 };
 
 #endif // GAMESTATE_HPP

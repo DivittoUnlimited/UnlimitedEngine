@@ -6,8 +6,13 @@
 
 GameState::GameState( States::ID id, StateStack& stack, Context context )
     : State( id, stack, context )
-    , mWorld( *context.window, *context.fonts, *context.sounds, false )
+    , mWorld( *context.window, *context.fonts, *context.sounds, false, true )
     , mPlayer( nullptr, 1, context.keys1 )
+    , mBlue2( Category::Blue2 )
+    , mBlue3( Category::Blue3 )
+    , mRed1( Category::Red1 )
+    , mRed2( Category::Red2 )
+    , mRed3( Category::Red3 )
 {
 
 }
@@ -103,6 +108,13 @@ bool GameState::update( sf::Time dt )
     catch( std::exception& e ) {
         std::cout << "There was an exception during the PlayerInput update: " << e.what( ) << std::endl;
     }
+
+    mBlue2.updateCurrent( dt, commands );
+    mBlue3.updateCurrent( dt, commands );
+
+    mRed1.updateCurrent( dt, commands );
+    mRed2.updateCurrent( dt, commands );
+    mRed3.updateCurrent( dt, commands );
 
     return true;
 }

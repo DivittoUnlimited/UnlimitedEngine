@@ -18,23 +18,23 @@ public:
     {
     }
 
-    void update( sf::Time dt, CommandQueue& commands, T* owner )
+    void update( sf::Time, CommandQueue&, T* owner )
     {
         owner->rotateLeft();
     }
 
-    void onEnter( T* owner )
+    void onEnter( T* )
     {
         std::cout << "IdleState onEnter( ) entered." << std::endl;
     }
 
-    void onExit( T* owner )
+    void onExit( T* )
     {
         std::cout << "IdleState onExit( ) entered" << std::endl;
     }
 };
 
-class AIStarShipController : public SceneNode
+class AIStarShipController
 {
 public:
     typedef PlayerAction::Type Action;
@@ -47,7 +47,6 @@ public:
     void rotateRight( void ) { mMoveRightFlag = true; }
     void thrust( void ) { mThrustFlag = true; }
     void fire( void ) { mFireFlag = true; }
-    void initializeActions( );
 
     AI::FiniteStateMachine<AIStarShipController> mFsm;
     unsigned int mIdentifier;

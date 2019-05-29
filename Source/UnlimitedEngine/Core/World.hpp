@@ -44,7 +44,7 @@ enum Ships {
 class World
 {
 public:
-    World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked = false );
+    World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked = false, bool isLocalMultiplayer = false );
     ~World( void );
     void draw( void );
     bool update( sf::Time dt );
@@ -74,6 +74,7 @@ private:
     SceneNode							mSceneGraph;
     std::vector<SceneNode*>          	mSceneLayers;   
     bool								mNetworkedWorld;
+    bool                                mLocalMultiplayerWorld;
     NetworkNode*						mNetworkNode;
     unsigned int                        mTeamAScore;
     unsigned int                        mTeamBScore;
