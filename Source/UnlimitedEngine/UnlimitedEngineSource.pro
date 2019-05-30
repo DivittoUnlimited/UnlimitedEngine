@@ -101,6 +101,7 @@ HEADERS += \
     Core/NetworkProtocol.hpp \
     Core/World.hpp \
     Objects/AIStarShipController.hpp \
+    Objects/AIStarShipController.inl \
     Objects/Arena.hpp \
     Objects/Bullet.hpp \
     Objects/Bumper.hpp \

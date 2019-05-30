@@ -37,6 +37,7 @@ struct AircraftFireTrigger
 };
 
 
+
 AIStarShipController::AIStarShipController( unsigned int identifier )
     : mFsm( AI::FiniteStateMachine<AIStarShipController>( this, new IdleState<AIStarShipController>(  ) ) )
     , mIdentifier( identifier )

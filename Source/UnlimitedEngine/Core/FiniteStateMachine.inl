@@ -15,14 +15,14 @@ void AI::FiniteStateMachine<T>::update( sf::Time dt, CommandQueue& commands )
 }
 
 template<class T>
-void AI::FiniteStateMachine<T>::changeState( State<T>* state )
+void AI::FiniteStateMachine<T>::changeState( State<T>* state, void* data )
 {
     assert( state );
     mCurrentState->onExit( mOwner );
     mPrevState = nullptr;
     mPrevState = mCurrentState;
     mCurrentState = state;
-    mCurrentState->onEnter( mOwner );
+    mCurrentState->onEnter( mOwner, data );
 }
 
 template<class T>

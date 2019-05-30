@@ -9,6 +9,8 @@
 #include "Core/Globals.hpp"
 #include "Core/KeyBinding.hpp"
 
+class AIStarShipController;
+
 template<class T>
 class IdleState : public AI::State<T>
 {
@@ -18,25 +20,35 @@ public:
     {
     }
 
-    void update( sf::Time, CommandQueue&, T* owner )
+    virtual ~IdleState( void ) {}
+    void update( sf::Time, CommandQueue&, T* owner );
+    void onEnter( T* owner, void* data );
+    void onExit( T* owner );
+};
+
+template<class T>
+class MoveToState : public AI::State<T>
+{
+public:
+    MoveToState( void )
+        : AI::State<T>( )
     {
-        //owner->fire( );
     }
 
-    void onEnter( T* )
-    {
-        std::cout << "IdleState onEnter( ) entered." << std::endl;
-    }
+    void update( sf::Time, CommandQueue&, T* owner );
 
-    void onExit( T* )
-    {
-        std::cout << "IdleState onExit( ) entered" << std::endl;
-    }
+    void onEnter( T* owner, void* data );
+    void onExit( T* owner );
+private:
+    //## MoveTo State Attributes
+    sf::Vector2f mTargetPos;
+    std::map<sf::Time, Command> mCommandList;
 };
 
 class AIStarShipController
 {
 public:
+    /// 1-800-552-8159 insurance number you need to call ASAP!!!!!!!!!
     typedef PlayerAction::Type Action;
     AIStarShipController( unsigned int identifier );
 
@@ -60,5 +72,5 @@ public:
     Command mThrustCommand;
     Command mFireCommand;
 };
-
+#include "AIStarShipController.inl"
 #endif // AICONTROLLER_HPP
