@@ -26,9 +26,9 @@ StarShip::StarShip( Category::Type category )
     mSprite.setOutlineThickness( 1 );
     mSprite.setOutlineColor( sf::Color::White );
 
-    if( mCategory == Category::BlueTeam )
+    if( mCategory == Category::Player || mCategory == Category::Blue1 || mCategory == Category::Blue2 || mCategory == Category::Blue3  )
         mSprite.setFillColor( sf::Color::Blue );
-    else if( mCategory == Category::RedTeam )
+    else if( mCategory == Category::Player2 || mCategory == Category::Red1 || mCategory == Category::Red2 || mCategory == Category::Red3 )
         mSprite.setFillColor( sf::Color::Red );
     else
         mSprite.setFillColor( sf::Color( 255, 0, 255, 0 ) );
