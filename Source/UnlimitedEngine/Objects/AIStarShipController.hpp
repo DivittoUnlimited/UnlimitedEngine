@@ -9,7 +9,16 @@
 #include "Core/Globals.hpp"
 #include "Core/KeyBinding.hpp"
 
+
+class StarShip;
 class AIStarShipController;
+
+enum AIStarShipState
+{
+      None = 0
+    , Idle
+    , MoveTo
+};
 
 template<class T>
 class IdleState : public AI::State<T>
@@ -19,7 +28,6 @@ public:
         : AI::State<T>( )
     {
     }
-
     virtual ~IdleState( void ) {}
     void update( sf::Time, CommandQueue&, T* owner );
     void onEnter( T* owner, void* data );
@@ -32,17 +40,18 @@ class MoveToState : public AI::State<T>
 public:
     MoveToState( void )
         : AI::State<T>( )
-    {
-    }
-
+        , mStarShip( nullptr )
+        , mTargetPos( 0.0f, 0.0f )
+        , mTargetAngle( 0.0f )
+    { }
     void update( sf::Time, CommandQueue&, T* owner );
-
     void onEnter( T* owner, void* data );
     void onExit( T* owner );
 private:
     //## MoveTo State Attributes
+    StarShip* mStarShip;
     sf::Vector2f mTargetPos;
-    std::map<sf::Time, Command> mCommandList;
+    float        mTargetAngle;
 };
 
 class AIStarShipController
@@ -50,7 +59,7 @@ class AIStarShipController
 public:
     /// 1-800-552-8159 insurance number you need to call ASAP!!!!!!!!!
     typedef PlayerAction::Type Action;
-    AIStarShipController( unsigned int identifier );
+    AIStarShipController( unsigned int identifier = 1 );
 
     void updateCurrent( sf::Time dt, CommandQueue& commands );
     unsigned int getCategory( void ) const;
@@ -66,7 +75,8 @@ public:
     bool mMoveRightFlag;
     bool mThrustFlag;
     bool mFireFlag;
-    std::map<PlayerAction::Type, Command>	mActionBinding;
+    AIStarShipState mNextState;
+
     Command mMoveLeftCommand;
     Command mMoveRightCommand;
     Command mThrustCommand;

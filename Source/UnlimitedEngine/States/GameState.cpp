@@ -2,18 +2,16 @@
 #include "Core/MusicPlayer.hpp"
 #include "Core/Globals.hpp"
 
-
-
 GameState::GameState( States::ID id, StateStack& stack, Context context )
     : State( id, stack, context )
-    , mWorld( *context.window, *context.fonts, *context.sounds, false, true )
+    , mWorld( *context.window, *context.fonts, *context.sounds, false, false )
     , mPlayer( nullptr, Category::Player, context.keys1 )
     , mPlayer2( new Player( nullptr, Category::Player2, context.keys2 ) )
-    , mBlue2( Category::Blue2 )
-    , mBlue3( Category::Blue3 )
-    , mRed1( Category::Red1 )
-    , mRed2( Category::Red2 )
-    , mRed3( Category::Red3 )
+    , mBlue2( (unsigned int)Category::Blue2 )
+    , mBlue3( (unsigned int)Category::Blue3 )
+    , mRed1( (unsigned int)Category::Red1 )
+    , mRed2( (unsigned int)Category::Red2 )
+    , mRed3( (unsigned int)Category::Red3 )
 {
 
 }
@@ -138,7 +136,3 @@ bool GameState::handleEvent( const sf::Event& event )
 
 	return true;
 }
-
-
-
-

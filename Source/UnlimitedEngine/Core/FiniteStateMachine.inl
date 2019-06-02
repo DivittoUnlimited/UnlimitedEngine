@@ -20,7 +20,8 @@ void AI::FiniteStateMachine<T>::changeState( State<T>* state, void* data )
     assert( state );
     mCurrentState->onExit( mOwner );
     mPrevState = nullptr;
-    mPrevState = mCurrentState;
+    *mPrevState = *mCurrentState;
+    mCurrentState = nullptr;
     mCurrentState = state;
     mCurrentState->onEnter( mOwner, data );
 }

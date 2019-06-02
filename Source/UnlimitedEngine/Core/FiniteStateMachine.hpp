@@ -20,7 +20,7 @@ public:
     FiniteStateMachine( T* owner, State<T>* startingState );
 
     void update( sf::Time dt, CommandQueue& commands );
-    void changeState( State<T>* state , void* data );
+    void changeState( State<T>* state, void* data = nullptr );
     void revertState( void );
 
     T* getOwner( void ) { return mOwner; }

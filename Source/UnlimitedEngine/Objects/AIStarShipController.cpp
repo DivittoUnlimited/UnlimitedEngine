@@ -39,8 +39,7 @@ struct AircraftFireTrigger
 
 
 AIStarShipController::AIStarShipController( unsigned int identifier )
-    : mFsm( AI::FiniteStateMachine<AIStarShipController>( this, new IdleState<AIStarShipController>(  ) ) )
-    , mIdentifier( identifier )
+    : mIdentifier( identifier )
     , mMoveLeftFlag( false )
     , mMoveRightFlag( false )
     , mThrustFlag( false )
@@ -49,6 +48,8 @@ AIStarShipController::AIStarShipController( unsigned int identifier )
     , mMoveRightCommand( )
     , mThrustCommand( )
     , mFireCommand( )
+    , mFsm( AI::FiniteStateMachine<AIStarShipController>( this, new IdleState<AIStarShipController>( ) ) )
+    , mNextState( AIStarShipState::None )
 {
     // define commands
     mMoveLeftCommand.category = mIdentifier;
@@ -88,6 +89,22 @@ AIStarShipController::AIStarShipController( unsigned int identifier )
 
 void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
+    if( mNextState != AIStarShipState::None )
+    {
+        switch( mNextState )
+        {
+            case AIStarShipState::Idle:
+                mFsm.changeState( new IdleState<AIStarShipController>( ) );
+            break;
+            case AIStarShipState::MoveTo:
+                mFsm.changeState( new MoveToState<AIStarShipController>(  ), static_cast<void*>( new sf::Vector2f( 100.0f, -100.0f ) ) );
+            break;
+            default:
+                std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;
+            break;
+        }
+        mNextState = AIStarShipState::None;
+    }
     mFsm.update( dt, commands );
     // eval commands and act accordingly
     if( mMoveLeftFlag )

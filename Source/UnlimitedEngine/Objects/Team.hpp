@@ -37,5 +37,4 @@ struct Team {
     std::vector<Flag*> flags;
 };
 
-
 #endif // TEAM_HPP

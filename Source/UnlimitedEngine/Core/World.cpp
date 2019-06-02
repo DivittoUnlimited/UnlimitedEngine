@@ -271,7 +271,7 @@ void World::buildScene( void )
         std::unique_ptr<StarShip> Red1( new StarShip( Category::Red1 ) );
         Red1->setPosition( WINDOW_WIDTH / 2, 200 );
         Red1->rotate( 180.0f );
-        Red1->setIdentifier( Category::Player2 );
+        Red1->setIdentifier( Category::Red1 );
         ARENA->REDTEAM->starShips[0] = Red1.get( );
         mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
     }
