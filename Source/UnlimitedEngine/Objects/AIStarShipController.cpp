@@ -97,7 +97,7 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
                 mFsm.changeState( new IdleState<AIStarShipController>( ) );
             break;
             case AIStarShipState::MoveTo:
-                mFsm.changeState( new MoveToState<AIStarShipController>(  ), static_cast<void*>( new sf::Vector2f( 100.0f, -100.0f ) ) );
+                mFsm.changeState( new MoveToState<AIStarShipController>(  ), static_cast<void*>( new sf::Vector2f( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 ) ) );
             break;
             default:
                 std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;
@@ -131,5 +131,5 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
 
 unsigned int AIStarShipController::getCategory( void ) const
 {
-    return mIdentifier; // CHECK ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+    return mIdentifier;
 }
