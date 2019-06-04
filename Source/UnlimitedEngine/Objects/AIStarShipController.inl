@@ -27,15 +27,6 @@ void IdleState<T>::onExit( T* )
 
 // ====================================================================================
 
-template<class T>
-void MoveToState<T>::update( sf::Time, CommandQueue&, T* owner )
-{
-    std::cout << mTargetAngle << std::endl;
-    float rot = mStarShip->getRotation() * ( 3.14f / 180.0f );
-   owner->rotateRight();
-
-    owner->thrust();
-}
 // Computes the bearing in degrees from the point A(a1,a2) to
 // the point B(b1,b2). Note that A and B are given in terms of
 // screen coordinates.
@@ -45,9 +36,55 @@ static double bearing(double a1, double a2, double b1, double b2) {
     // if (a1 = b1 and a2 = b2) throw an error
     double theta = atan2(b1 - a1, a2 - b2);
     if (theta < 0.0)
-        theta += TWOPI;
+       theta += TWOPI;
     return RAD2DEG * theta;
 }
+
+template<class T>
+void MoveToState<T>::update( sf::Time, CommandQueue&, T* owner )
+{
+    mTargetAngle = bearing( mStarShip->getPosition().x, mStarShip->getPosition().y, mTargetPos.x, mTargetPos.y );
+    float rot = mStarShip->getRotation() ;//* ( 3.14f / 180.0f );
+
+    if( owner->mIdentifier == 16 )
+        std::cout << owner->mIdentifier << ": Current: " << rot << ", Target: " << mTargetAngle << std::endl;
+
+    if( 180 > rot )
+    {
+        if( 180 > mTargetAngle )
+        {
+            if( rot < mTargetAngle - mStarShip->speed( ) )
+                owner->rotateRight( );
+            else if( rot > mTargetAngle + mStarShip->speed( ) )
+                owner->rotateLeft( );
+            else
+                owner->thrust( );
+        }else { // 180 < target
+            if( (360 - mTargetAngle) + rot < 180 )
+                owner->rotateLeft( );
+            else
+                owner->rotateRight( );
+        }
+    }else // 180 < rot
+    {
+        if( 180 > mTargetAngle )
+        {
+            if( (360 - mTargetAngle) + rot < 180 )
+                owner->rotateLeft( );
+            else
+                owner->rotateRight( );
+        }else { // 180 < target
+            if( rot < mTargetAngle - mStarShip->speed( ) )
+                owner->rotateRight( );
+            else if( rot > mTargetAngle + mStarShip->speed( ) )
+                owner->rotateLeft( );
+            else
+                owner->thrust( );
+        }
+    }
+
+}
+
 template<class T>
 void MoveToState<T>::onEnter( T* owner, void* data )
 {
@@ -65,6 +102,10 @@ void MoveToState<T>::onEnter( T* owner, void* data )
         }
     }
     assert( mStarShip != nullptr );
+
+    // Get the needed angle to change to to reach target position
+
+    mTargetPos = *static_cast<sf::Vector2f*>( data );
     mTargetAngle = bearing( mStarShip->getPosition().x, mStarShip->getPosition().y, mTargetPos.x, mTargetPos.y );
     /*
     mTargetPos = *static_cast<sf::Vector2f*>( data );
