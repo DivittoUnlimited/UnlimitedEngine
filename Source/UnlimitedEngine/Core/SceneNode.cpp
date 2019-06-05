@@ -21,7 +21,7 @@ unsigned int SceneNode::attachChild( Ptr child )
 {
     child->mParent = this;
     mChildren.push_back( std::move( child ) );
-    return (unsigned int)mChildren.size( ) - 1; // index of new child
+    return static_cast<unsigned int>( mChildren.size( ) - 1 ); // index of new child
 }
 
 SceneNode::Ptr SceneNode::detachChild( const SceneNode& node )

@@ -12,11 +12,11 @@ StarShip::StarShip( Category::Type category )
     , mSprite( sf::ConvexShape( 4 ) )
     , mSpeed( 5 )
     , mMaxVelocity( 200 )
+    , mHasFlag( false )
     , mFire( false )
     , mCategory( category )
     , mShotTimer( sf::Time::Zero )
     , mReloadTime( sf::milliseconds( 100 ) )
-    , mHasFlag( false )
 {
     centerOrigin( mSprite );
     mSprite.setPoint( 0, sf::Vector2f(  0, -12 ) );
