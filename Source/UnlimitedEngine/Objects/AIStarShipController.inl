@@ -122,7 +122,7 @@ void MoveToState<T>::onExit( T* owner )
 template <class T>
 void PursuitState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
-    mTargetPos = mTarget->getPosition() + mTarget->getVelocity( ) * mLookAheadTime.asSeconds( ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    mTargetPos = mTarget->getPosition() + (mTarget->getVelocity( ) * (float)mLookAheadTime.asMilliseconds( )); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     mTargetAngle = bearing( mStarShip->getPosition().x, mStarShip->getPosition().y, mTargetPos.x, mTargetPos.y );
 
     if( ( mStarShip->getPosition().x >= mTargetPos.x - mStarShip->speed( ) ) && ( mStarShip->getPosition().x <= mTargetPos.x + mStarShip->speed( ) ) &&
@@ -191,8 +191,6 @@ void PursuitState<T>::onEnter( T* owner, void* data )
     // Get the needed angle to change to to reach target position
     mTarget = static_cast<Entity*>( data );
     assert( mTarget );
-    mTargetPos = mTarget->getPosition() + mTarget->getVelocity( ) * mLookAheadTime.asSeconds( ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    mTargetAngle = bearing( mStarShip->getPosition().x, mStarShip->getPosition().y, mTargetPos.x, mTargetPos.y );
 }
 
 template<class T>

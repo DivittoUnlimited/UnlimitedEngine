@@ -63,7 +63,7 @@ public:
     PursuitState( void )
         : AI::State<T>( )
         , mStarShip( nullptr )
-        , mLookAheadTime( sf::milliseconds( 3000 ) )
+        , mLookAheadTime( sf::milliseconds( 5000 ) )
     { }
     void update( sf::Time, CommandQueue&, T* owner );
     void onEnter( T* owner, void* data );
