@@ -19,6 +19,7 @@ enum AIStarShipState
     , Idle
     , MoveTo
     , Pursuit
+    , Evade
 };
 
 template<class T>
@@ -63,18 +64,19 @@ public:
     PursuitState( void )
         : AI::State<T>( )
         , mStarShip( nullptr )
-        , mLookAheadTime( sf::milliseconds( 5000 ) )
+        , mLookAheadTime( sf::milliseconds( 250 ) )
     { }
     void update( sf::Time, CommandQueue&, T* owner );
     void onEnter( T* owner, void* data );
     void onExit( T* owner );
 private:
     //## Pursuit State Attributes
-    StarShip* mStarShip;
-    Entity*   mTarget;
-    sf::Vector2f mTargetPos;
-    float     mTargetAngle;
-    sf::Time  mLookAheadTime;
+    StarShip*       mStarShip;
+    Entity*         mTarget;
+    sf::Vector2f    mTargetPos;
+    float           mTargetAngle;
+    sf::Vector2f    mTargetDistance;
+    sf::Time        mLookAheadTime;
 };
 
 
@@ -85,17 +87,19 @@ public:
     EvadeState( void )
         : AI::State<T>( )
         , mStarShip( nullptr )
-        , mTargetPos( 0.0f, 0.0f )
-        , mTargetAngle( 0.0f )
+        , mLookAheadTime( sf::milliseconds( 250 ) )
     { }
     void update( sf::Time, CommandQueue&, T* owner );
     void onEnter( T* owner, void* data );
     void onExit( T* owner );
 private:
-    //## Evade State Attributes
-    StarShip* mStarShip;
-    sf::Vector2f mTargetPos;
-    float        mTargetAngle;
+    //## Pursuit State Attributes
+    StarShip*       mStarShip;
+    Entity*         mTarget;
+    sf::Vector2f    mTargetPos;
+    float           mTargetAngle;
+    sf::Vector2f    mTargetDistance;
+    sf::Time        mLookAheadTime;
 };
 
 template<class T>

@@ -21,7 +21,7 @@ template <class T>
 void IdleState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
     owner->rotateLeft( );
-    owner->mNextState = AIStarShipState::Pursuit;
+    owner->mNextState = AIStarShipState::Evade;
 }
 
 template<class T>
@@ -122,20 +122,40 @@ void MoveToState<T>::onExit( T* owner )
 template <class T>
 void PursuitState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
-    mTargetPos = mTarget->getPosition() + (mTarget->getVelocity( ) * (float)mLookAheadTime.asMilliseconds( )); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    mTargetAngle = bearing( mStarShip->getPosition().x, mStarShip->getPosition().y, mTargetPos.x, mTargetPos.y );
+    // save typing and method calls
+    float x = mStarShip->getPosition( ).x;
+    float y = mStarShip->getPosition( ).y;
+    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * (float)mLookAheadTime.asSeconds( ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    if( ( mStarShip->getPosition().x >= mTargetPos.x - mStarShip->speed( ) ) && ( mStarShip->getPosition().x <= mTargetPos.x + mStarShip->speed( ) ) &&
-         ( mStarShip->getPosition().y >= mTargetPos.y - mStarShip->speed( ) ) && ( mStarShip->getPosition().y <= mTargetPos.y + mStarShip->speed( ) ) )
+    // if owner has met goal of colliding with target
+    if( ( x >= mTargetPos.x - mStarShip->speed( ) ) && ( x <= mTargetPos.x + mStarShip->speed( ) ) &&
+         ( y >= mTargetPos.y - mStarShip->speed( ) ) && ( y <= mTargetPos.y + mStarShip->speed( ) ) )
     {
         owner->mNextState = AIStarShipState::Idle;
         return;
     }
 
-    float rot = mStarShip->getRotation( );
-    if( 180 > rot )
+    // Solve so AI can use Screen wrap effect
+    if( x > mTargetPos.x && ( ( WINDOW_WIDTH - x ) + mTargetPos.x < x - mTargetPos.x ) ) // if distance to target is shorter using wrap, owner to the right
     {
-        if( 180 > mTargetAngle )
+        mStarShip->getSprite( )->setFillColor( sf::Color::Green );
+        mTargetAngle = bearing( -x, y, mTargetPos.x, mTargetPos.y );
+    }
+    else if( x < mTargetPos.x && ( ( WINDOW_WIDTH - mTargetPos.x ) + x < mTargetPos.x - x ) ) // if distance to target is shorter using wrap, owner to the left
+    {
+        mStarShip->getSprite( )->setFillColor( sf::Color::Yellow );
+        mTargetAngle = bearing( x, y, -mTargetPos.x, mTargetPos.y );
+    }
+    else // ships closer not using wrap effect, solve normally
+    {
+        mStarShip->getSprite( )->setFillColor( sf::Color::Red );
+        mTargetAngle = bearing( x, y, mTargetPos.x, mTargetPos.y );
+    }
+
+    float rot = mStarShip->getRotation( );
+    if( 180 >= rot )
+    {
+        if( 180 >= mTargetAngle )
         {
             if( rot < mTargetAngle - mStarShip->speed( ) )
                 owner->rotateRight( );
@@ -146,18 +166,26 @@ void PursuitState<T>::update( sf::Time, CommandQueue&, T* owner )
         }else { // 180 < target
             if( (360 - mTargetAngle) + rot < 180 )
                 owner->rotateLeft( );
-            else
+            else if( (360 - mTargetAngle) + rot > 180 )
                 owner->rotateRight( );
+            else {
+                owner->thrust( );
+            }
         }
-    }else // 180 < rot
+    }
+    else // 180 < rot
     {
-        if( 180 > mTargetAngle )
+        if( 180 >= mTargetAngle )
         {
             if( (360 - mTargetAngle) + rot < 180 )
+                owner->rotateRight( );
+            else if( (360 - mTargetAngle) + rot > 180 )
                 owner->rotateLeft( );
             else
-                owner->rotateRight( );
-        }else { // 180 < target
+                owner->thrust( );
+        }else if( 180 < mTargetAngle )
+        {
+
             if( rot < mTargetAngle - mStarShip->speed( ) )
                 owner->rotateRight( );
             else if( rot > mTargetAngle + mStarShip->speed( ) )
@@ -166,7 +194,6 @@ void PursuitState<T>::update( sf::Time, CommandQueue&, T* owner )
                 owner->thrust( );
         }
     }
-
 }
 
 template<class T>
@@ -205,13 +232,109 @@ void PursuitState<T>::onExit( T* )
 template <class T>
 void EvadeState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
+    // save typing and method calls
+    float x = mStarShip->getPosition( ).x;
+    float y = mStarShip->getPosition( ).y;
+    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * (float)mLookAheadTime.asSeconds( ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    // if owner has met goal of colliding with target
+    if( ( x >= mTargetPos.x - mStarShip->speed( ) ) && ( x <= mTargetPos.x + mStarShip->speed( ) ) &&
+         ( y >= mTargetPos.y - mStarShip->speed( ) ) && ( y <= mTargetPos.y + mStarShip->speed( ) ) )
+    {
+        owner->mNextState = AIStarShipState::Idle;
+        return;
+    }
+
+    // Solve so AI can use Screen wrap effect
+    if( x > mTargetPos.x && ( ( WINDOW_WIDTH - x ) + mTargetPos.x < x - mTargetPos.x ) ) // if distance to target is shorter using wrap, owner to the right
+    {
+        mStarShip->getSprite( )->setFillColor( sf::Color::Green );
+        mTargetAngle = bearing( -x, y, mTargetPos.x, mTargetPos.y );
+    }
+    else if( x < mTargetPos.x && ( ( WINDOW_WIDTH - mTargetPos.x ) + x < mTargetPos.x - x ) ) // if distance to target is shorter using wrap, owner to the left
+    {
+        mStarShip->getSprite( )->setFillColor( sf::Color::Yellow );
+        mTargetAngle = bearing( x, y, -mTargetPos.x, mTargetPos.y );
+    }
+    else // ships closer not using wrap effect, solve normally
+    {
+        mStarShip->getSprite( )->setFillColor( sf::Color::Red );
+        mTargetAngle = bearing( x, y, mTargetPos.x, mTargetPos.y );
+    }
+
+    if( mTargetAngle < 180 )
+        mTargetAngle += 180;
+    else if( mTargetAngle >= 180 )
+        mTargetAngle -= 180;
+
+    float rot = mStarShip->getRotation( );
+    if( 180 >= rot )
+    {
+        if( 180 >= mTargetAngle )
+        {
+            if( rot < mTargetAngle - mStarShip->speed( ) )
+                owner->rotateRight( );
+            else if( rot > mTargetAngle + mStarShip->speed( ) )
+                owner->rotateLeft( );
+            else {
+                owner->thrust( );
+            }
+        }else { // 180 < target
+            if( (360 - mTargetAngle) + rot < 180 )
+                owner->rotateLeft( );
+            else if( (360 - mTargetAngle) + rot > 180 )
+                owner->rotateRight( );
+            else {
+                owner->thrust( );
+            }
+        }
+    }
+    else // 180 < rot
+    {
+        if( 180 >= mTargetAngle )
+        {
+            if( (360 - mTargetAngle) + rot < 180 )
+                owner->rotateRight( );
+            else if( (360 - mTargetAngle) + rot > 180 )
+                owner->rotateLeft( );
+            else
+                owner->thrust( );
+        }else if( 180 < mTargetAngle )
+        {
+
+            if( rot < mTargetAngle - mStarShip->speed( ) )
+                owner->rotateRight( );
+            else if( rot > mTargetAngle + mStarShip->speed( ) )
+                owner->rotateLeft( );
+            else
+                owner->thrust( );
+        }
+    }
 
 }
 
 template<class T>
-void EvadeState<T>::onEnter( T* owner, void* )
+void EvadeState<T>::onEnter( T* owner, void* data )
 {
     std::cout << "EvadeState onEnter( ) entered." << std::endl;
+    for( unsigned int i = 0; i < 3; ++i ) // 3 becuase thats the number of starships per team
+    {
+        if( owner->mIdentifier == static_cast<unsigned int>(ARENA->REDTEAM->starShips[i]->getIdentifier( ) ) )
+        {
+            mStarShip = ARENA->REDTEAM->starShips[i];
+            break;
+        }
+        else if( owner->mIdentifier == static_cast<unsigned int>( ARENA->BLUETEAM->starShips[i]->getIdentifier( ) ) )
+        {
+            mStarShip = ARENA->BLUETEAM->starShips[i];
+            break;
+        }
+    }
+    assert( mStarShip != nullptr );
+
+    // Get the needed angle to change to to reach target position
+    mTarget = static_cast<Entity*>( data );
+    assert( mTarget );
 }
 
 template<class T>

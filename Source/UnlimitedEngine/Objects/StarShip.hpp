@@ -28,6 +28,7 @@ public:
     int                   getIdentifier( void ) { return mIdentifier; }
     void                  setIdentifier( int identifier ) { mIdentifier = identifier; }
     void                  setCategory( Category::Type cat );
+    sf::ConvexShape*      getSprite( void ) { return &mSprite; }
 
 private:
     int mIdentifier;
