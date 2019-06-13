@@ -3,19 +3,19 @@
 
 #include <math.h>
 
-Bullet::Bullet( sf::Vector2f pos, sf::Vector2f vel, float angle )
+Bullet::Bullet( sf::Vector2f pos, float angle )
     : Entity( )
-    , mStartingLifeSpan( sf::milliseconds( 2000 ) )
+    , mStartingLifeSpan( sf::milliseconds( 500 ) )
     , mLifeSpan( mStartingLifeSpan )
     , mSprite( sf::CircleShape( 4 ) )
-    , mMaxVelocity( 1800 )
+    , mMaxVelocity( 600 )
 {
     mSprite.setFillColor( sf::Color::Yellow );
     this->setPosition( pos + sf::Vector2f( 0, -20 ) );
-    angle *= (3.14 / 180);
+    angle *= (3.14f / 180.0f );
     sf::Vector2f force( std::sin( angle ), -1 * std::cos( angle ) );
-    force *= 300.0f;
-    force += vel;
+    force *= mMaxVelocity;
+    //force += vel;
     this->setVelocity( force );
 }
 

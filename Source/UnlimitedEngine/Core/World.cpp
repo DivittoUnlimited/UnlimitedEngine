@@ -247,12 +247,11 @@ void World::buildScene( void )
     ARENA->BLUETEAM->starShips[0] = blue1.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue1 ) );
 
-    /*
-    std::unique_ptr<StarShip> blue2( new StarShip( Category::Blue2 ) );
+    std::unique_ptr<StarShip> blue2( new StarShip( Category::Player ) );
     blue2->setPosition( 250, WINDOW_HEIGHT - 150 );
     ARENA->BLUETEAM->starShips[1] = blue2.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue2 ) );
-
+/*
     std::unique_ptr<StarShip> blue3( new StarShip( Category::Blue3 ) );
     blue3->setPosition( WINDOW_WIDTH - 250, WINDOW_HEIGHT - 150 );
     ARENA->BLUETEAM->starShips[2] = blue3.get( );
@@ -276,13 +275,13 @@ void World::buildScene( void )
         ARENA->REDTEAM->starShips[0] = Red1.get( );
         mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
     }
-/*
-    std::unique_ptr<StarShip> red2( new StarShip( Category::Red2 ) );
+
+    std::unique_ptr<StarShip> red2( new StarShip( Category::Red1 ) );
     red2->setPosition( 250, 150 );
     red2->rotate( 180.0f );
     ARENA->REDTEAM->starShips[1] = red2.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( red2 ) );
-
+/*
     std::unique_ptr<StarShip> Red3( new StarShip( Category::Red3 ) );
     Red3->setPosition( WINDOW_WIDTH - 250, 150 );
     Red3->rotate( 180.0f );

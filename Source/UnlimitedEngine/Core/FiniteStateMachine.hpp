@@ -4,6 +4,8 @@
 #include <SFML/System/Time.hpp>
 
 #include "Core/CommandQueue.hpp"
+#include <stack>
+
 namespace AI {
 
 template<class T>
@@ -22,6 +24,7 @@ public:
     void update( sf::Time dt, CommandQueue& commands );
     void changeState( State<T>* state, void* data = nullptr );
     void enterBlipState( State<T>* state, void* data = nullptr );
+    void exitBlipState( void );
     void revertState( void );
 
     T* getOwner( void ) { return mOwner; }
@@ -31,6 +34,7 @@ private:
     T*        mOwner;
     State<T>* mCurrentState;
     State<T>* mPrevState;
+    std::stack<State<T>*> mBlipStates;
 };
 }
 #include "Core/FiniteStateMachine.inl"

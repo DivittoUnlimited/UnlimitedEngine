@@ -21,7 +21,7 @@ template <class T>
 void IdleState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
     owner->rotateLeft( );
-    owner->mNextState = AIStarShipState::Evade;
+    owner->mNextState = AIStarShipState::ShootTarget;
 }
 
 template<class T>
@@ -125,7 +125,7 @@ void PursuitState<T>::update( sf::Time, CommandQueue&, T* owner )
     // save typing and method calls
     float x = mStarShip->getPosition( ).x;
     float y = mStarShip->getPosition( ).y;
-    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * (float)mLookAheadTime.asSeconds( ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * static_cast<float>( mLookAheadTime.asSeconds( ) ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     // if owner has met goal of colliding with target
     if( ( x >= mTargetPos.x - mStarShip->speed( ) ) && ( x <= mTargetPos.x + mStarShip->speed( ) ) &&
@@ -235,7 +235,7 @@ void EvadeState<T>::update( sf::Time, CommandQueue&, T* owner )
     // save typing and method calls
     float x = mStarShip->getPosition( ).x;
     float y = mStarShip->getPosition( ).y;
-    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * (float)mLookAheadTime.asSeconds( ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * static_cast<float>( mLookAheadTime.asSeconds( ) ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     // if owner has met goal of colliding with target
     if( ( x >= mTargetPos.x - mStarShip->speed( ) ) && ( x <= mTargetPos.x + mStarShip->speed( ) ) &&
@@ -350,7 +350,18 @@ void EvadeState<T>::onExit( T* )
 template <class T>
 void ShootTargetState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
+    // solve distance to target
+    float xComp = mTarget->getPosition().x - mStarShip->getPosition().x;
+    float yComp = mTarget->getPosition( ).y - mStarShip->getPosition().y;
+    xComp *= xComp;
+    yComp *= yComp;
+    mDistanceToTarget = std::sqrt( ( yComp / xComp ) );
 
+    if( mDistanceToTarget <= mRange )
+    {
+        // shoot
+        owner->fire( );
+    }
 }
 
 template<class T>
@@ -358,7 +369,7 @@ void ShootTargetState<T>::onEnter( T* owner, void* data )
 {
     for( unsigned int i = 0; i < 3; ++i ) // 3 becuase thats the number of starships per team
     {
-        if( owner->mIdentifier == static_cast<unsigned int>(ARENA->REDTEAM->starShips[i]->getIdentifier( ) ) )
+        if( owner->mIdentifier == static_cast<unsigned int>( ARENA->REDTEAM->starShips[i]->getIdentifier( ) ) )
         {
             mStarShip = ARENA->REDTEAM->starShips[i];
             break;
@@ -371,8 +382,10 @@ void ShootTargetState<T>::onEnter( T* owner, void* data )
     }
     assert( mStarShip != nullptr );
 
-    // Get the needed angle to change to to reach target position
-    mTargetPos = *static_cast<sf::Vector2f*>( data );
+    mTarget = static_cast<Entity*>( data );
+    assert( mTarget );
+    owner->mNextBlipState = AIStarShipState::Pursuit;
+
 }
 
 template<class T>

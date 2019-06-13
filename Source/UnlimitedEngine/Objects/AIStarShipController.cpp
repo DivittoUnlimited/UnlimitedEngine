@@ -36,8 +36,6 @@ struct AircraftFireTrigger
     int ID;
 };
 
-
-
 AIStarShipController::AIStarShipController( unsigned int identifier )
     : mFsm( AI::FiniteStateMachine<AIStarShipController>( this, new IdleState<AIStarShipController>( ) ) )
     , mIdentifier( identifier )
@@ -46,6 +44,7 @@ AIStarShipController::AIStarShipController( unsigned int identifier )
     , mThrustFlag( false )
     , mFireFlag( false )
     , mNextState( AIStarShipState::None )
+    , mNextBlipState( AIStarShipState::None )
     , mMoveLeftCommand( )
     , mMoveRightCommand( )
     , mThrustCommand( )
@@ -55,12 +54,12 @@ AIStarShipController::AIStarShipController( unsigned int identifier )
     mMoveLeftCommand.category = mIdentifier;
     mMoveLeftCommand.action = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
             if( this->mIdentifier == static_cast<unsigned int>(a.getIdentifier( ) ) )
-                a.rotate( -1 * a.speed( ) );
+                a.rotate( -1 * a.speed( ) - 2 );
     } );
     mMoveRightCommand.category = mIdentifier;
     mMoveRightCommand.action = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
             if( this->mIdentifier == static_cast<unsigned int>(a.getIdentifier( ) ) )
-                a.rotate( a.speed( ) );
+                a.rotate( a.speed( ) + 2 );
     } );
     mThrustCommand.category = mIdentifier;
     mThrustCommand.action = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
@@ -72,7 +71,7 @@ AIStarShipController::AIStarShipController( unsigned int identifier )
                 force.x = static_cast<float>( sin( angle ) );
                 force.y = static_cast<float>( -cos( angle ) );
                 // apply speed to components seperatly
-                force *= a.speed( );
+                force *= a.speed( ) + 1;
                 // accellerate the ship with the results
                 a.accelerate( force );
                 // Validate ship isnt going to fast and correct if needed.
@@ -105,11 +104,42 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
             case AIStarShipState::Evade:
                 mFsm.changeState( new EvadeState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) );
             break;
+            case AIStarShipState::ShootTarget:
+                mFsm.changeState( new ShootTargetState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) );
+            break;
             default:
                 std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;
             break;
         }
         mNextState = AIStarShipState::None;
+    }
+
+    if( mNextBlipState != AIStarShipState::None )
+    {
+        switch( mNextBlipState )
+        {
+            case AIStarShipState::Idle:
+                mFsm.enterBlipState( new IdleState<AIStarShipController>( ) );
+            break;
+            case AIStarShipState::MoveTo:
+                mFsm.enterBlipState( new MoveToState<AIStarShipController>(  ), static_cast<void*>( new sf::Vector2f( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 ) ) );
+            break;
+            case AIStarShipState::Pursuit:
+                mFsm.enterBlipState( new PursuitState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) );
+            break;
+            case AIStarShipState::Evade:
+                mFsm.enterBlipState( new EvadeState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) );
+            break;
+            case AIStarShipState::ShootTarget:
+                mFsm.enterBlipState( new ShootTargetState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) );
+            break;
+            default:
+                std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;
+            break;
+        }
+
+        std::cout << "HEY!!!! Targeting Blue[0] is broken!!!! line 140" << std::endl;
+        mNextBlipState = AIStarShipState::None;
     }
     mFsm.update( dt, commands );
     // eval commands and act accordingly

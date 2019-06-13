@@ -20,6 +20,7 @@ enum AIStarShipState
     , MoveTo
     , Pursuit
     , Evade
+    , ShootTarget
 };
 
 template<class T>
@@ -109,8 +110,9 @@ public:
     ShootTargetState( void )
         : AI::State<T>( )
         , mStarShip( nullptr )
-        , mTargetPos( 0.0f, 0.0f )
-        , mDistanceToTarget( 0.0f )
+        , mTarget( nullptr )
+        , mDistanceToTarget( 1000.0f )
+        , mRange( 2.0f )
     { }
     void update( sf::Time, CommandQueue&, T* owner );
     void onEnter( T* owner, void* data );
@@ -118,8 +120,9 @@ public:
 private:
     //## MoveTo State Attributes
     StarShip* mStarShip;
-    sf::Vector2f mTargetPos;
-    float        mDistanceToTarget;
+    Entity*   mTarget;
+    float     mDistanceToTarget;
+    float     mRange;
 };
 
 class AIStarShipController
@@ -144,6 +147,7 @@ public:
     bool mThrustFlag;
     bool mFireFlag;
     AIStarShipState mNextState;
+    AIStarShipState mNextBlipState;
 
     Command mMoveLeftCommand;
     Command mMoveRightCommand;

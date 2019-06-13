@@ -12,7 +12,7 @@
 class Bullet : public Entity
 {
 public:
-    Bullet( sf::Vector2f pos, sf::Vector2f vel, float angle );
+    Bullet(sf::Vector2f pos, float angle );
 
     virtual unsigned int  getCategory( ) const;
     virtual sf::FloatRect getBoundingRect( ) const;
@@ -26,7 +26,7 @@ public:
     /// damage is equal to half the percentage of life the bullet has remaining. i.e 60% of life left == 30 damaage
     /// \return
     ///
-    float                 getDamageOutput( void ) { return .5 * (100 - (mLifeSpan.asMilliseconds( ) * 100) / mStartingLifeSpan.asMilliseconds( ) ); }
+    float                 getDamageOutput( void ) { return .5f * (100.0f - (mLifeSpan.asMilliseconds( ) * 100.0f) / mStartingLifeSpan.asMilliseconds( ) ); }
     float                 maximumVelocity( void ) const { return mMaxVelocity; }
     void                  maximumVelocity( float maxVel ) { this->mMaxVelocity = maxVel; }
 

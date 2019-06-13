@@ -16,7 +16,7 @@ StarShip::StarShip( Category::Type category )
     , mFire( false )
     , mCategory( category )
     , mShotTimer( sf::Time::Zero )
-    , mReloadTime( sf::milliseconds( 100 ) )
+    , mReloadTime( sf::milliseconds( 500 ) )
 {
     centerOrigin( mSprite );
     mSprite.setPoint( 0, sf::Vector2f(  0, -12 ) );
@@ -36,7 +36,7 @@ StarShip::StarShip( Category::Type category )
     mFireCommand.category = Category::ObjectLayer;
     mFireCommand.action   = [this] ( SceneNode& node, sf::Time )
     {
-         std::unique_ptr<Bullet> bullet( new Bullet( this->getPosition( ), this->getVelocity( ), this->getRotation( ) ) );
+         std::unique_ptr<Bullet> bullet( new Bullet( this->getPosition( ), this->getRotation( ) ) );
 
          bullet->setPosition( getPosition( ) );
          node.attachChild( std::move( bullet ) );
