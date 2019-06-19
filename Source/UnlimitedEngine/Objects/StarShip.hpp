@@ -25,6 +25,7 @@ public:
     bool                  getHasFlag( void ) const { return this->mHasFlag; }
     void                  setHasFlag( bool hasFlag ) { this->mHasFlag = hasFlag; }
     void                  fire( void );
+    void                  thrust( void );
     int                   getIdentifier( void ) { return mIdentifier; }
     void                  setIdentifier( int identifier ) { mIdentifier = identifier; }
     void                  setCategory( Category::Type cat );

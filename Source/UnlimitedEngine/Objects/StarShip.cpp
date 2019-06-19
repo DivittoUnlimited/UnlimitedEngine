@@ -1,4 +1,5 @@
 #include "StarShip.hpp"
+#include <math.h>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
@@ -96,3 +97,19 @@ void StarShip::fire( void )
     }
 }
 
+void StarShip::thrust( void )
+{
+    // break down angle to x and y
+    float angle = this->getRotation( ) * ( 3.14f / 180.0f );
+    sf::Vector2f force;
+    force.x = static_cast<float>( sin( angle ) );
+    force.y = static_cast<float>( -cos( angle ) );
+    // apply speed to components seperatly
+    force *= this->speed( ) + 1;
+    // accellerate the ship with the results
+    this->accelerate( force );
+    // Validate ship isnt going to fast and correct if needed.
+    float totalVelocity = static_cast<float>( std::sqrt( (this->getVelocity( ).x*this->getVelocity( ).x) + (this->getVelocity( ).y*this->getVelocity( ).y) ) );
+    if( totalVelocity > this->maximumVelocity( ) + this->getHitpoints( ) )
+        this->setVelocity( this->getVelocity( ) * this->maximumVelocity( ) / totalVelocity );
+}

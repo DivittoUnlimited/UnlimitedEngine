@@ -99,6 +99,8 @@ HEADERS += \
     Core/KeyBinding.hpp \
     Core/NetworkNode.hpp \
     Core/NetworkProtocol.hpp \
+    Core/SteeringBehaviors.hpp \
+    Core/SteeringBehaviors.inl \
     Core/World.hpp \
     Objects/AIStarShipController.hpp \
     Objects/AIStarShipController.inl \

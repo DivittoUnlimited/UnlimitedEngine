@@ -4,6 +4,7 @@
 #include "Core/Utility.hpp"
 #include "Core/Globals.hpp"
 #include "StarShip.hpp"
+#include "Arena.hpp"
 
 Bumper::Bumper( Category::Type category )
     : Entity( )
@@ -52,14 +53,13 @@ bool Bumper::isMarkedForRemoval( ) const
 
 void Bumper::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
-    /*
     float bumperX = this->getPosition( ).x;
 
     float center  = WINDOW_WIDTH / 2;
 
     if( mCategory == Category::BumperBlue )
     {
-        float playerX = Red->getPosition( ).x;
+        float playerX = ARENA->REDTEAM->starShips[0]->getPosition( ).x;
         // both ship and bumper are on the same side of screen or nearer the middle of the screen than the edge
         if( ( ( bumperX > center && ( playerX > center ) ) || ( ( bumperX < center ) && ( playerX < center ) ) ) ||
                 (std::abs( bumperX - center ) < 200 && ( std::abs( playerX - center ) < 200 ) ) )
@@ -81,7 +81,7 @@ void Bumper::updateCurrent( sf::Time dt, CommandQueue& commands )
     }
     else // Red Bumper
     {
-        float playerX = Blue->getPosition( ).x;
+        float playerX = ARENA->BLUETEAM->starShips[0]->getPosition( ).x;
         // both ship and bumper are on the same side of screen or nearer the middle of the screen than the edge
         if( ( ( ( ( bumperX > center ) && (playerX > center ) ) ) || ( ( bumperX < center ) && ( playerX < center ) ) ) ||
                 ( ( std::abs( bumperX - center ) < 200 ) && ( std::abs( playerX - center ) < 200 ) ) )
@@ -111,7 +111,7 @@ void Bumper::updateCurrent( sf::Time dt, CommandQueue& commands )
     float totalVelocity = (float)std::sqrt( (this->getVelocity( ).x*this->getVelocity( ).x) + (this->getVelocity( ).y*this->getVelocity( ).y) );
     if( totalVelocity > this->maximumVelocity( ) + this->getHitpoints( ) )
         this->setVelocity( this->getVelocity( ) * this->maximumVelocity( ) / totalVelocity );
-*/
+
     Entity::updateCurrent( dt, commands );
 }
 

@@ -9,6 +9,7 @@
 #include "Core/Globals.hpp"
 #include "Core/KeyBinding.hpp"
 #include "Core/Entity.hpp"
+#include "Core/SteeringBehaviors.hpp"
 
 class StarShip;
 class AIStarShipController;
@@ -17,10 +18,10 @@ enum AIStarShipState
 {
       None = 0
     , Idle
-    , MoveTo
     , Pursuit
     , Evade
     , ShootTarget
+    , CaptureFlag
 };
 
 template<class T>
@@ -38,27 +39,6 @@ public:
 };
 
 template<class T>
-class MoveToState : public AI::State<T>
-{
-public:
-    MoveToState( void )
-        : AI::State<T>( )
-        , mStarShip( nullptr )
-        , mTargetPos( 0.0f, 0.0f )
-        , mTargetAngle( 0.0f )
-    { }
-    void update( sf::Time, CommandQueue&, T* owner );
-    void onEnter( T* owner, void* data );
-    void onExit( T* owner );
-private:
-    //## MoveTo State Attributes
-    StarShip* mStarShip;
-    sf::Vector2f mTargetPos;
-    float        mTargetAngle;
-};
-
-
-template<class T>
 class PursuitState : public AI::State<T>
 {
 public:
@@ -73,13 +53,11 @@ public:
 private:
     //## Pursuit State Attributes
     StarShip*       mStarShip;
-    Entity*         mTarget;
     sf::Vector2f    mTargetPos;
     float           mTargetAngle;
     sf::Vector2f    mTargetDistance;
     sf::Time        mLookAheadTime;
 };
-
 
 template<class T>
 class EvadeState : public AI::State<T>
@@ -96,7 +74,6 @@ public:
 private:
     //## Pursuit State Attributes
     StarShip*       mStarShip;
-    Entity*         mTarget;
     sf::Vector2f    mTargetPos;
     float           mTargetAngle;
     sf::Vector2f    mTargetDistance;
@@ -110,7 +87,6 @@ public:
     ShootTargetState( void )
         : AI::State<T>( )
         , mStarShip( nullptr )
-        , mTarget( nullptr )
         , mDistanceToTarget( 1000.0f )
         , mRange( 2.0f )
     { }
@@ -120,15 +96,32 @@ public:
 private:
     //## MoveTo State Attributes
     StarShip* mStarShip;
-    Entity*   mTarget;
     float     mDistanceToTarget;
     float     mRange;
+};
+
+template<class T>
+class CaptureFlagState : public AI::State<T>
+{
+public:
+    CaptureFlagState( void )
+        : AI::State<T>( )
+        , mStarShip( nullptr )
+        , mHasFlag( false )
+        , mChangeTargets( true )
+    { }
+    void update( sf::Time, CommandQueue&, T* owner );
+    void onEnter( T* owner, void* data );
+    void onExit( T* owner );
+private:
+    StarShip* mStarShip;
+    bool mHasFlag;
+    bool mChangeTargets; // prevents changing target to goal every frame after flag is in hand
 };
 
 class AIStarShipController
 {
 public:
-    /// 1-800-552-8159 insurance number you need to call ASAP!!!!!!!!!
     typedef PlayerAction::Type Action;
     AIStarShipController( unsigned int identifier = 1 );
 
@@ -153,6 +146,9 @@ public:
     Command mMoveRightCommand;
     Command mThrustCommand;
     Command mFireCommand;
+
+    Entity* mTargetObject;
+
 };
 #include "AIStarShipController.inl"
 #endif // AICONTROLLER_HPP

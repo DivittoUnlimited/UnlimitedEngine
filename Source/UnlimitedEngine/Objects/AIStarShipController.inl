@@ -20,8 +20,39 @@ static double bearing( double a1, double a2, double b1, double b2 ) {
 template <class T>
 void IdleState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
-    owner->rotateLeft( );
-    owner->mNextState = AIStarShipState::ShootTarget;
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    // attempting to move seek behavior out of state machine and into its own class. goals turned off in world for testing. when seek runs in Capture mode it thinks its a goal by id
+         //    in this state starships still dont move.
+    SteeringBehaviors::seek( ARENA->REDTEAM->starShips[owner->getCategory()], sf::Vector2f( 500, 500 ) );
 }
 
 template<class T>
@@ -36,86 +67,6 @@ void IdleState<T>::onExit( T* )
     std::cout << "IdleState onExit( ) entered" << std::endl;
 }
 
-// ====================================================================================
-/// MoveToState
-///
-template<class T>
-void MoveToState<T>::update( sf::Time, CommandQueue&, T* owner )
-{
-    if( ( mStarShip->getPosition().x >= mTargetPos.x - mStarShip->speed( ) ) && ( mStarShip->getPosition().x <= mTargetPos.x + mStarShip->speed( ) ) &&
-         ( mStarShip->getPosition().y >= mTargetPos.y - mStarShip->speed( ) ) && ( mStarShip->getPosition().y <= mTargetPos.y + mStarShip->speed( ) ) )
-    {
-        owner->mNextState = AIStarShipState::Idle;
-        return;
-    }
-
-    mTargetAngle = bearing( mStarShip->getPosition().x, mStarShip->getPosition().y, mTargetPos.x, mTargetPos.y );
-    float rot = mStarShip->getRotation() ;
-
-    if( 180 > rot )
-    {
-        if( 180 > mTargetAngle )
-        {
-            if( rot < mTargetAngle - mStarShip->speed( ) )
-                owner->rotateRight( );
-            else if( rot > mTargetAngle + mStarShip->speed( ) )
-                owner->rotateLeft( );
-            else
-                owner->thrust( );
-        }else { // 180 < target
-            if( (360 - mTargetAngle) + rot < 180 )
-                owner->rotateLeft( );
-            else
-                owner->rotateRight( );
-        }
-    }else // 180 < rot
-    {
-        if( 180 > mTargetAngle )
-        {
-            if( (360 - mTargetAngle) + rot < 180 )
-                owner->rotateLeft( );
-            else
-                owner->rotateRight( );
-        }else { // 180 < target
-            if( rot < mTargetAngle - mStarShip->speed( ) )
-                owner->rotateRight( );
-            else if( rot > mTargetAngle + mStarShip->speed( ) )
-                owner->rotateLeft( );
-            else
-                owner->thrust( );
-        }
-    }
-}
-
-template<class T>
-void MoveToState<T>::onEnter( T* owner, void* data )
-{
-    for( unsigned int i = 0; i < 3; ++i ) // 3 becuase thats the number of starships per team
-    {
-        if( owner->mIdentifier == static_cast<unsigned int>(ARENA->REDTEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->REDTEAM->starShips[i];
-            break;
-        }
-        else if( owner->mIdentifier == static_cast<unsigned int>( ARENA->BLUETEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->BLUETEAM->starShips[i];
-            break;
-        }
-    }
-    assert( mStarShip != nullptr );
-
-    // Get the needed angle to change to to reach target position
-    mTargetPos = *static_cast<sf::Vector2f*>( data );
-    mTargetAngle = bearing( mStarShip->getPosition().x, mStarShip->getPosition().y, mTargetPos.x, mTargetPos.y );
-}
-
-template<class T>
-void MoveToState<T>::onExit( T* owner )
-{
-    std::cout << "ID: " << owner->getCategory() << "MoveToState onExit( ) Complete!" << std::endl;
-}
-
 // ===========================================================================================================
 /// PursuitState
 ///
@@ -125,30 +76,29 @@ void PursuitState<T>::update( sf::Time, CommandQueue&, T* owner )
     // save typing and method calls
     float x = mStarShip->getPosition( ).x;
     float y = mStarShip->getPosition( ).y;
-    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * static_cast<float>( mLookAheadTime.asSeconds( ) ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    mTargetPos = owner->mTargetObject->getPosition( ) + (owner->mTargetObject->getVelocity( ) * static_cast<float>( mLookAheadTime.asSeconds( ) ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    /*
     // if owner has met goal of colliding with target
     if( ( x >= mTargetPos.x - mStarShip->speed( ) ) && ( x <= mTargetPos.x + mStarShip->speed( ) ) &&
          ( y >= mTargetPos.y - mStarShip->speed( ) ) && ( y <= mTargetPos.y + mStarShip->speed( ) ) )
     {
-        owner->mNextState = AIStarShipState::Idle;
+        // owner->mNextState = AIStarShipState::Idle;
         return;
     }
+*/
 
     // Solve so AI can use Screen wrap effect
     if( x > mTargetPos.x && ( ( WINDOW_WIDTH - x ) + mTargetPos.x < x - mTargetPos.x ) ) // if distance to target is shorter using wrap, owner to the right
     {
-        mStarShip->getSprite( )->setFillColor( sf::Color::Green );
         mTargetAngle = bearing( -x, y, mTargetPos.x, mTargetPos.y );
     }
     else if( x < mTargetPos.x && ( ( WINDOW_WIDTH - mTargetPos.x ) + x < mTargetPos.x - x ) ) // if distance to target is shorter using wrap, owner to the left
     {
-        mStarShip->getSprite( )->setFillColor( sf::Color::Yellow );
         mTargetAngle = bearing( x, y, -mTargetPos.x, mTargetPos.y );
     }
     else // ships closer not using wrap effect, solve normally
     {
-        mStarShip->getSprite( )->setFillColor( sf::Color::Red );
         mTargetAngle = bearing( x, y, mTargetPos.x, mTargetPos.y );
     }
 
@@ -200,24 +150,12 @@ template<class T>
 void PursuitState<T>::onEnter( T* owner, void* data )
 {
     std::cout << "PursuitState onEnter( ) entered." << std::endl;
-    for( unsigned int i = 0; i < 3; ++i ) // 3 becuase thats the number of starships per team
-    {
-        if( owner->mIdentifier == static_cast<unsigned int>(ARENA->REDTEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->REDTEAM->starShips[i];
-            break;
-        }
-        else if( owner->mIdentifier == static_cast<unsigned int>( ARENA->BLUETEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->BLUETEAM->starShips[i];
-            break;
-        }
-    }
+    mStarShip = ARENA->REDTEAM->starShips[owner->getCategory( )];
     assert( mStarShip != nullptr );
 
     // Get the needed angle to change to to reach target position
-    mTarget = static_cast<Entity*>( data );
-    assert( mTarget );
+    owner->mTargetObject = static_cast<Entity*>( data );
+    assert( owner->mTargetObject );
 }
 
 template<class T>
@@ -235,7 +173,7 @@ void EvadeState<T>::update( sf::Time, CommandQueue&, T* owner )
     // save typing and method calls
     float x = mStarShip->getPosition( ).x;
     float y = mStarShip->getPosition( ).y;
-    mTargetPos = mTarget->getPosition( ) + (mTarget->getVelocity( ) * static_cast<float>( mLookAheadTime.asSeconds( ) ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    mTargetPos = owner->mTargetObject->getPosition( ) + (owner->mTargetObject->getVelocity( ) * static_cast<float>( mLookAheadTime.asSeconds( ) ) ); // CHECK ME IF SOMETHING LOOKS DUMB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     // if owner has met goal of colliding with target
     if( ( x >= mTargetPos.x - mStarShip->speed( ) ) && ( x <= mTargetPos.x + mStarShip->speed( ) ) &&
@@ -317,24 +255,12 @@ template<class T>
 void EvadeState<T>::onEnter( T* owner, void* data )
 {
     std::cout << "EvadeState onEnter( ) entered." << std::endl;
-    for( unsigned int i = 0; i < 3; ++i ) // 3 becuase thats the number of starships per team
-    {
-        if( owner->mIdentifier == static_cast<unsigned int>(ARENA->REDTEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->REDTEAM->starShips[i];
-            break;
-        }
-        else if( owner->mIdentifier == static_cast<unsigned int>( ARENA->BLUETEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->BLUETEAM->starShips[i];
-            break;
-        }
-    }
+    mStarShip = ARENA->REDTEAM->starShips[owner->getCategory( )];
     assert( mStarShip != nullptr );
 
     // Get the needed angle to change to to reach target position
-    mTarget = static_cast<Entity*>( data );
-    assert( mTarget );
+    owner->mTargetObject = static_cast<Entity*>( data );
+    assert( owner->mTargetObject );
 }
 
 template<class T>
@@ -351,8 +277,8 @@ template <class T>
 void ShootTargetState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
     // solve distance to target
-    float xComp = mTarget->getPosition().x - mStarShip->getPosition().x;
-    float yComp = mTarget->getPosition( ).y - mStarShip->getPosition().y;
+    float xComp = owner->mTargetObject->getPosition( ).x - mStarShip->getPosition( ).x;
+    float yComp = owner->mTargetObject->getPosition( ).y - mStarShip->getPosition( ).y;
     xComp *= xComp;
     yComp *= yComp;
     mDistanceToTarget = std::sqrt( ( yComp / xComp ) );
@@ -367,29 +293,91 @@ void ShootTargetState<T>::update( sf::Time, CommandQueue&, T* owner )
 template<class T>
 void ShootTargetState<T>::onEnter( T* owner, void* data )
 {
-    for( unsigned int i = 0; i < 3; ++i ) // 3 becuase thats the number of starships per team
-    {
-        if( owner->mIdentifier == static_cast<unsigned int>( ARENA->REDTEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->REDTEAM->starShips[i];
-            break;
-        }
-        else if( owner->mIdentifier == static_cast<unsigned int>( ARENA->BLUETEAM->starShips[i]->getIdentifier( ) ) )
-        {
-            mStarShip = ARENA->BLUETEAM->starShips[i];
-            break;
-        }
-    }
+    mStarShip = ARENA->REDTEAM->starShips[owner->getCategory( )];
     assert( mStarShip != nullptr );
 
-    mTarget = static_cast<Entity*>( data );
-    assert( mTarget );
+    owner->mTargetObject = static_cast<Entity*>( data );
+    assert( owner->mTargetObject );
     owner->mNextBlipState = AIStarShipState::Pursuit;
-
 }
 
 template<class T>
 void ShootTargetState<T>::onExit( T* owner )
 {
-    std::cout << "ID: " << owner->getCategory() << "MoveToState onExit( ) Complete!" << std::endl;
+    std::cout << "ID: " << owner->getCategory() << "ShootTargetState onExit( ) Complete!" << std::endl;
 }
+
+// ======================================================================================
+/// CaptureFlagState
+///
+///
+template <class T>
+void CaptureFlagState<T>::update( sf::Time, CommandQueue&, T* owner )
+{
+    SteeringBehaviors::seek( mStarShip, sf::Vector2f( 500, 500 ) );
+   /*
+    if( !mChangeTargets )
+    {
+        // Owner already has flag check if goal has been reached.
+            // Clear states.
+
+    }
+    else if( mHasFlag && mChangeTargets )
+    {
+        // MoveTo goal
+
+        mChangeTargets = false;
+    }
+    */
+}
+
+template<class T>
+void CaptureFlagState<T>::onEnter( T* owner, void* data )
+{
+    std::cout << "CaptureFlagState onEnter( ) entered." << std::endl;
+    mStarShip = ARENA->REDTEAM->starShips[(unsigned int)owner->getCategory( )];
+    assert( mStarShip != nullptr );
+
+    owner->mTargetObject = static_cast<Entity*>( data );
+    assert( owner->mTargetObject );
+}
+
+template<class T>
+void CaptureFlagState<T>::onExit( T* )
+{
+    std::cout << "CaptureFlagState onExit( ) entered" << std::endl;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

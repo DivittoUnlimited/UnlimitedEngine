@@ -224,13 +224,14 @@ void World::buildScene( void )
 
     // Create objects in the world
     // Goals
+    /*
     std::unique_ptr<Goal> teamAGoal( new Goal( Category::GoalBlue ) );
     ARENA->BLUETEAM->goal = teamAGoal.get( );
     mSceneLayers[0]->attachChild( std::move( teamAGoal ) );
     std::unique_ptr<Goal> teamBGoal( new Goal( Category::GoalRed ) );
     ARENA->REDTEAM->goal = teamBGoal.get( );
     mSceneLayers[0]->attachChild( std::move( teamBGoal ) );
-
+*/
     // Bumpers
     std::unique_ptr<Bumper> bumperBlue1( new Bumper( Category::BumperBlue ) );
     bumperBlue1->setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT - 170 );
