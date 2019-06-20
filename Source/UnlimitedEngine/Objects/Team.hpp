@@ -31,7 +31,7 @@ struct Team {
         delete bumper;
         delete goal;
     }
-    std::array<StarShip*, 3> starShips;
+    std::array<StarShip*, 2> starShips;
     Bumper* bumper;
     Goal* goal;
     std::vector<Flag*> flags;

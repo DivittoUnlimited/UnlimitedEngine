@@ -26,11 +26,10 @@ protected:
     Player  mPlayer;
     Player*  mPlayer2;
     AIStarShipController mBlue2;
-    AIStarShipController mBlue3;
 
     AIStarShipController mRed1;
     AIStarShipController mRed2;
-    AIStarShipController mRed3;
+
 };
 
 #endif // GAMESTATE_HPP

@@ -7,11 +7,9 @@ GameState::GameState( States::ID id, StateStack& stack, Context context )
     , mWorld( *context.window, *context.fonts, *context.sounds, false, false )
     , mPlayer( nullptr, Category::Player, context.keys1 )
     , mPlayer2( new Player( nullptr, Category::Player2, context.keys2 ) )
-    , mBlue2( (unsigned int)Category::Blue2 )
-    , mBlue3( (unsigned int)Category::Blue3 )
-    , mRed1( (unsigned int)Category::Red1 )
-    , mRed2( (unsigned int)Category::Red2 )
-    , mRed3( (unsigned int)Category::Red3 )
+    , mBlue2( Category::Blue2 )
+    , mRed1( Category::Red1 )
+    , mRed2( Category::Red2 )
 {
 
 }
@@ -78,7 +76,7 @@ GameState::~GameState( )
     } else std::cout << "Error reading Game.lua data table" << std::endl;
     lua_close( L );
     */
-    delete mPlayer2;
+    //delete mPlayer2;
 }
 
 void GameState::draw( )
@@ -109,18 +107,17 @@ bool GameState::update( sf::Time dt )
         std::cout << "There was an exception during the Player1_Input update: " << e.what( ) << std::endl;
     }
 
+    /*
     if( mPlayer2 != nullptr )
         try { mPlayer2->handleRealtimeInput( commands ); }
         catch( std::exception& e ) {
             std::cout << "There was an exception during the Player2_Input update: " << e.what( ) << std::endl;
         }
-
-    //mBlue2.updateCurrent( dt, commands );
-    //mBlue3.updateCurrent( dt, commands );
+*/
+    mBlue2.updateCurrent( dt, commands );
 
     mRed1.updateCurrent( dt, commands );
-    //mRed2.updateCurrent( dt, commands );
-    //mRed3.updateCurrent( dt, commands );
+    mRed2.updateCurrent( dt, commands );
 
     return true;
 }

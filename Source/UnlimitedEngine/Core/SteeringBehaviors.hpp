@@ -30,7 +30,7 @@ public:
     static void arrive( T& obj, sf::Vector2f targetPos );
 
     template<class T>
-    static void seek( T& obj, sf::Vector2f targetPos );
+    static void seek( T obj, sf::Vector2f targetPos );
 
     template<class T, class K>
     static void pursuit( T& obj, K& target );

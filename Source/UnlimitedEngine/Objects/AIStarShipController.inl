@@ -20,45 +20,26 @@ static double bearing( double a1, double a2, double b1, double b2 ) {
 template <class T>
 void IdleState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
+    std::cout << owner->getCategory( ) << " Is updating!" << std::endl;
+5555
+    ///
+    /// \brief SteeringBehaviors::seek
+    ///  attempting to move seek behavior out of state machine and into its own class.
+    /// Starships is an array size 2 owner->getCategory() returns large numbers outside scope of starships, which
+    /// is why it's not working!!!
+    ///
+    /// How to set AIControlers category/ identifier more apropriatly??
     ///
     ///
     ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    // attempting to move seek behavior out of state machine and into its own class. goals turned off in world for testing. when seek runs in Capture mode it thinks its a goal by id
-         //    in this state starships still dont move.
+    /// But then how is it working for other states????
     SteeringBehaviors::seek( ARENA->REDTEAM->starShips[owner->getCategory()], sf::Vector2f( 500, 500 ) );
 }
 
 template<class T>
-void IdleState<T>::onEnter( T*, void* )
+void IdleState<T>::onEnter( T* owner, void* )
 {
-    std::cout << "IdleState onEnter( ) entered." << std::endl;
+    std::cout << owner->getCategory( ) << " IdleState onEnter( ) entered." << std::endl;
 }
 
 template<class T>
@@ -266,7 +247,7 @@ void EvadeState<T>::onEnter( T* owner, void* data )
 template<class T>
 void EvadeState<T>::onExit( T* )
 {
-    std::cout << "Evadetate onExit( ) entered" << std::endl;
+    std::cout << "EvadeState onExit( ) entered" << std::endl;
 }
 
 // ====================================================================================

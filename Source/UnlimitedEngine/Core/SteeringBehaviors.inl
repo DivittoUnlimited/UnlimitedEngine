@@ -1,5 +1,5 @@
 #include "SteeringBehaviors.hpp"
-
+#include <iostream>
 
 template<class T>
 void SteeringBehaviors::wander( T& obj )
@@ -14,8 +14,10 @@ void SteeringBehaviors::arrive( T& obj, sf::Vector2f targetPos )
 }
 
 template<class T>
-void SteeringBehaviors::seek( T& obj, sf::Vector2f targetPos )
+void SteeringBehaviors::seek( T obj, sf::Vector2f targetPos )
 {
+    assert( obj );
+    std::cout << "Obj Pos: " << obj->getPosition().x << ", " << obj->getPosition( ).y << std::endl;
     float targetAngle = bearing( obj->getPosition( ).x, obj->getPosition( ).y, targetPos.x, targetPos.y );
     float rot = obj->getRotation( );
 
