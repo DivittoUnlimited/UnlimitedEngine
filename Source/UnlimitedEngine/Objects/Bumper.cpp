@@ -59,7 +59,7 @@ void Bumper::updateCurrent( sf::Time dt, CommandQueue& commands )
 
     if( mCategory == Category::BumperBlue )
     {
-        float playerX = ARENA->REDTEAM->starShips[0]->getPosition( ).x;
+        float playerX = ARENA->REDTEAM->starShips[Category::Red1]->getPosition( ).x;
         // both ship and bumper are on the same side of screen or nearer the middle of the screen than the edge
         if( ( ( bumperX > center && ( playerX > center ) ) || ( ( bumperX < center ) && ( playerX < center ) ) ) ||
                 (std::abs( bumperX - center ) < 200 && ( std::abs( playerX - center ) < 200 ) ) )
@@ -81,7 +81,7 @@ void Bumper::updateCurrent( sf::Time dt, CommandQueue& commands )
     }
     else // Red Bumper
     {
-        float playerX = ARENA->BLUETEAM->starShips[0]->getPosition( ).x;
+        float playerX = ARENA->BLUETEAM->starShips[Category::Blue1]->getPosition( ).x;
         // both ship and bumper are on the same side of screen or nearer the middle of the screen than the edge
         if( ( ( ( ( bumperX > center ) && (playerX > center ) ) ) || ( ( bumperX < center ) && ( playerX < center ) ) ) ||
                 ( ( std::abs( bumperX - center ) < 200 ) && ( std::abs( playerX - center ) < 200 ) ) )

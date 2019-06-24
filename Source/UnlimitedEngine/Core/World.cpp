@@ -82,17 +82,10 @@ CommandQueue& World::getCommandQueue( )
 
 StarShip* World::getStarShip( int identifier ) const
 {
-    for( StarShip* a : ARENA->BLUETEAM->starShips )
-    {
-        if( a->getIdentifier( ) == identifier )
-            return a;
-    }
-    for( StarShip* a : ARENA->REDTEAM->starShips )
-    {
-        if( a->getIdentifier( ) == identifier )
-            return a;
-    }
-
+    if( ARENA->BLUETEAM->starShips.find( identifier ) != ARENA->BLUETEAM->starShips.end( ) )
+        return ARENA->BLUETEAM->starShips.at( identifier );
+    else if( ARENA->REDTEAM->starShips.find( identifier ) != ARENA->REDTEAM->starShips.end( ) )
+        return ARENA->REDTEAM->starShips.at( identifier );
     return nullptr;
 }
 
@@ -239,12 +232,12 @@ void World::buildScene( void )
     std::unique_ptr<StarShip> blue1( new StarShip( Category::Player ) );
     blue1->setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT - 200 );
     blue1->setIdentifier( Category::Player );
-    ARENA->BLUETEAM->starShips[0] = blue1.get( );
+    ARENA->BLUETEAM->starShips[Category::Blue1] = blue1.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue1 ) );
 
     std::unique_ptr<StarShip> blue2( new StarShip( Category::Player ) );
     blue2->setPosition( 250, WINDOW_HEIGHT - 150 );
-    ARENA->BLUETEAM->starShips[1] = blue2.get( );
+    ARENA->BLUETEAM->starShips[Category::Blue2] = blue2.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue2 ) );
 
     // Red StarShips
@@ -254,7 +247,7 @@ void World::buildScene( void )
         Red1->setPosition( WINDOW_WIDTH / 2, 200 );
         Red1->rotate( 180.0f );
         Red1->setIdentifier( Category::Player2 );
-        ARENA->REDTEAM->starShips[0] = Red1.get( );
+        ARENA->REDTEAM->starShips[Category::Red1] = Red1.get( );
         mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
     }
     else {
@@ -262,14 +255,14 @@ void World::buildScene( void )
         Red1->setPosition( WINDOW_WIDTH / 2, 200 );
         Red1->rotate( 180.0f );
         Red1->setIdentifier( Category::Red1 );
-        ARENA->REDTEAM->starShips[0] = Red1.get( );
+        ARENA->REDTEAM->starShips[Category::Red1] = Red1.get( );
         mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
     }
 
     std::unique_ptr<StarShip> red2( new StarShip( Category::Red1 ) );
     red2->setPosition( 250, 150 );
     red2->rotate( 180.0f );
-    ARENA->REDTEAM->starShips[1] = red2.get( );
+    ARENA->REDTEAM->starShips[Category::Red2] = red2.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( red2 ) );
 
     // Blue Teams Starting flags

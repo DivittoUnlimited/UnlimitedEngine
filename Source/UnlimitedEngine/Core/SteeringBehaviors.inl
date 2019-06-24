@@ -17,41 +17,37 @@ template<class T>
 void SteeringBehaviors::seek( T obj, sf::Vector2f targetPos )
 {
     assert( obj );
-    std::cout << "Obj Pos: " << obj->getPosition().x << ", " << obj->getPosition( ).y << std::endl;
     float targetAngle = bearing( obj->getPosition( ).x, obj->getPosition( ).y, targetPos.x, targetPos.y );
     float rot = obj->getRotation( );
 
-    if( 180 > rot )
-        if( 180 > targetAngle )
-            if( rot < targetAngle - obj->speed( ) )
-                obj->rotate( obj->speed( ) );
-            else if( rot > targetAngle + obj->speed( ) )
-                obj->rotate( -obj->speed( ) );
-            else
-                obj->thrust( );
-        else  // 180 < target
-            if( (360 - targetAngle) + rot < 180 )
-                obj->rotate(-obj->speed() );
-            else if( 360 - targetAngle + rot > 180 )
-                obj->rotate( obj->speed() );
-            else
-                obj->thrust( );
-    else // 180 < rot
-        if( 180 > targetAngle )
-            if( (360 - targetAngle) + rot < 180 )
-                obj->rotate( -obj->speed( ) );
-            else if( (360 - targetAngle) + rot > 180 )
-                obj->rotate( obj->speed( ) );
-            else
-                obj->thrust( );
-        else  // 180 < target
-            if( rot < targetAngle - obj->speed( ) )
-                obj->rotate( obj->speed( ) );
-            else if( rot > targetAngle + obj->speed( ) )
-                obj->rotate( -obj->speed( ) );
-            else
-                obj->thrust( );
-
+    if( rot <= targetAngle + obj->speed( ) && rot >= targetAngle - obj->speed( ) ) // obj facing target edge case
+        obj->thrust( );
+    else {
+        if( 180 >= rot ) {
+            if( 180 > targetAngle ) {
+                if( rot < targetAngle - obj->speed( ) )      obj->rotate( obj->speed( ) );
+                else if( rot > targetAngle + obj->speed( ) ) obj->rotate( -obj->speed( ) );
+                else                                         obj->thrust( );
+            }
+            else {  // 180 < target
+                if( (360 - targetAngle) + rot < 180 )    obj->rotate(-obj->speed( ) );
+                else if( 360 - targetAngle + rot > 180 ) obj->rotate( obj->speed( ) );
+                else                                     obj->thrust( );
+            }
+        }
+        else {
+            if( 180 > targetAngle ) {
+                if( (360 - targetAngle) + rot < 180 )      obj->rotate( -obj->speed( ) );
+                else if( (360 - targetAngle) + rot > 180 ) obj->rotate( obj->speed( ) );
+                else                                       obj->thrust( );
+            }
+            else {  // 180 < target
+                if( rot < targetAngle - obj->speed( ) )      obj->rotate( obj->speed( ) );
+                else if( rot > targetAngle + obj->speed( ) ) obj->rotate( -obj->speed( ) );
+                else                                         obj->thrust( );
+            }
+        }
+    }
 }
 
 template<class T, class K>

@@ -20,20 +20,10 @@ static double bearing( double a1, double a2, double b1, double b2 ) {
 template <class T>
 void IdleState<T>::update( sf::Time, CommandQueue&, T* owner )
 {
-    std::cout << owner->getCategory( ) << " Is updating!" << std::endl;
-5555
     ///
     /// \brief SteeringBehaviors::seek
-    ///  attempting to move seek behavior out of state machine and into its own class.
-    /// Starships is an array size 2 owner->getCategory() returns large numbers outside scope of starships, which
-    /// is why it's not working!!!
-    ///
-    /// How to set AIControlers category/ identifier more apropriatly??
-    ///
-    ///
-    ///
-    /// But then how is it working for other states????
-    SteeringBehaviors::seek( ARENA->REDTEAM->starShips[owner->getCategory()], sf::Vector2f( 500, 500 ) );
+    /////     // SEEK WORKS BUT DOES NOT ACCOUNT FOR SCREENWRAP!!!!!!!!!!!!!
+    SteeringBehaviors::seek( ARENA->REDTEAM->starShips.at(owner->getCategory( )), ARENA->BLUETEAM->starShips.at(Category::Blue1)->getPosition( ) );
 }
 
 template<class T>

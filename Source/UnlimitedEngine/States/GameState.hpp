@@ -24,11 +24,11 @@ public:
 protected:
     World   mWorld;
     Player  mPlayer;
-    Player*  mPlayer2;
-    AIStarShipController mBlue2;
+    //Player*  mPlayer2;
+    //AIStarShipController mBlue2;
 
     AIStarShipController mRed1;
-    AIStarShipController mRed2;
+    //AIStarShipController mRed2;
 
 };
 
