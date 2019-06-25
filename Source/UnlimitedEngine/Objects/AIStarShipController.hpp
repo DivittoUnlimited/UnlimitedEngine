@@ -60,27 +60,6 @@ private:
 };
 
 template<class T>
-class EvadeState : public AI::State<T>
-{
-public:
-    EvadeState( void )
-        : AI::State<T>( )
-        , mStarShip( nullptr )
-        , mLookAheadTime( sf::milliseconds( 250 ) )
-    { }
-    void update( sf::Time, CommandQueue&, T* owner );
-    void onEnter( T* owner, void* data );
-    void onExit( T* owner );
-private:
-    //## Pursuit State Attributes
-    StarShip*       mStarShip;
-    sf::Vector2f    mTargetPos;
-    float           mTargetAngle;
-    sf::Vector2f    mTargetDistance;
-    sf::Time        mLookAheadTime;
-};
-
-template<class T>
 class ShootTargetState : public AI::State<T>
 {
 public:

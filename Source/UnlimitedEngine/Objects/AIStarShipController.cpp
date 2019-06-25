@@ -94,7 +94,6 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
         {
             case AIStarShipState::Idle:         mFsm.changeState( new IdleState<AIStarShipController>( ) );                                                              break;
             case AIStarShipState::Pursuit:      mFsm.changeState( new PursuitState<AIStarShipController>(  ),     static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
-            case AIStarShipState::Evade:        mFsm.changeState( new EvadeState<AIStarShipController>(  ),       static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             case AIStarShipState::ShootTarget:  mFsm.changeState( new ShootTargetState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             case AIStarShipState::CaptureFlag:  mFsm.changeState( new CaptureFlagState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->flags[0] ) );     break;
             default: std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;                                                                     break;
@@ -107,7 +106,6 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
         switch( mNextBlipState ) {
             case AIStarShipState::Idle:         mFsm.enterBlipState( new IdleState<AIStarShipController>( ) );                                                              break;
             case AIStarShipState::Pursuit:      mFsm.enterBlipState( new PursuitState<AIStarShipController>(  ),     static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
-            case AIStarShipState::Evade:        mFsm.enterBlipState( new EvadeState<AIStarShipController>(  ),       static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             case AIStarShipState::ShootTarget:  mFsm.enterBlipState( new ShootTargetState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             case AIStarShipState::CaptureFlag:  mFsm.enterBlipState( new CaptureFlagState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             default: std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;                                                                        break;

@@ -32,11 +32,8 @@ public:
     template<class T>
     static void seek( T obj, sf::Vector2f targetPos );
 
-    template<class T, class K>
-    static void pursuit( T& obj, K& target );
-
-    template<class T, class K>
-    static void evade( T& obj, K& target );
+    template<class T>
+    static void evade( T obj, sf::Vector2f targetPos );
 
 };
 
