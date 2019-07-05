@@ -97,7 +97,7 @@ void StarShip::fire( void )
     }
 }
 
-void StarShip::thrust( void )
+void StarShip::thrust( float addedForce )
 {
     // break down angle to x and y
     float angle = this->getRotation( ) * ( 3.14f / 180.0f );
@@ -105,7 +105,7 @@ void StarShip::thrust( void )
     force.x = static_cast<float>( sin( angle ) );
     force.y = static_cast<float>( -cos( angle ) );
     // apply speed to components seperatly
-    force *= this->speed( ) + 1;
+    force *= addedForce + 1;
     // accellerate the ship with the results
     this->accelerate( force );
     // Validate ship isnt going to fast and correct if needed.

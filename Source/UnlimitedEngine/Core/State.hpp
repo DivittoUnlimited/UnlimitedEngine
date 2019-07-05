@@ -14,7 +14,7 @@ namespace sf
 	class RenderWindow;
 }
 class StateStack;
-class Player;
+//class Player;
 class MusicPlayer;
 class SoundPlayer;
 class KeyBinding;
@@ -38,7 +38,7 @@ public:
         , fonts( &fonts )
         , music( &music )
         , sounds( &sounds )
-        , player( nullptr )
+        //, player( nullptr )
         , highScores( highScores )
         , keys1( &keys1 )
         , keys2( &keys2 )
@@ -51,7 +51,7 @@ public:
         FontManager*	  fonts;
         MusicPlayer*      music;
         SoundPlayer*      sounds;
-        Player*			  player;
+        //Player*			  player;
         std::string       tiledMapFilePath;
         std::vector<std::pair<std::string, int>>* highScores;
         KeyBinding*			keys1;

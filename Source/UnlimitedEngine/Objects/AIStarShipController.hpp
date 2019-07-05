@@ -18,8 +18,6 @@ enum AIStarShipState
 {
       None = 0
     , Idle
-    , Pursuit
-    , Evade
     , ShootTarget
     , CaptureFlag
 };
@@ -39,27 +37,6 @@ public:
 };
 
 template<class T>
-class PursuitState : public AI::State<T>
-{
-public:
-    PursuitState( void )
-        : AI::State<T>( )
-        , mStarShip( nullptr )
-        , mLookAheadTime( sf::milliseconds( 250 ) )
-    { }
-    void update( sf::Time, CommandQueue&, T* owner );
-    void onEnter( T* owner, void* data );
-    void onExit( T* owner );
-private:
-    //## Pursuit State Attributes
-    StarShip*       mStarShip;
-    sf::Vector2f    mTargetPos;
-    float           mTargetAngle;
-    sf::Vector2f    mTargetDistance;
-    sf::Time        mLookAheadTime;
-};
-
-template<class T>
 class ShootTargetState : public AI::State<T>
 {
 public:
@@ -67,7 +44,7 @@ public:
         : AI::State<T>( )
         , mStarShip( nullptr )
         , mDistanceToTarget( 1000.0f )
-        , mRange( 2.0f )
+        , mRange( 200.0f )
     { }
     void update( sf::Time, CommandQueue&, T* owner );
     void onEnter( T* owner, void* data );
@@ -86,16 +63,14 @@ public:
     CaptureFlagState( void )
         : AI::State<T>( )
         , mStarShip( nullptr )
-        , mHasFlag( false )
-        , mChangeTargets( true )
+        , mAlreadyHadFlag( false )
     { }
     void update( sf::Time, CommandQueue&, T* owner );
     void onEnter( T* owner, void* data );
     void onExit( T* owner );
 private:
     StarShip* mStarShip;
-    bool mHasFlag;
-    bool mChangeTargets; // prevents changing target to goal every frame after flag is in hand
+    bool mAlreadyHadFlag; // prevents changing target to goal every frame after flag is in hand
 };
 
 class AIStarShipController
@@ -111,6 +86,7 @@ public:
     void rotateRight( void ) { mMoveRightFlag = true; }
     void thrust( void ) { mThrustFlag = true; }
     void fire( void ) { mFireFlag = true; }
+    unsigned int getNearestFlag( void );
 
     AI::FiniteStateMachine<AIStarShipController> mFsm;
     unsigned int mIdentifier;
@@ -120,6 +96,7 @@ public:
     bool mFireFlag;
     AIStarShipState mNextState;
     AIStarShipState mNextBlipState;
+    StarShip* mStarShip;
 
     Command mMoveLeftCommand;
     Command mMoveRightCommand;

@@ -26,15 +26,14 @@ public:
     template<class T>
     static void wander( T& obj );
 
-    template<class T, class K>
-    static void arrive( T& obj, sf::Vector2f targetPos );
-
     template<class T>
     static void seek( T obj, sf::Vector2f targetPos );
 
     template<class T>
     static void evade( T obj, sf::Vector2f targetPos );
 
+    template<class T>
+    static void arrive( T obj, sf::Vector2f targetPos );
 };
 
 #include "SteeringBehaviors.inl"

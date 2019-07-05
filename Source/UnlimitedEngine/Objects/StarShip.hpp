@@ -25,7 +25,7 @@ public:
     bool                  getHasFlag( void ) const { return this->mHasFlag; }
     void                  setHasFlag( bool hasFlag ) { this->mHasFlag = hasFlag; }
     void                  fire( void );
-    void                  thrust( void );
+    void                  thrust( float addedForce );
     int                   getIdentifier( void ) { return mIdentifier; }
     void                  setIdentifier( int identifier ) { mIdentifier = identifier; }
     void                  setCategory( Category::Type cat );
@@ -36,7 +36,9 @@ private:
     sf::ConvexShape mSprite;
     float mSpeed;
     float mMaxVelocity;
+public:
     bool mHasFlag;
+private:
     bool mFire;
     Category::Type mCategory;
     sf::Time       mShotTimer;

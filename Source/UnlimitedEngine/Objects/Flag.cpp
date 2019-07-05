@@ -3,11 +3,12 @@
 #include "Core/Utility.hpp"
 
 Flag::Flag( Category::Type category, sf::Vector2f startingPos )
-    : SceneNode( )
+    : Entity( )
     , mSprite( sf::ConvexShape( 4 ) )
     , mCategory( category )
     , mStarShip( nullptr )
     , mStartingPos( startingPos )
+    , mCapturable( true )
 {
     centerOrigin( mSprite );
     mSprite.setPoint( 0, sf::Vector2f( -5, -5 ) );
@@ -47,7 +48,7 @@ bool Flag::isDestroyed( ) const
 
 void Flag::updateCurrent( sf::Time, CommandQueue& )
 {
-
+    this->rotate( 4 );
 }
 
 void Flag::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const

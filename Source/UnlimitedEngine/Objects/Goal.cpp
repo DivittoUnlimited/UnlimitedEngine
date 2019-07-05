@@ -5,7 +5,7 @@
 #include "Core/Globals.hpp"
 
 Goal::Goal( Category::Type category )
-    : SceneNode( )
+    : Entity( )
     , mCategory( category )
     , mSprite( sf::RectangleShape( sf::Vector2f( 200.0f, 30.0f ) ) )
 {

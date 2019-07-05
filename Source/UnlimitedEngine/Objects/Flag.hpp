@@ -2,10 +2,10 @@
 #define FLAG_HPP
 
 #include <SFML/Graphics/ConvexShape.hpp>
-#include "Core/SceneNode.hpp"
+#include "Core/EmitterNode.hpp"
 #include "Objects/StarShip.hpp"
 
-class Flag : public SceneNode
+class Flag : public Entity
 {
 public:
     Flag( Category::Type category, sf::Vector2f startingPos );
@@ -20,12 +20,14 @@ public:
     StarShip*             getStarShip( void )  { return this->mStarShip; }
     void setFillColor( sf::Color color ) { this->mSprite.setFillColor( color ); }
     const sf::Vector2f    getStartingPos( void ) const { return mStartingPos; }
-
+    bool                  isCapturable( void ) { return mCapturable; }
+    void                  setCapturable( bool capturable ) { this->mCapturable = capturable; }
 private:
     sf::ConvexShape mSprite;
     Category::Type  mCategory;
     StarShip*       mStarShip;
     sf::Vector2f    mStartingPos;
+    bool            mCapturable;
 };
 
 #endif // FLAG_HPP

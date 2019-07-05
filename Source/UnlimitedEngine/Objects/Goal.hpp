@@ -2,9 +2,9 @@
 #define GOAL_HPP
 
 #include <SFML/Graphics/RectangleShape.hpp>
-#include "Core/SceneNode.hpp"
+#include "Core/Entity.hpp"
 
-class Goal : public SceneNode
+class Goal : public Entity
 {
 public:
     Goal( Category::Type category );

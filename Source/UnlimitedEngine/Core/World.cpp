@@ -142,6 +142,7 @@ void World::handleCollisions( )
                     player.attachChild( mSceneLayers[0]->detachChild( flag ) );
                     flag.setStarShip( &player );
                     flag.setPosition(  0, 45 );
+                    flag.setCapturable( false );
                     player.setHasFlag( true );
               }
         }
@@ -154,6 +155,7 @@ void World::handleCollisions( )
                     player.attachChild( mSceneLayers[0]->detachChild( flag ) );
                     flag.setStarShip( &player );
                     flag.setPosition(  0, 45 );
+                    flag.setCapturable( false );
                     player.setHasFlag( true );
               }
         }
@@ -165,6 +167,7 @@ void World::handleCollisions( )
             starShip->setHasFlag( false );
             mSceneLayers[0]->attachChild( starShip->detachChild( flag ) ); // removes flag from player reattaches to layer
             flag.setPosition( flag.getStartingPos( ) );
+            //flag.setCapturable( true );
             ARENA->BLUETEAM->goal->scale( .5, 1 );
             ARENA->REDTEAM->goal->scale( 1.5, 1 );
             if( mTeamAScore > 0 )
@@ -185,6 +188,7 @@ void World::handleCollisions( )
             starShip->setHasFlag( false );
             mSceneLayers[0]->attachChild( starShip->detachChild( flag ) ); // removes flag from player reattaches to layer
             flag.setPosition( flag.getStartingPos( ) );
+            //flag.setCapturable( true );
             ARENA->REDTEAM->goal->scale( .5, 1 );
             ARENA->BLUETEAM->goal->scale( 1.5, 1 );
             if( mTeamBScore > 0 )
@@ -220,6 +224,7 @@ void World::buildScene( void )
     mSceneLayers[0]->attachChild( std::move( teamBGoal ) );
 
     // Bumpers
+
     std::unique_ptr<Bumper> bumperBlue1( new Bumper( Category::BumperBlue ) );
     bumperBlue1->setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT - 170 );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( bumperBlue1 ) );
@@ -228,18 +233,19 @@ void World::buildScene( void )
     bumperRed1->setPosition( WINDOW_WIDTH / 2, 170 );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( bumperRed1 ) );
 
+
     // Blue StarShips
     std::unique_ptr<StarShip> blue1( new StarShip( Category::Player ) );
     blue1->setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT - 200 );
     blue1->setIdentifier( Category::Player );
     ARENA->BLUETEAM->starShips[Category::Blue1] = blue1.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue1 ) );
-
-    std::unique_ptr<StarShip> blue2( new StarShip( Category::Player ) );
+/*
+    std::unique_ptr<StarShip> blue2( new StarShip( Category::Blue2 ) );
     blue2->setPosition( 250, WINDOW_HEIGHT - 150 );
     ARENA->BLUETEAM->starShips[Category::Blue2] = blue2.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( blue2 ) );
-
+*/
     // Red StarShips
     if( mLocalMultiplayerWorld )
     {
@@ -259,11 +265,13 @@ void World::buildScene( void )
         mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( Red1 ) );
     }
 
-    std::unique_ptr<StarShip> red2( new StarShip( Category::Red1 ) );
+/*
+    std::unique_ptr<StarShip> red2( new StarShip( Category::Red2 ) );
     red2->setPosition( 250, 150 );
     red2->rotate( 180.0f );
     ARENA->REDTEAM->starShips[Category::Red2] = red2.get( );
     mSceneLayers.at( Layers::ObjectLayer )->attachChild( std::move( red2 ) );
+*/
 
     // Blue Teams Starting flags
     std::unique_ptr<Flag> flag3( new Flag( Category::FlagBlue, sf::Vector2f( 174, 678 ) ) );

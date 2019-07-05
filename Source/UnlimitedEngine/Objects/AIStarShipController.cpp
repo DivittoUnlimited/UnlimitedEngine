@@ -49,6 +49,7 @@ AIStarShipController::AIStarShipController( unsigned int identifier )
     , mMoveRightCommand( )
     , mThrustCommand( )
     , mFireCommand( )
+    , mStarShip( ARENA->REDTEAM->starShips[mIdentifier] )
 {
     // define commands
     mMoveLeftCommand.category = mIdentifier;
@@ -92,11 +93,10 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
     {
         switch( mNextState )
         {
-            case AIStarShipState::Idle:         mFsm.changeState( new IdleState<AIStarShipController>( ) );                                                              break;
-            case AIStarShipState::Pursuit:      mFsm.changeState( new PursuitState<AIStarShipController>(  ),     static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
-            case AIStarShipState::ShootTarget:  mFsm.changeState( new ShootTargetState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
-            case AIStarShipState::CaptureFlag:  mFsm.changeState( new CaptureFlagState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->flags[0] ) );     break;
-            default: std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;                                                                     break;
+            case AIStarShipState::Idle:         mFsm.changeState( new IdleState<AIStarShipController>( ) );                                                                     break;
+            case AIStarShipState::ShootTarget:  mFsm.changeState( new ShootTargetState<AIStarShipController>(  ), static_cast<void*>( new unsigned int( Category::Blue1 ) ) );  break;
+            case AIStarShipState::CaptureFlag:  mFsm.changeState( new CaptureFlagState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->flags[0] ) );            break;
+            default: std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;                                                                            break;
         }
         mNextState = AIStarShipState::None;
     }
@@ -105,7 +105,6 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
     {
         switch( mNextBlipState ) {
             case AIStarShipState::Idle:         mFsm.enterBlipState( new IdleState<AIStarShipController>( ) );                                                              break;
-            case AIStarShipState::Pursuit:      mFsm.enterBlipState( new PursuitState<AIStarShipController>(  ),     static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             case AIStarShipState::ShootTarget:  mFsm.enterBlipState( new ShootTargetState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             case AIStarShipState::CaptureFlag:  mFsm.enterBlipState( new CaptureFlagState<AIStarShipController>(  ), static_cast<void*>( ARENA->BLUETEAM->starShips[0] ) ); break;
             default: std::cout << "Invalid state reached in the AIStarshipController!" << std::endl;                                                                        break;
@@ -116,6 +115,10 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
     mFsm.update( dt, commands );
 
     // eval commands and act accordingly
+    /*
+     *
+     *
+     *  NOT IN USE DONT GET CONFUSED
     if( mMoveLeftFlag )
     {
         commands.push( mMoveLeftCommand );
@@ -132,6 +135,7 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
         commands.push( mThrustCommand );
         mThrustFlag = false;
     }
+    */
     if( mFireFlag )
     {
         commands.push( mFireCommand );
@@ -142,4 +146,34 @@ void AIStarShipController::updateCurrent( sf::Time dt, CommandQueue& commands )
 unsigned int AIStarShipController::getCategory( void ) const
 {
     return mIdentifier;
+}
+
+unsigned int AIStarShipController::getNearestFlag( void )
+{
+    auto pos = mStarShip->getPosition( );
+    float nearestDistance = 0.0f;
+    unsigned int nearestFlag = 0;
+    for( unsigned int i = 5; i < (unsigned int)ARENA->BLUETEAM->flags.size( ); ++i )
+    {
+        auto flag = ARENA->BLUETEAM->flags[i];
+        if( flag->isCapturable( ) )
+        {
+            sf::Vector2f targetPos = flag->getPosition( );
+            pos.x = targetPos.x - pos.x;
+            pos.y = targetPos.y - pos.y;
+            pos.x *= pos.x;
+            pos.y *= pos.y;
+            float distance = std::sqrt( pos.y + pos.x );
+            if( nearestDistance == 0.0f )
+            {
+                nearestDistance = std::abs( distance );
+                nearestFlag = i;
+            }
+            else if( std::abs( distance ) < std::abs( nearestDistance ) ) {
+                nearestDistance = std::abs( distance );
+                nearestFlag = i;
+            }
+        }
+    }
+    return nearestFlag;
 }

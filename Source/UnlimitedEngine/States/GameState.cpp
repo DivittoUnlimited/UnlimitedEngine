@@ -114,10 +114,10 @@ bool GameState::update( sf::Time dt )
             std::cout << "There was an exception during the Player2_Input update: " << e.what( ) << std::endl;
         }
 */
-   // mBlue2.updateCurrent( dt, commands );
+    //mBlue2.updateCurrent( dt, commands );
 
     mRed1.updateCurrent( dt, commands );
-  //  mRed2.updateCurrent( dt, commands );
+    //mRed2.updateCurrent( dt, commands );
 
     return true;
 }
