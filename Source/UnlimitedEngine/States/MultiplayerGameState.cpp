@@ -129,6 +129,7 @@ void MultiplayerGameState::onDestroy( void )
 
 bool MultiplayerGameState::update( sf::Time dt )
 {
+    /*
     // Connected to server: Handle all the network logic
     if( mConnected )
     {
@@ -242,7 +243,7 @@ bool MultiplayerGameState::update( sf::Time dt )
         requestStateClear( );
         requestStackPush( States::Menu );
     }
-
+*/
     return true;
 }
 
@@ -321,6 +322,7 @@ void MultiplayerGameState::updateBroadcastMessage( sf::Time elapsedTime )
 
 void MultiplayerGameState::handlePacket( sf::Int32 packetType, sf::Packet& packet )
 {
+
     switch( packetType )
     {
         // Send message to all clients
@@ -370,7 +372,7 @@ void MultiplayerGameState::handlePacket( sf::Int32 packetType, sf::Packet& packe
             sf::Int32 identifier;
             packet >> identifier;
 
-            mWorld.removeStarShip( identifier );
+            //mWorld.removeStarShip( identifier );
             mPlayers.erase( identifier );
         } break;
         case Server::AcceptCoopPartner:
@@ -445,12 +447,12 @@ void MultiplayerGameState::handlePacket( sf::Int32 packetType, sf::Packet& packe
                 sf::Int32 identifier;
                 packet >> identifier >> position.x >> position.y;
 
-                StarShip* starShip = mWorld.getStarShip( identifier );
-                bool isLocal = std::find( mLocalPlayerIdentifiers.begin( ), mLocalPlayerIdentifiers.end( ), identifier ) != mLocalPlayerIdentifiers.end( );
-                if( starShip && !isLocal )
+                //StarShip* starShip = mWorld.getStarShip( identifier );
+               // bool isLocal = std::find( mLocalPlayerIdentifiers.begin( ), mLocalPlayerIdentifiers.end( ), identifier ) != mLocalPlayerIdentifiers.end( );
+               // if( starShip && !isLocal )
                 {
-                    sf::Vector2f interpolatedPosition =  starShip->getPosition( ) + ( position - starShip->getPosition( ) ) * 0.1f;
-                    starShip->setPosition( interpolatedPosition );
+                 //   sf::Vector2f interpolatedPosition =  starShip->getPosition( ) + ( position - starShip->getPosition( ) ) * 0.1f;
+                 //   starShip->setPosition( interpolatedPosition );
                 }
             }
         } break;

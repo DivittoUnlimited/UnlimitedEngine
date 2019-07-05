@@ -8,9 +8,7 @@
 #include <string>
 #include <algorithm>
 #include <math.h>
-
-#include "Objects/StarShip.hpp"
-
+/*
 ///
 /// \brief The ActorMover struct
 /// Functor to move the player based on velocity and the delta time for this frame.
@@ -42,7 +40,7 @@ struct AircraftFireTrigger
 
     int ID;
 };
-
+*/
 Player::Player( sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding )
     : mKeyBinding( binding )
     , mIdentifier( identifier )
@@ -194,33 +192,5 @@ void Player::handleNetworkRealtimeChange(PlayerAction::Type action, bool actionE
 
 void Player::initializeActions( )
 {
-    mActionBinding[PlayerAction::MoveLeft].action      = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
-            if( this->mIdentifier == a.getIdentifier( ) )
-                a.rotate( -1 * a.speed( ) );
-    } );
-    mActionBinding[PlayerAction::MoveRight].action     = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
-            if( this->mIdentifier == a.getIdentifier( ) )
-                a.rotate( a.speed( ) );
-    } );
-     mActionBinding[PlayerAction::MoveUp].action        = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ){
-            if( this->mIdentifier == a.getIdentifier( ) )
-            {
-                // break down angle to x and y
-                double angle = a.getRotation() * (3.14 / 180);
-                sf::Vector2f force;
-                force.x = sin( angle );
-                force.y = -cos( angle );
-                // apply speed to components seperatly
-                force *= a.speed( );
-                // accellerate the ship with the results
-                a.accelerate( force );
-                // Validate ship isnt going to fast and correct if needed.
-                float totalVelocity = (float)std::sqrt( (a.getVelocity( ).x*a.getVelocity( ).x) + (a.getVelocity( ).y*a.getVelocity( ).y) );
-                if( totalVelocity > a.maximumVelocity( ) + a.getHitpoints( ) )
-                    a.setVelocity( a.getVelocity( ) * a.maximumVelocity( ) / totalVelocity );
-            }
-    } );
-    mActionBinding[PlayerAction::Fire].action         = derivedAction<StarShip>( [this] ( StarShip& a, sf::Time ) {
-            if( this->mIdentifier == a.getIdentifier() ) a.fire( );
-    });
+
 }

@@ -6,10 +6,6 @@ GameState::GameState( States::ID id, StateStack& stack, Context context )
     : State( id, stack, context )
     , mWorld( *context.window, *context.fonts, *context.sounds, false, false )
     , mPlayer( nullptr, Category::Player, context.keys1 )
-    //, mPlayer2( new Player( nullptr, Category::Player2, context.keys2 ) )
-    //, mBlue2( Category::Blue2 )
-    , mRed1( Category::Red1 )
-    //, mRed2( Category::Red2 )
 {
 
 }
@@ -88,36 +84,11 @@ bool GameState::update( sf::Time dt )
 {
     mWorld.update( dt );
 
-    /* Old Example of "Game" logic update with flag scores to show victory...
-    if (!mWorld.hasAlivePlayer())
-    {
-        mPlayer.setMissionStatus(Player::MissionFailure);
-        requestStackPush(States::GameOver);
-    }
-    else if (mWorld.hasPlayerReachedEnd())
-    {
-        mPlayer.setMissionStatus(Player::MissionSuccess);
-        requestStackPush(States::MissionSuccess);
-    }
-    */
-
     CommandQueue& commands = mWorld.getCommandQueue( );
     try { mPlayer.handleRealtimeInput( commands ); }
     catch( std::exception& e ) {
         std::cout << "There was an exception during the Player1_Input update: " << e.what( ) << std::endl;
     }
-
-    /*
-    if( mPlayer2 != nullptr )
-        try { mPlayer2->handleRealtimeInput( commands ); }
-        catch( std::exception& e ) {
-            std::cout << "There was an exception during the Player2_Input update: " << e.what( ) << std::endl;
-        }
-*/
-    //mBlue2.updateCurrent( dt, commands );
-
-    mRed1.updateCurrent( dt, commands );
-    //mRed2.updateCurrent( dt, commands );
 
     return true;
 }

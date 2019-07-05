@@ -6,10 +6,7 @@
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
-#include "Objects/StarShip.hpp"
-#include "Objects/Flag.hpp"
-#include "Objects/Goal.hpp"
-#include "Objects/Bumper.hpp"
+
 #include "Gui/MessageBoxNode.hpp"
 
 #include "Core/ResourceManager.hpp"
@@ -49,9 +46,6 @@ public:
     void draw( void );
     bool update( sf::Time dt );
     CommandQueue& getCommandQueue( void );
-    StarShip* getStarShip( int identifier ) const;
-    StarShip* addStarShip(int identifier , Category::Type category);
-    void removeStarShip( int identifier );
     bool pollGameAction( GameActions::Action& out );
     bool matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Category::Type type1, Category::Type type2 );
 
@@ -76,8 +70,7 @@ private:
     bool								mNetworkedWorld;
     bool                                mLocalMultiplayerWorld;
     NetworkNode*						mNetworkNode;
-    unsigned int                        mTeamAScore;
-    unsigned int                        mTeamBScore;
+
 };
 
 #endif // WORLD_HPP

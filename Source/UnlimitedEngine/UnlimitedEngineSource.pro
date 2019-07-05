@@ -12,12 +12,6 @@ SOURCES += \
     Core/KeyBinding.cpp \
     Core/NetworkNode.cpp \
     Core/World.cpp \
-    Objects/AIStarShipController.cpp \
-    Objects/Bullet.cpp \
-    Objects/Bumper.cpp \
-    Objects/Flag.cpp \
-    Objects/Goal.cpp \
-    Objects/StarShip.cpp \
     States/MultiplayerGameState.cpp \
         main.cpp \
     lua/lapi.c \
@@ -102,15 +96,6 @@ HEADERS += \
     Core/SteeringBehaviors.hpp \
     Core/SteeringBehaviors.inl \
     Core/World.hpp \
-    Objects/AIStarShipController.hpp \
-    Objects/AIStarShipController.inl \
-    Objects/Arena.hpp \
-    Objects/Bullet.hpp \
-    Objects/Bumper.hpp \
-    Objects/Flag.hpp \
-    Objects/Goal.hpp \
-    Objects/StarShip.hpp \
-    Objects/Team.hpp \
     States/MenuState.hpp \
     States/MultiplayerGameState.hpp \
     lua/lapi.h \

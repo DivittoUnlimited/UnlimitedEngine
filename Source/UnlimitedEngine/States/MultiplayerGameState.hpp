@@ -6,7 +6,6 @@
 #include "Core/Player.hpp"
 #include "Core/GameServer.hpp"
 #include "Core/Globals.hpp"
-#include "Objects/Arena.hpp"
 
 #include <SFML/Network/TcpSocket.hpp>
 #include <SFML/Network/Packet.hpp>

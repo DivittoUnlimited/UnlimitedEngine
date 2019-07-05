@@ -1,36 +1,4 @@
 
 TO_DO LIST:
-* change vector of flags per team to map of flags to make indexing them much easier!!!
-* Research how the steering behaviors are actually rotating the ships.
-* How do players communicate with each other and  the team logic?
-* Fix all remaining starship id issues with category numbering system.
-    - consider removing buildScene? - doubt it
-* Give AI more access to info with insight methods:
-    - FlagInRange, PlayerInRange, underAttack, hasFlag, healthLow, etc...
-    - data from these methods should be communicated to team logic as well as other players.
-* Break Arena into grid
-    - starting positions
-    - playbook positions (best spot for situation)
-* team logic should include things like:
-    - defend the flag holder,
-    - defend location so other ship can capture flag,
-    - target specific player to gain advantage etc...
-* Should flags respawn or just disapear after capture?
+(EDIT Notes.txt to print message here)
 
-GAME IDEAS:
-Power up astroids
-Turrets
-    -team bullets
-    -hurt everyone
-Bumper Speed based on it's health
-    health regens over time
-Ships slow down when they get hit
-    Health regens over time
-stocks per team?
-bullet radius bigger with charge up
-bullet radius and damage smaller over time
-Shooting energy bar that takes longer to regen if fully depleted
-bigger bullets cost more energy
-bullets auto fire when bullet has consumed all energy available to shoot
-bar not shown but will be obvious in gameplay.
-where/how to show health?
