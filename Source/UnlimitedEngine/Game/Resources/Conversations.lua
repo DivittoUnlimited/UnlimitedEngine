@@ -4,54 +4,270 @@
 
 return {
 	Map = {
-                CowboyBobIntro = 0;
+                IntroCutSceneDialog = 0;
+                Chapter1            = 1;
+                Chapter2            = 2;
+                Chapter3            = 3;
+                Chapter4            = 4;
+                Chapter5            = 5;
+                Chapter6            = 6;
+                Chapter7            = 7;
+                Chapter8            = 8;
+                Chapter9            = 9;
+                Chapter10           = 10;
 	};
 	
-        CowboyBobIntro = {
+        -- IntroCutSceneDialog
+        IntroCutSceneDialog = {
                 { -- Link 0
-                        dialog = "WWWeeeeelllll' Howdy Partner!!!";
-			responses = {
+                        dialog = "Can you here me general?";
+                        responses = {
                                 {
-                                        text = "Well' Howdy!";
-                                        link = -1;
-                                },
-				{
-                                        text = "You talkin' to me?";
+                                        text = "What's going on?";
                                         link = 1;
                                 }
                         };
-		},
-		{ -- Link 1
-                        dialog = "yes sir' my names Bob an' i reckon' you look a little lost there patner.";
-			responses = {
+                },
+                { -- Link 1
+                        dialog = "Your troops were ambushed in the night, we found you barely alive amoung your men.";
+                        responses = {
                                 {
-                                        text = "I ain't lost i jus' don't like yer face!";
+                                        text = "Any other Survivors?";
                                         link = 2;
                                 },
-				{
-                                        text = "Actually patner you migh' be right.";
+                                {
+                                        text = "Who attacked us!?";
                                         link = 3;
                                 }
                         };
-		},
+                },
                 { -- Link 2
-                        dialog = "Is tha' so? Draw! ya yella' belly!";
-			responses = {
+                        dialog = "No sir, but we think we know who the attackers were. We are staging a counter attack.\nWe need you to command the troops.";
+                        responses = {
                                 {
-                                        text = "...";
+                                        text = "I'm ready, Let's go crush those cowards!";
                                         link = -1;
                                 }
                         };
-		},
+                },
                 { -- Link 3
-                        dialog = "Well follo' me!";
-			responses = {
+                        dialog = "We found the army that atacked you, and we are staging a counter offensive as we speak sir!\nWe need you to lead us in the battle!";
+                        responses = {
                                 {
-                                        text = "Continue...";
+                                        text = "Let's go crush those cowards!";
                                         link = -1;
                                 }
                         };
                 }
-	};
-	
+        };
+        -- ======================================================================================
+        -- ======================================================================================
+        -- Chapter1
+        Chapter1 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 2!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- Chapter2
+        Chapter2 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 3!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+        -- Chapter3
+        Chapter3 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 4!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+        -- Chapter4
+        Chapter4 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 5!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+        -- Chapter5
+        Chapter5 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 6!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+        -- Chapter6
+        Chapter6 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 7!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+        -- Chapter7
+        Chapter7 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 8!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+        -- Chapter8
+        Chapter8 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 9!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+        -- Chapter9
+        Chapter9 = {
+            { -- Link 0
+                    dialog = "You are about to enter level 10!";
+                    responses = {
+                            {
+                                    text = "Well that's not a very good story...";
+                                    link = 1;
+                            }
+                    };
+            },
+            { -- Link 1
+                    dialog = "Let's see you write a better story then!";
+                    responses = {
+                            {
+                                    text = "Maybe i will...";
+                                    link = -1;
+                            }
+                    };
+            }
+        };
+        -- ========================================================================================
+        -- ========================================================================================
+
+
+
 };

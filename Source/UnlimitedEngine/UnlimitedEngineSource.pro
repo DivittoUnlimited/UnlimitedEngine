@@ -12,7 +12,16 @@ SOURCES += \
     Core/KeyBinding.cpp \
     Core/NetworkNode.cpp \
     Core/World.cpp \
+    States/ConquestBattleSetupState.cpp \
+    States/ConquestModeSetup.cpp \
+    States/ConquestOverviewState.cpp \
+    States/CutSceneState.cpp \
     States/MultiplayerGameState.cpp \
+    States/QuickBattleSetupState.cpp \
+    States/SettingsState.cpp \
+    States/ShopState.cpp \
+    States/SinglePlayerMenuState.cpp \
+    States/StoryModeSetupState.cpp \
         main.cpp \
     lua/lapi.c \
     lua/lauxlib.c \
@@ -96,8 +105,17 @@ HEADERS += \
     Core/SteeringBehaviors.hpp \
     Core/SteeringBehaviors.inl \
     Core/World.hpp \
+    States/ConquestBattleSetupState.hpp \
+    States/ConquestModeSetup.hpp \
+    States/ConquestOverviewState.hpp \
+    States/CutSceneState.hpp \
     States/MenuState.hpp \
     States/MultiplayerGameState.hpp \
+    States/QuickBattleSetupState.hpp \
+    States/SettingsState.hpp \
+    States/ShopState.hpp \
+    States/SinglePlayerMenuState.hpp \
+    States/StoryModeSetupState.hpp \
     lua/lapi.h \
     lua/lauxlib.h \
     lua/lcode.h \

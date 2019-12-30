@@ -2,6 +2,7 @@
 #define PAUSESTATE_HPP
 
 #include "Core/State.hpp"
+#include "Gui/Container.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -15,9 +16,8 @@ public:
     virtual bool handleEvent(const sf::Event& event);
 
 private:
-    sf::Sprite mBackgroundSprite;
+    GUI::Container mGUIContainer;
     sf::Text   mPausedText;
-    sf::Text   mInstructionText;
 };
 
 #endif // PAUSESTATE_HPP

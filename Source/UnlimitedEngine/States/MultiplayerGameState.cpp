@@ -127,7 +127,7 @@ void MultiplayerGameState::onDestroy( void )
     }
 }
 
-bool MultiplayerGameState::update( sf::Time dt )
+bool MultiplayerGameState::update( sf::Time )
 {
     /*
     // Connected to server: Handle all the network logic

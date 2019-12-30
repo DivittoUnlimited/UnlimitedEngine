@@ -31,15 +31,15 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
              devNotes += "\n";
         }
         myfile.close( );
-    } else std::cout << "Unable to open to-do.txt" << std::endl;;
+    } else std::cout << "Unable to open to-do.txt" << std::endl;
 
-    mDevNotes = sf::Text( devNotes, mContext.fonts->get( FontMap.at( "Default" ) ), 24 );
+    mDevNotes = sf::Text( devNotes, mContext.fonts->get( FontMap.at( "Default" ) ), 20 );
     mDevNotes.setFillColor( sf::Color( 255, 255, 255, 255 ) );
     mDevNotes.setPosition( 10, 600 );
     mDevNotes.setOutlineThickness( 1 );
     mDevNotes.setOutlineColor( sf::Color( 0, 255, 0, 255 ) );
 
-    mTitleText = sf::Text( "MAIN MENU", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
+    mTitleText = sf::Text( "Tactics Tribes\nMENU", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
     mTitleText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     centerOrigin( mTitleText );
     mTitleText.setPosition( WINDOW_WIDTH / 2, 200 );
@@ -47,45 +47,52 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     mTitleText.setOutlineThickness( 5 );
     mTitleText.setStyle( sf::Text::Bold );
 
+    auto testMap = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    testMap->setPosition( WINDOW_WIDTH / 2 - 100, 390 );
+    testMap->setText( "TEST_MAP" );
+    testMap->setCallback( [this] ( )
+    {
+        requestStackPop( );
+        requestStackPush( States::BattleState );
+    });
+
     auto playButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
-    playButton->setText( "Solo Game" );
+    playButton->setText( "Single Player" );
     playButton->setCallback( [this] ( )
 	{
         requestStackPop( );
-        requestStackPush( States::SinglePlayer );
+        requestStackPush( States::SinglePlayerMenuState );
 	});
 
     auto playLocalButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playLocalButton->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
-    playLocalButton->setText( "Two Player Battle" );
+    playLocalButton->setText( "Vs. Mode (STUB)" );
     playLocalButton->setCallback( [this] ( )
     {
-        requestStackPop( );
-        requestStackPush( States::HostGame );
+        //requestStackPop( );
+        //requestStackPush( States::HostGame );
     });
 
     auto playMultiplayerButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playMultiplayerButton->setPosition( WINDOW_WIDTH / 2 - 100, 570 );
-    playMultiplayerButton->setText( "Online Arena" );
+    playMultiplayerButton->setText( "Multiplayer (STUB)" );
     playMultiplayerButton->setCallback( [this] ( )
     {
-        requestStackPop( );
-        requestStackPush( States::HostGame );
+        //requestStackPop( );
+        //requestStackPush( States::HostGame );
     });
 
-    /*
-     * Removed for debugging
     auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 525 );
+    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 630 );
     settingsButton->setText( "Settings" );
     settingsButton->setCallback([this] ( )
 	{
-        requestStackPush( States::Settings );
+        requestStackPush( States::SettingsState );
 	});
-    */
+
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 630 );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 690 );
     exitButton->setText( "Exit" );
     exitButton->setCallback([this] ( )
 	{
@@ -93,10 +100,11 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStateClear( );
 	});
 
-    //mGUIContainer.pack( settingsButton );
+    mGUIContainer.pack( testMap );
     mGUIContainer.pack( playButton );
     mGUIContainer.pack( playLocalButton );
     mGUIContainer.pack( playMultiplayerButton );
+    mGUIContainer.pack( settingsButton );
     mGUIContainer.pack( exitButton );
 }
 
@@ -110,7 +118,7 @@ void MenuState::draw( )
     sf::RenderTarget& window = *getContext( ).window;
 
     window.setView( window.getDefaultView( ) );
-
+    window.clear( sf::Color::Black );
     window.draw( mTitleText );
     window.draw( mGUIContainer );
     window.draw( mDevNotes );

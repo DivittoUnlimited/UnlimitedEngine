@@ -228,7 +228,7 @@ static std::map<std::string, unsigned  int> buildResourceMap( std::string fileNa
         {
             lua_pushnil( L );  // first key
             while( lua_next( L, -2 ) != 0 ) {
-                t.insert( std::pair<std::string, unsigned int>( lua_tostring( L, -2 ), (unsigned int)lua_tointeger( L, -1 )  ) );
+                t.insert( std::pair<std::string, unsigned int>( lua_tostring( L, -2 ), static_cast<unsigned int>( lua_tointeger( L, -1 )  ) ) );
                 lua_pop( L, 1); // removes 'value'; keeps 'key' for next iteration
             }
             lua_pop( L, 1 ); // remove table
@@ -238,10 +238,10 @@ static std::map<std::string, unsigned  int> buildResourceMap( std::string fileNa
     return t;
 }
 
+static std::map<std::string, unsigned int> ConversationMap      = buildResourceMap( "Game/Resources/Conversations.lua" );
 static std::map<std::string, unsigned int> ParticleMap          = buildResourceMap( "Game/Resources/Particles.lua" );
 static std::map<std::string, unsigned int> ActorMap             = buildResourceMap( "Game/Resources/Actors.lua" );
 static std::map<std::string, unsigned int> WarpMap              = buildResourceMap( "Game/Resources/Warps.lua" );
-static std::map<std::string, unsigned int> ConversationMap      = buildResourceMap( "Game/Resources/Conversations.lua" );
 
 static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorData> {
         std::vector<ActorData> data( ActorMap.size( ) );
@@ -405,7 +405,6 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
                 {
                     // Get Conversation node Array.
                     std::vector<DialogNode> v;
-
                     lua_pushnil( L );
                     while( lua_next(L , -2 ) != 0 )
                     {
@@ -432,7 +431,7 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
                                         lua_pop( L, 1 ); // text
 
                                         lua_getfield( L, -1, "link" );
-                                        if( lua_isnumber( L, -1 ) ) data.second = (int)lua_tonumber( L, -1 );
+                                        if( lua_isnumber( L, -1 ) ) data.second = static_cast<int>( lua_tonumber( L, -1 ) );
                                         lua_pop( L, 1 ); // link
 
                                         responses.push_back( data );
@@ -449,7 +448,7 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
 
                     data[i->second].conversationBranches = v;
 
-                    lua_pop( L, 1 ); // nil value to traverse convo Links
+                    //lua_pop( L, 1 ); // nil value to traverse convo Links
                 }
                 lua_pop( L, 1 ); // defintion table
             }

@@ -23,7 +23,6 @@ public:
 protected:
     World   mWorld;
     Player  mPlayer;
-
 };
 
 #endif // GAMESTATE_HPP

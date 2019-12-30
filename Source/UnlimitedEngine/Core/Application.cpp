@@ -7,10 +7,19 @@
 #include "States/MenuState.hpp"
 #include "States/PauseState.hpp"
 #include "States/LoadingState.hpp"
+#include "States/SettingsState.hpp"
 #include "States/MultiplayerGameState.hpp"
 #include "States/GameState.hpp"
 #include "States/SplashScreen.hpp"
 #include "States/MessageBoxState.hpp"
+#include "States/SinglePlayerMenuState.hpp"
+#include "States/QuickBattleSetupState.hpp"
+#include "States/ConquestModeSetup.hpp"
+#include "States/ConquestOverviewState.hpp"
+#include "States/ConquestBattleSetupState.hpp"
+#include "States/ShopState.hpp"
+#include "States/StoryModeSetupState.hpp"
+#include "States/CutSceneState.hpp"
 #include "DataTables.hpp"
 #include "Globals.hpp"
 
@@ -26,11 +35,11 @@ Application::Application( )
     , mTextures( )
     , mFonts( )
     , mMusic( )
-    , mKeyBinding1(1)
-    , mKeyBinding2(2)
-    , mStateStack(State::Context(States::None, mWindow, mTextures, mFonts, mMusic, mSoundEffects,  new std::vector<std::pair<std::string, int>>(), mKeyBinding1, mKeyBinding2))
-    , mStatisticsNumFrames(0)
-    , mStatisticsText()
+    , mKeyBinding1( 1 )
+    , mKeyBinding2( 2 )
+    , mStateStack(State::Context( States::None, mWindow, mTextures, mFonts, mMusic, mSoundEffects,  new std::vector<std::pair<std::string, int>>(), mKeyBinding1, mKeyBinding2))
+    , mStatisticsNumFrames( 0 )
+    , mStatisticsText( )
     , mStatisticsUpdateTime( sf::Time::Zero )
 {
     mWindow.setKeyRepeatEnabled( false );
@@ -119,14 +128,34 @@ void Application::updateStatistics( sf::Time dt )
 
 void Application::registerStates( )
 {
-    mStateStack.registerState<SplashScreen>         ( States::SplashScreen         );
-    mStateStack.registerState<TitleState>           ( States::Title                );
-    mStateStack.registerState<LoadingState>         ( States::Loading              );
-    mStateStack.registerState<MenuState>            ( States::Menu                 );
-    mStateStack.registerState<GameState>            ( States::SinglePlayer         );
-    mStateStack.registerState<MultiplayerGameState> ( States::HostGame,      true  );
-    mStateStack.registerState<MultiplayerGameState> ( States::JoinGame,      false );
-    mStateStack.registerState<PauseState>           ( States::Pause                );
-    mStateStack.registerState<MessageBoxState>      ( States::MessageBox           );
+    mStateStack.registerState<SplashScreen>             ( States::SplashScreen          );
+    mStateStack.registerState<SettingsState>            ( States::SettingsState         );
+    mStateStack.registerState<TitleState>               ( States::Title                 );
+    mStateStack.registerState<LoadingState>             ( States::Loading               );
+    mStateStack.registerState<MenuState>                ( States::Menu                  );
+    mStateStack.registerState<GameState>                ( States::BattleState           );
+    mStateStack.registerState<MultiplayerGameState>     ( States::HostGame,      true   );
+    mStateStack.registerState<MultiplayerGameState>     ( States::JoinGame,      false  );
+    mStateStack.registerState<PauseState>               ( States::Pause                 );
+    mStateStack.registerState<MessageBoxState>          ( States::MessageBox            );
+    mStateStack.registerState<SinglePlayerMenuState>    ( States::SinglePlayerMenuState );
+    mStateStack.registerState<QuickBattleSetupState>    ( States::QuickBattleSetupState );
+    mStateStack.registerState<ConquestModeSetup>        ( States::ConquestModeSetup     );
+    mStateStack.registerState<ConquestOverviewState>    ( States::ConquestOverviewState );
+    mStateStack.registerState<ConquestBattleSetupState> ( States::ConquestBattleSetupState );
+    mStateStack.registerState<ShopState>                ( States::ShopState );
+    mStateStack.registerState<StoryModeSetupState>      ( States::StoryModeSetupState );
+
+    // CutScenes
+    mStateStack.registerState<CutSceneState>            ( States::IntroDialogState, States::Level1 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene1State, States::Level2 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene2State, States::Level3 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene3State, States::Level4 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene4State, States::Level5 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene5State, States::Level6 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene6State, States::Level7 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene7State, States::Level8 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene8State, States::Level9 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene9State, States::Level10 );
 }
 

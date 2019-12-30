@@ -15,9 +15,9 @@ TitleState::TitleState( States::ID id, StateStack& stack, Context context )
 {
     mContext.textures->load( TextureMap.at( "DivittoUnlimitedLogo" ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "DivittoUnlimitedLogo" ) ) );
 
-    mBackgroundSprite.setTexture( context.textures->get( TextureMap.at( "DivittoUnlimitedLogo" ) ) );
+    //mBackgroundSprite.setTexture( context.textures->get( TextureMap.at( "DivittoUnlimitedLogo" ) ) );
 
-    mTitleText = sf::Text( "TITLE SCREEN", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
+    mTitleText = sf::Text( "Tactics Tribes", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
     mTitleText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     centerOrigin( mTitleText );
     mTitleText.setPosition( WINDOW_WIDTH / 2, 200 );
@@ -40,7 +40,7 @@ TitleState::~TitleState( )
 void TitleState::draw( )
 {
     sf::RenderTarget& window = *getContext( ).window;
-    window.draw( mBackgroundSprite );
+    //window.draw( mBackgroundSprite );
     window.draw( mTitleText );
     if ( mShowText )
        window.draw( mText );

@@ -10,8 +10,8 @@
 class MessageBoxState : public State
 {
 public:
-    MessageBoxState( States::ID id, StateStack& stack, Context context );
-    MessageBoxState( States::ID id, StateStack& stack, Context context, std::string convoName );
+    // MessageBoxState( States::ID id, StateStack& stack, Context context );
+    MessageBoxState(States::ID id, StateStack& stack, Context context, std::string convoName = "ERROR NO CONVO NAME" );
     ~MessageBoxState( void );
 
     virtual void draw( void );

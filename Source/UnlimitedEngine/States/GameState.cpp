@@ -98,7 +98,7 @@ bool GameState::handleEvent( const sf::Event& event )
     mPlayer.handleEvent( event, mWorld.getCommandQueue( ) );
 
     // Escape pressed, trigger the pause screen -- 9 is the id of the start button
-    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape )) {
+    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )) {
         requestStackPush( States::Pause );
     }
 

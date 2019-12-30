@@ -1,4 +1,13 @@
 
 TO_DO LIST:
-(EDIT Notes.txt to print message here)
-
+    - Add boolean to pause state to flag if escape should close state or open it.
+    - make sure Conversations.lua can easily handle conversations
+            between more than two people
+    - create all other needed game state stubs and connect them appropriatly to each other
+    - blip state cut scenes during battles
+    - Demi gods are used like bonus power ups
+    - heros are troops that level up and can die (lose all levels)
+    - figure out why vs mode and multiplayer call Host game?
+        - check main menu buttons
+    - how does the pause state know to call a new menuState
+        -or to pop battleState back to conquestOverviewState?
