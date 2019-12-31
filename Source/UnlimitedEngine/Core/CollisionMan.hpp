@@ -12,7 +12,7 @@
 #include <SFML/Graphics/RectangleShape.hpp> // for debug rect
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include "SceneNode.hpp"
+#include "Graphics/SceneNode.hpp"
 #include "Globals.hpp"
 
 namespace CollisionMan {

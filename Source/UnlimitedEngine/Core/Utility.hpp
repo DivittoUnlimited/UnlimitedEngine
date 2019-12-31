@@ -1,7 +1,7 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 
-#include "Core/Animation.hpp"
+#include "Graphics/Animation.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/System/Vector2.hpp>

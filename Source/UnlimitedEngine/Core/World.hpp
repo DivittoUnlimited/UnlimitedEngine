@@ -12,18 +12,18 @@
 #include "Core/ResourceManager.hpp"
 #include "Core/ResourceIdentifiers.hpp"
 
-#include "Core/SceneNode.hpp"
-#include "Core/SpriteNode.hpp"
+#include "Graphics/SceneNode.hpp"
+#include "Graphics/SpriteNode.hpp"
 
 #include "Core/CommandQueue.hpp"
 #include "Core/Command.hpp"
 #include "Core/State.hpp"
-#include "Core/PostEffect.hpp"
-#include "Core/BloomEffect.hpp"
+#include "Graphics/PostEffect.hpp"
+#include "Graphics/BloomEffect.hpp"
 #include "Core/Globals.hpp"
 #include "Core/Player.hpp"
 #include "Core/CollisionMan.hpp"
-#include "Core/EmitterNode.hpp"
+#include "Graphics/EmitterNode.hpp"
 #include "Core/NetworkNode.hpp"
 
 enum Ships {

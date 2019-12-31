@@ -2,7 +2,10 @@
 -- As many characters can be used in dialog as well as response text, as well as any number of responses can be given to the player to choose from. The only limits are how the game displays
 -- this information (i.e Pokemon's Text box w/ 4 answers, Bioware's Dialog selection wheel, etc... ).
 
+local textures = require( "Game/Resources/Assets" ).Textures;
+
 return {
+
 	Map = {
                 IntroCutSceneDialog = 0;
                 Chapter1            = 1;
@@ -20,6 +23,9 @@ return {
         -- IntroCutSceneDialog
         IntroCutSceneDialog = {
                 { -- Link 0
+                        portrait = -1;
+                        x = 0;
+                        y = 0;
                         dialog = "Can you here me general?";
                         responses = {
                                 {
@@ -29,6 +35,9 @@ return {
                         };
                 },
                 { -- Link 1
+                        portrait = textures.DemoGirl;
+                        x = 100;
+                        y = 50;
                         dialog = "Your troops were ambushed in the night, we found you barely alive amoung your men.";
                         responses = {
                                 {
@@ -42,7 +51,10 @@ return {
                         };
                 },
                 { -- Link 2
-                        dialog = "No sir, but we think we know who the attackers were. We are staging a counter attack.\nWe need you to command the troops.";
+                        portrait = textures.DemoGirl;
+                        x = 100;
+                        y = 50;
+                        dialog = "No, but we think we know who the attackers were. Our troops staging a counter attack.\nWe need you to command the troops.";
                         responses = {
                                 {
                                         text = "I'm ready, Let's go crush those cowards!";
@@ -51,7 +63,10 @@ return {
                         };
                 },
                 { -- Link 3
-                        dialog = "We found the army that atacked you, and we are staging a counter offensive as we speak sir!\nWe need you to lead us in the battle!";
+                        portrait = textures.DemoGirl;
+                        x = 100;
+                        y = 50;
+                        dialog = "We found the army that attacked you, and we are staging a counter offensive as we speak,\nWe need you to lead us in the battle.";
                         responses = {
                                 {
                                         text = "Let's go crush those cowards!";
@@ -65,6 +80,9 @@ return {
         -- Chapter1
         Chapter1 = {
             { -- Link 0
+                    portrait = textures.DemoGirl;
+                    x = 100;
+                    y = 50;
                     dialog = "You are about to enter level 2!";
                     responses = {
                             {
@@ -74,6 +92,9 @@ return {
                     };
             },
             { -- Link 1
+                    portrait = textures.DemoGirl;
+                    x = 100;
+                    y = 50;
                     dialog = "Let's see you write a better story then!";
                     responses = {
                             {

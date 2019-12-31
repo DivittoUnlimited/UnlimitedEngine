@@ -12,6 +12,8 @@ return {
         cowboy               = 6;
         woodTexture          = 7;
         SevenSunSetDemoTexture   = 8;
+        DemoGirl                 = 9;
+        DemoLevel                = 10;
     };
 
     SoundEffects = {

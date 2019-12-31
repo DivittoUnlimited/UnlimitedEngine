@@ -16,6 +16,9 @@ private:
     MessageBoxNode* mMessageBox;
     States::ID mNextState;
     bool mHasRanDialog;
+
+    sf::Sprite mPortrait;
+
 };
 
 #endif // INTROCUTSCENESTATE_HPP

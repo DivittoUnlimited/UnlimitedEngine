@@ -21,6 +21,6 @@ return {
     };
 
     PlayerTexture       = "Default";
-    TiledMapFilePath    = "Game/Levels/SevenSunsetDemo.lua";
+    TiledMapFilePath    = "Game/Resources/Maps/DemoLevel.lua";
 
 };

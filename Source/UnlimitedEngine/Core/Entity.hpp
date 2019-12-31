@@ -1,7 +1,7 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
-#include "SceneNode.hpp"
+#include "Graphics/SceneNode.hpp"
 
 ///
 /// \brief The Entity class

@@ -1,7 +1,7 @@
 #ifndef NETWORKNODE_HPP
 #define NETWORKNODE_HPP
 
-#include "SceneNode.hpp"
+#include "Graphics/SceneNode.hpp"
 #include "NetworkProtocol.hpp"
 
 #include <queue>

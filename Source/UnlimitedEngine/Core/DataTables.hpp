@@ -89,6 +89,8 @@ struct ItemData {
 
 struct ConversationData {
     std::vector<DialogNode> conversationBranches;
+    std::vector<int> portrait; // lua identifier // matches up with corresponding link in convo
+    std::vector<sf::Vector2f> portraitPosition; // index will line up with other two vectors
 };
 
 static std::map<std::string, unsigned int> TextureMap;
@@ -405,13 +407,29 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
                 {
                     // Get Conversation node Array.
                     std::vector<DialogNode> v;
+                    int portrait = 0;
+                    sf::Vector2f position;
+
                     lua_pushnil( L );
-                    while( lua_next(L , -2 ) != 0 )
+                    while( lua_next( L, -2 ) != 0 )
                     {
                         std::string text;
                         std::vector<std::pair<std::string, int>> responses;
                         if( lua_istable( L, -1 ) )
                         {
+                            lua_getfield( L, -1, "portrait" );
+                            if( lua_isnumber( L, -1 ) ) portrait = static_cast<int>( lua_tointeger( L, -1 ) ); else portrait = 0;
+                            lua_pop( L, 1 ); // portrait
+
+                            lua_getfield( L, -1, "x" );
+                            if( lua_isnumber( L, -1 ) ) position.x = static_cast<unsigned int>( lua_tointeger( L, -1 ) ); else position.x = 0; // center
+                            lua_pop( L, 1 ); // y
+
+                            lua_getfield( L, -1, "y" );
+                            if( lua_isnumber( L, -1 ) ) position.y = static_cast<unsigned int>( lua_tointeger( L, -1 ) ); else position.y = 0; // center
+                            lua_pop( L, 1 ); // y
+
+                            // =========================
                             lua_getfield( L, -1, "dialog" );
                             if( lua_isstring( L, -1 ) ) text = lua_tostring( L, -1 ); else text = "ERROR1";
                             lua_pop( L, 1 ); // text
@@ -444,9 +462,12 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
                         } else std::cout << "Error reading ConversationData" << std::endl;
                         lua_pop( L, 1 ); // DialogNode
                         v.push_back( DialogNode( text, responses ) );
+                        data[i->second].portrait.push_back( portrait );
+                        data[i->second].portraitPosition.push_back( position );
                     }
 
                     data[i->second].conversationBranches = v;
+
 
                     //lua_pop( L, 1 ); // nil value to traverse convo Links
                 }

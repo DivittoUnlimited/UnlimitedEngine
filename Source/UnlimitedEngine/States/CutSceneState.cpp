@@ -21,9 +21,14 @@ CutSceneState::CutSceneState( States::ID id, StateStack& stack, Context context,
     : State( id, stack, context )
     , mNextState( nextState )
     , mHasRanDialog( false )
+    , mPortrait( )
 {
     // mContext.music->setVolume( 30 );
     // mContext.music->play( MusicMap.at( "MenuTheme" ) );
+
+    mContext.textures->load( TextureMap.at( "DemoGirl" ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "DemoGirl" ) ) );
+
+
     switch( mNextState )
     {
         case States::Level1:  mMessageBox = new MessageBoxNode( "IntroCutSceneDialog",  *context.fonts ); break;
@@ -39,6 +44,9 @@ CutSceneState::CutSceneState( States::ID id, StateStack& stack, Context context,
         default: break;
     }
     mMessageBox->setPosition( 50, 400 );
+
+
+
 }
 
 CutSceneState::~CutSceneState()
@@ -51,7 +59,11 @@ void CutSceneState::draw( )
     sf::RenderTarget& window = *getContext( ).window;
     window.setView( window.getDefaultView( ) );
     window.clear( sf::Color::Black );
+
+    if( mMessageBox->getPortrait() != -1 )
+        window.draw( mPortrait );
     window.draw( *mMessageBox );
+
 }
 
 bool CutSceneState::update( sf::Time )
@@ -60,6 +72,18 @@ bool CutSceneState::update( sf::Time )
     {
         requestStackPop( );
         requestStackPush( States::BattleState );
+    }
+    else
+    {
+        // make sure portrait(s) are in correctly and in the right place
+
+        if( mMessageBox->getPortrait() != -1 )
+        {
+            mPortrait.setTexture( mContext.textures->get( static_cast<unsigned int>( mMessageBox->getPortrait( ) ) ) );
+            mPortrait.setPosition( mMessageBox->getPortraitPosition() );
+        }
+
+
     }
     return true;
 }

@@ -2,7 +2,7 @@
 #define COMMAND_HPP
 
 #include "Category.hpp"
-#include "Core/ParticleNode.hpp"
+#include "Graphics/ParticleNode.hpp"
 
 #include <SFML/System/Time.hpp>
 
