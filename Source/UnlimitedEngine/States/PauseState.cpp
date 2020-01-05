@@ -35,8 +35,8 @@ PauseState::PauseState( States::ID id, StateStack& stack, Context context )
     playerWins->setText( "Player Wins!" );
     playerWins->setCallback( [this] ( )
     {
-        //requestStackPop( );
-        //requestStackPush( States::SinglePlayerMenuState );
+        requestStateClear( );
+        requestStackPush( States::BattleStatScreen );
     });
 
     auto playerLoses = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

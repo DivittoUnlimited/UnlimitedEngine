@@ -52,6 +52,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     testMap->setText( "TEST_MAP" );
     testMap->setCallback( [this] ( )
     {
+        GAME_MODE = GameModes::QuickBattle;
         requestStackPop( );
         requestStackPush( States::BattleState );
     });
@@ -61,6 +62,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playButton->setText( "Single Player" );
     playButton->setCallback( [this] ( )
 	{
+        GAME_MODE = GameModes::Online;
         requestStackPop( );
         requestStackPush( States::SinglePlayerMenuState );
 	});
@@ -70,6 +72,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playLocalButton->setText( "Vs. Mode (STUB)" );
     playLocalButton->setCallback( [this] ( )
     {
+        GAME_MODE = GameModes::Online;
         //requestStackPop( );
         //requestStackPush( States::HostGame );
     });
@@ -88,6 +91,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     settingsButton->setText( "Settings" );
     settingsButton->setCallback([this] ( )
 	{
+        GAME_MODE = GameModes::NONE;
         requestStackPush( States::SettingsState );
 	});
 

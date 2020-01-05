@@ -20,6 +20,7 @@
 #include "States/ShopState.hpp"
 #include "States/StoryModeSetupState.hpp"
 #include "States/CutSceneState.hpp"
+#include "States/BattleStatScreen.hpp"
 #include "DataTables.hpp"
 #include "Globals.hpp"
 
@@ -145,6 +146,7 @@ void Application::registerStates( )
     mStateStack.registerState<ConquestBattleSetupState> ( States::ConquestBattleSetupState );
     mStateStack.registerState<ShopState>                ( States::ShopState );
     mStateStack.registerState<StoryModeSetupState>      ( States::StoryModeSetupState );
+    mStateStack.registerState<BattleStatScreen>         ( States::BattleStatScreen );
 
     // CutScenes
     mStateStack.registerState<CutSceneState>            ( States::IntroDialogState, States::Level1 );

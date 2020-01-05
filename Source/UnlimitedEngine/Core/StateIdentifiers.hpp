@@ -29,6 +29,7 @@ namespace States
         ConquestBattleSetupState,
         ShopState,
         StoryModeSetupState,
+        BattleStatScreen,
 
         // CutScenes
         IntroCutSceneDialogState,

@@ -41,6 +41,7 @@ SinglePlayerMenuState::SinglePlayerMenuState( States::ID id, StateStack& stack, 
     quickBattle->setText( "Quick Battle" );
     quickBattle->setCallback( [this] ( )
     {
+        GAME_MODE = GameModes::QuickBattle;
         requestStackPop( );
         requestStackPush( States::QuickBattleSetupState );
     });
@@ -50,6 +51,7 @@ SinglePlayerMenuState::SinglePlayerMenuState( States::ID id, StateStack& stack, 
     storyMode->setText( "Story Mode" );
     storyMode->setCallback( [this] ( )
     {
+        GAME_MODE = GameModes::StoryMode;
         requestStackPop( );
         requestStackPush( States::StoryModeSetupState );
     });
@@ -59,6 +61,7 @@ SinglePlayerMenuState::SinglePlayerMenuState( States::ID id, StateStack& stack, 
     conquestMode->setText( "Conquest" );
     conquestMode->setCallback( [this] ( )
     {
+        GAME_MODE = GameModes::Conquest;
         requestStackPop( );
         requestStackPush( States::ConquestModeSetup );
     });
@@ -68,6 +71,7 @@ SinglePlayerMenuState::SinglePlayerMenuState( States::ID id, StateStack& stack, 
     exitButton->setText( "Return to Menu" );
     exitButton->setCallback( [this] ( )
     {
+        GAME_MODE = GameModes::NONE;
         requestStackPop( );
         requestStackPush( States::Menu );
     });

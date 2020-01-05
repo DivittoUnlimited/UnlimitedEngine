@@ -44,6 +44,7 @@ HEADERS += \
     Core/Entity.hpp \
     Core/FiniteStateMachine.hpp \
     Core/FiniteStateMachine.inl \
+    Core/GameModeIdentifiers.hpp \
     Core/GameServer.hpp \
     Core/Globals.hpp \
     Core/KeyBinding.hpp \
@@ -82,6 +83,7 @@ HEADERS += \
     Gui/Label.hpp \
     Gui/MessageBoxNode.hpp \
     Gui/ResponseSelector.hpp \
+    States/BattleStatScreen.hpp \
     States/ConquestBattleSetupState.hpp \
     States/ConquestModeSetup.hpp \
     States/ConquestOverviewState.hpp \
@@ -164,6 +166,7 @@ SOURCES += \
     Gui/Label.cpp \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
+    States/BattleStatScreen.cpp \
     States/ConquestBattleSetupState.cpp \
     States/ConquestModeSetup.cpp \
     States/ConquestOverviewState.cpp \
