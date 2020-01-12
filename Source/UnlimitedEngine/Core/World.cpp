@@ -20,10 +20,10 @@ World::World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& s
     , mLocalMultiplayerWorld( isLocalMultiplayer )
     , mNetworkNode( nullptr )
 {
-    if( !mSceneTexture.create( mTarget.getView().getSize().x, mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
+    if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView().getSize().x ), mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
 
-    buildScene( );
+    buildScene( "Game/Resources/Maps/TacticsTribeDemoLevel.lua" ); // Hardcoded value! this needs to change to make multiple levels possible.
 }
 
 World::~World( void )
@@ -38,7 +38,8 @@ void World::draw( )
 
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
-        mSceneTexture.display( );
+
+        //mSceneTexture.display( );
 
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
 
@@ -108,7 +109,7 @@ void World::handleCollisions( )
 
 }
 
-void World::buildScene( void )
+void World::buildScene( std::string tileMapFilePath )
 {
     /*
      * NON tiled levels
@@ -128,7 +129,7 @@ void World::buildScene( void )
 
     // load TiledMap
         std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
-        Tiled::TiledMap map = Tiled::loadFromFile( "Game/Resources/Maps/DemoLevel.lua" ); //mContext.TiledMapFilePath );
+        Tiled::TiledMap map = Tiled::loadFromFile( tileMapFilePath ); //mContext.TiledMapFilePath );
 
         struct Tile {
             std::string texID;
@@ -206,6 +207,24 @@ void World::buildScene( void )
                     else {
                         mSceneLayers.push_back( layer.get( ) );
                         mSceneGraph.attachChild( std::move( layer ) );
+                        mMovementGrid.buildGrid( map.tileSets[0], map.layers[i] );
+
+                        // build drawable grid
+                        for( unsigned int p = 0; p < map.layers[i].height; ++p )
+                        {
+                            for( unsigned int k = 0; k < map.layers[i].width; ++k )
+                            {
+                                std::unique_ptr<RectangleShapeNode> rect(
+                                            new RectangleShapeNode( sf::IntRect( sf::Vector2i( static_cast<int>( k * tileSets.tileWidth ), static_cast<int>( p * tileSets.tileHeight ) ),
+                                                                                 sf::Vector2i( static_cast<int>( tileSets.tileWidth ), static_cast<int>( tileSets.tileHeight ) ) ) ) );
+                                rect.get()->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+                                rect.get()->getSprite()->setOutlineThickness( 1 );
+                                rect.get()->getSprite()->setOutlineColor( sf::Color::Black );
+                                this->mDrawableGrid.push_back( rect.get( ) );
+                                mSceneGraph.attachChild( std::move( rect ) );
+                            }
+
+                        }
                     }
                 }
             }

@@ -14,6 +14,7 @@
 
 #include "Graphics/SceneNode.hpp"
 #include "Graphics/SpriteNode.hpp"
+#include "Graphics/RectangleShapeNode.hpp"
 
 #include "Core/CommandQueue.hpp"
 #include "Core/Command.hpp"
@@ -25,6 +26,8 @@
 #include "Core/CollisionMan.hpp"
 #include "Graphics/EmitterNode.hpp"
 #include "Core/NetworkNode.hpp"
+#include "GameObjects/Grid.hpp"
+
 
 enum Ships {
       TeamAShip1 = 0
@@ -51,7 +54,7 @@ public:
 
     void handleCollisions( void );
 
-    void buildScene( void );
+    void buildScene( std::string tileMapFilePath );
 
 private:
     sf::RenderTarget&					mTarget;
@@ -66,10 +69,15 @@ private:
     CommandQueue						mCommandQueue;
     BloomEffect							mBloomEffect;
     SceneNode							mSceneGraph;
+
     std::vector<SceneNode*>          	mSceneLayers;   
     bool								mNetworkedWorld;
     bool                                mLocalMultiplayerWorld;
     NetworkNode*						mNetworkNode;
+
+    // Game specific
+    Grid                                mMovementGrid;
+    std::vector<RectangleShapeNode*>    mDrawableGrid;
 
 };
 

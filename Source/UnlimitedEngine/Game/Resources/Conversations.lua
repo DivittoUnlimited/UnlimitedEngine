@@ -1,6 +1,12 @@
--- Displayed in MessageBox starting at link 0. The link given with each answer tells where to direct the conversation a link with a negative value ends the conversation.
--- As many characters can be used in dialog as well as response text, as well as any number of responses can be given to the player to choose from. The only limits are how the game displays
+-- Displayed in MessageBox starting at link 0. The link given with each answer tells where to direct
+-- the conversation a link with a negative value ends the conversation.
+-- As many characters can be used in dialog as well as response text, as well as any number of
+-- responses can be given to the player to choose from. The only limits are how the game displays
 -- this information (i.e Pokemon's Text box w/ 4 answers, Bioware's Dialog selection wheel, etc... ).
+
+-- This file might become far to large to be managable. Breaking it up into seperate conversation files
+-- will work as long as they are all referenced here.
+
 
 local textures = require( "Game/Resources/Assets" ).Textures;
 

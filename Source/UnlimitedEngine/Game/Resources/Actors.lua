@@ -1,4 +1,11 @@
 
+-- This file and it's coresponding parts in dataTables.hpp
+-- are relics from an rpg game where "Actors" where NPC's
+-- Currently only the path obj is being loaded by the engine
+-- as a vector of pairs that represent the angle the actor should be
+-- moving and the distance they should move.
+-- Anthony Divitto 1-6-20
+
 return {
     Map = {
         BadGuy    = 0;

@@ -1,3 +1,8 @@
+-- if you want to use an asset ( image file, sound effect etc.. ) then it better be registered in the
+-- Assets.lua file and then defined with it's file path here.
+
+
+
 local Assets = require( "Game/Resources/Assets" );
 
 local Tex   = Assets.Textures;
@@ -13,12 +18,7 @@ return {
         [Tex.Particle]                  = "Media/Textures/Particle.png";
         [Tex.Buttons]                   = "Media/Textures/Buttons.png";
 
-        -- Demo
-        [Tex.tiles]                     = "Media/Textures/tiles.png";
-        [Tex.trainers]                  = "Media/Textures/trainers.png";
-        [Tex.cowboy]                    = "Media/Textures/cowboy.png";
-        [Tex.woodTexture]               = "Media/Textures/woodTexture.png";
-        [Tex.SevenSunSetDemoTexture]    = "Media/Textures/SevenSunSetDemoTexture.png";
+        -- Game Specific
         [Tex.DemoGirl]                  = "Media/Textures/Girl.png";
         [Tex.DemoLevel]                 = "Media/Textures/DemoLevel.png";
     };

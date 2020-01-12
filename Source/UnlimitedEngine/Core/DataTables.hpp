@@ -9,6 +9,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+#include <array>
 #include <vector>
 #include <functional>
 
@@ -50,6 +51,7 @@ struct Limb {
     sf::Color    color;
 };
 
+// left over from western rpg game
 struct AnimationFrame {
     AnimationFrame( void )
     {
@@ -62,6 +64,7 @@ struct AnimationFrame {
     std::pair<float, float> spritePos; // relative to it's origin
 };
 
+// left over from western rpg game
 struct ScriptedAnimationData {
     std::vector<AnimationFrame> frames;
 };
@@ -74,6 +77,7 @@ struct ParticleData
     int          particleCount;
 };
 
+// Left over from a western rpg game
 struct ActorData {
     std::vector<Direction> directions;
 };
@@ -91,6 +95,13 @@ struct ConversationData {
     std::vector<DialogNode> conversationBranches;
     std::vector<int> portrait; // lua identifier // matches up with corresponding link in convo
     std::vector<sf::Vector2f> portraitPosition; // index will line up with other two vectors
+};
+
+struct UnitTypeData {
+    int strength;
+    int dexterity;
+    int constitution;
+    int defense;
 };
 
 static std::map<std::string, unsigned int> TextureMap;
@@ -245,58 +256,10 @@ static std::map<std::string, unsigned int> ParticleMap          = buildResourceM
 static std::map<std::string, unsigned int> ActorMap             = buildResourceMap( "Game/Resources/Actors.lua" );
 static std::map<std::string, unsigned int> WarpMap              = buildResourceMap( "Game/Resources/Warps.lua" );
 
-static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorData> {
-        std::vector<ActorData> data( ActorMap.size( ) );
-        lua_State* L = luaL_newstate();
-        luaL_openlibs(L);
-        lua_getglobal( L, "debug" );
-        lua_getfield( L, -1, "traceback" );
-        lua_replace( L, -2 );
-        luaL_loadfile( L, "Game/Resources/Actors.lua" );
-        if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
-            luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
-            std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
-            throw( lua_tostring( L, -1 ) );
-        }
-        if( lua_istable( L, -1 ) ) // Anon table
-        {
-            for( auto i = ActorMap.begin(); i != ActorMap.end( ); ++i )
-            {
-                lua_getfield( L, -1, i->first.c_str( ) );
-                if( lua_istable( L, -1 ) ) // Actor Definition
-                {
-                    // "path finding"
-                    lua_getfield( L, -1, "path" );
-                    if( lua_istable( L, -1 ) )
-                    {
-                        lua_pushnil( L );
-                        while( lua_next(L , -2 ) != 0 )
-                        {
-                            if( lua_istable( L, -1 ) )
-                            {
-                                lua_pushnil( L );
-                                std::vector<float> v;
-                                while( lua_next( L, -2 ) != 0 )
-                                {
-                                    v.push_back((float)lua_tonumber( L, -1 ));
-                                    lua_pop( L, 1 );
-                                }
-                                //std::cout << "attempting: "<< i->second << ": path {" << a << ", " << d << " }" << std::endl;
-                                data[i->second].directions.push_back( Direction( v[0], v[1] ) );
-                                lua_pop( L, 1 ); // anon vector
-                            } else std::cout << "Error reading actor path data" << std::endl;
-                        }
-                        lua_pop( L, 1 ); // "path" table
-                    }
-                }
-                lua_pop( L, 1 ); // defintion table
-            }
-            lua_pop( L, 1 ); // anon table
-        }else std::cout << "Error reading Actors.lua" << std::endl;
+// Tactics tribe Maps
+static std::map<std::string, unsigned int> TerrainTypeMap       = buildResourceMap( "Game/TerrainTypes.lua" );
+static std::map<std::string, unsigned int> UnitTypeMap          = buildResourceMap( "Game/UnitTypes.lua" );
 
-    lua_close( L );
-    return data;
-}( );
 static std::vector<WarpData> initializeWarpData = []() -> std::vector<WarpData> {
     std::vector<WarpData> data( WarpMap.size( ) );
     lua_State* L = luaL_newstate();
@@ -479,6 +442,115 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
         lua_close( L );
         return data;
 }( ); // initializeConversationData
+
+static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<UnitTypeData> {
+        std::vector<UnitTypeData> data( UnitTypeMap.size( ) );
+        lua_State* L = luaL_newstate();
+        luaL_openlibs(L);
+        lua_getglobal( L, "debug" );
+        lua_getfield( L, -1, "traceback" );
+        lua_replace( L, -2 );
+        luaL_loadfile( L, "Game/UnitTypes.lua" );
+        if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+            luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+            std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+            throw( lua_tostring( L, -1 ) );
+        }
+        if( lua_istable( L, -1 ) ) // Anon table
+        {
+            for( auto i = UnitTypeMap.begin(); i != UnitTypeMap.end(); ++i )
+            {
+                lua_getfield( L, -1, i->first.c_str( ) );
+                if( lua_istable( L, -1 ) ) // UnitType Definition
+                {
+                    lua_getfield( L, -1, "strength" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].strength = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "strength" << std::endl;
+                    lua_pop( L, 1 );
+                    lua_getfield( L, -1, "dexterity" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].dexterity = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "dexterity" << std::endl;
+                    lua_pop( L, 1 );
+                    lua_getfield( L, -1, "constitution" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].constitution = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "constition" << std::endl;
+                    lua_pop( L, 1 );
+                    lua_getfield( L, -1, "defense" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].defense = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "defense" << std::endl;
+                    lua_pop( L, 1 );
+                }
+                lua_pop( L, 1 ); // defintion table
+            }
+            lua_pop( L, 1 ); // anon table
+        }else std::cout << "Error reading Warps.lua" << std::endl;
+        lua_close( L );
+        return data;
+}( ); // initializeUnitTypesData
+
+// Left over from western rpg game
+static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorData> {
+        std::vector<ActorData> data( ActorMap.size( ) );
+        lua_State* L = luaL_newstate();
+        luaL_openlibs(L);
+        lua_getglobal( L, "debug" );
+        lua_getfield( L, -1, "traceback" );
+        lua_replace( L, -2 );
+        luaL_loadfile( L, "Game/Resources/Actors.lua" );
+        if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+            luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+            std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+            throw( lua_tostring( L, -1 ) );
+        }
+        if( lua_istable( L, -1 ) ) // Anon table
+        {
+            for( auto i = ActorMap.begin(); i != ActorMap.end( ); ++i )
+            {
+                lua_getfield( L, -1, i->first.c_str( ) );
+                if( lua_istable( L, -1 ) ) // Actor Definition
+                {
+                    // "path finding"
+                    lua_getfield( L, -1, "path" );
+                    if( lua_istable( L, -1 ) )
+                    {
+                        lua_pushnil( L );
+                        while( lua_next(L , -2 ) != 0 )
+                        {
+                            if( lua_istable( L, -1 ) )
+                            {
+                                lua_pushnil( L );
+                                std::vector<float> v;
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    v.push_back((float)lua_tonumber( L, -1 ));
+                                    lua_pop( L, 1 );
+                                }
+                                //std::cout << "attempting: "<< i->second << ": path {" << a << ", " << d << " }" << std::endl;
+                                data[i->second].directions.push_back( Direction( v[0], v[1] ) );
+                                lua_pop( L, 1 ); // anon vector
+                            } else std::cout << "Error reading actor path data" << std::endl;
+                        }
+                        lua_pop( L, 1 ); // "path" table
+                    }
+                }
+                lua_pop( L, 1 ); // defintion table
+            }
+            lua_pop( L, 1 ); // anon table
+        }else std::cout << "Error reading Actors.lua" << std::endl;
+
+    lua_close( L );
+    return data;
+}( );
+
+// this is a special table designed to help the grid decide where units can move on any given turn.
+static std::vector<std::vector<int>> inititializeUnitMovementCostTable = []() -> std::vector<std::vector<int>> {
+    std::vector<std::vector<int>> data;
+
+    return data;
+}( );
+
+
+
 
 #endif // DATATABLES_HPP
 

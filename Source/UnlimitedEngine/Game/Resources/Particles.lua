@@ -1,4 +1,9 @@
 
+-- Particle Effects!!!
+-- This is left over from building the engine using a shoot'em up style game.
+-- the engine does not currently display them, although it could.
+
+
 return {
     Map = {
           PortalEffect        = 0;

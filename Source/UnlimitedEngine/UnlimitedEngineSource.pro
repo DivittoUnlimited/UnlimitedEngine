@@ -14,11 +14,13 @@ DISTFILES += \
     Game/Resources/Actors.lua \
     Game/Resources/Assets.lua \
     Game/Resources/Conversations.lua \
-    Game/Resources/Maps/DemoLevel.lua \
     Game/Resources/Maps/TacticsTribeDemoLevel.lua \
     Game/Resources/Particles.lua \
     Game/Resources/SourceFileMap.lua \
     Game/Resources/Warps.lua \
+    Game/TerrainTypes.lua \
+    Game/UnitMovementCost.lua \
+    Game/UnitTypes.lua \
     Media/Sansation.ttf \
     Media/Shaders/Add.frag \
     Media/Shaders/Brightness.frag \
@@ -31,7 +33,8 @@ DISTFILES += \
     Media/Textures/DemoLevel.png \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Media/Textures/Girl.png \
-    Media/Textures/Particle.png
+    Media/Textures/Particle.png \
+    Notes.txt
 
 HEADERS += \
     Core/Application.hpp \
@@ -66,6 +69,7 @@ HEADERS += \
     Core/Utility.hpp \
     Core/Utility.inl \
     Core/World.hpp \
+    GameObjects/Grid.hpp \
     Graphics/Animation.hpp \
     Graphics/BloomEffect.hpp \
     Graphics/EmitterNode.hpp \
@@ -150,6 +154,7 @@ SOURCES += \
     Core/StateStack.cpp \
     Core/Utility.cpp \
     Core/World.cpp \
+    GameObjects/Grid.cpp \
     Graphics/Animation.cpp \
     Graphics/BloomEffect.cpp \
     Graphics/EmitterNode.cpp \
