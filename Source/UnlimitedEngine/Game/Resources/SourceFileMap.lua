@@ -9,7 +9,7 @@ local Tex   = Assets.Textures;
 local Font  = Assets.Fonts;
 local Sound = Assets.SoundEffects;
 local Music = Assets.Music;
-local Level = Assets.Levels;
+local Map   = Assets.Maps;
 
 return {
     Textures = {
@@ -21,6 +21,7 @@ return {
         -- Game Specific
         [Tex.DemoGirl]                  = "Media/Textures/Girl.png";
         [Tex.DemoLevel]                 = "Media/Textures/DemoLevel.png";
+        [Tex.LightInfantry]             = "Media/Textures/LightInfantry.png";
     };
     Fonts = {
         [Font.Default]              = "Media/Sansation.ttf";
@@ -29,4 +30,8 @@ return {
     };
     Music = {
     };
-};
+    Maps =
+    {
+        [Map.DemoMap] = "Game/Resources/Maps/TacticsTribeDemoLevel.lua";
+    };
+}

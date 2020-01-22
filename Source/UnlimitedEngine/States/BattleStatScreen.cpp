@@ -39,7 +39,40 @@ BattleStatScreen::BattleStatScreen( States::ID id, StateStack& stack, Context co
         switch( GAME_MODE )
         {
             case GameModes::QuickBattle: requestStackPush( States::Menu ); break;
-            case GameModes::StoryMode:   requestStackPush( States::Menu ); break;
+            case GameModes::StoryMode:
+                switch( CURRENT_LEVEL )
+                {
+                    case States::Level1:
+                        requestStackPush( States::IntroDialogState );
+                    break;
+                    case States::Level2:
+                        requestStackPush( States::cutScene1State );
+                    break;
+                    case States::Level3:
+                        requestStackPush( States::cutScene2State );
+                    break;
+                    case States::Level4:
+                        requestStackPush( States::cutScene3State );
+                    break;
+                    case States::Level5:
+                        requestStackPush( States::cutScene4State );
+                    break;
+                    case States::Level6:
+                        requestStackPush( States::cutScene5State );
+                    break;
+                    case States::Level7:
+                        requestStackPush( States::cutScene6State );
+                    break;
+                    case States::Level8:
+                        requestStackPush( States::cutScene7State );
+                    break;
+                    case States::Level9:
+                        requestStackPush( States::cutScene8State );
+                    break;
+
+                    default: break;
+                }
+            break;
             case GameModes::Conquest:    requestStackPush( States::Menu ); break;
             default: break;
         }

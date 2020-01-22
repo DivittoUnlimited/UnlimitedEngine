@@ -6,7 +6,12 @@ enum Layers {
     ObjectLayer = 0
 };
 
-World::World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked, bool isLocalMultiplayer )
+namespace
+{
+    const std::vector<UnitTypeData> UnitDataTable = initializeUnitTypeData;  // initializeUnitTypeData in DataTable.hpp
+}
+
+World::World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked, bool isLocalMultiplayer )
     : mTarget( outputTarget )
     , mSceneTexture( )
     , mWorldView( mTarget.getDefaultView( ) )
@@ -19,11 +24,13 @@ World::World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& s
     , mNetworkedWorld( networked )
     , mLocalMultiplayerWorld( isLocalMultiplayer )
     , mNetworkNode( nullptr )
+    , mLevel( level )
 {
-    if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView().getSize().x ), mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
+    if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
 
-    buildScene( "Game/Resources/Maps/TacticsTribeDemoLevel.lua" ); // Hardcoded value! this needs to change to make multiple levels possible.
+    buildScene( MediaFileMap.at( "Maps" ).at( mLevel ) );
+
 }
 
 World::~World( void )
@@ -62,6 +69,35 @@ bool World::update( sf::Time dt )
     catch( std::exception& e ) {
         std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl;
     }
+
+    // update graphical view of grid based on data view
+    if( mMovementGrid.mHasUpdated )
+    {
+        for( unsigned int i = 0; i < mDrawableGrid.size(); ++i )
+        {
+            for( unsigned int j = 0; j < mDrawableGrid[i].size(); ++j )
+            {
+                if( mMovementGrid.mData[j][i].isPossibleAttackPosition )
+                {
+                    mDrawableGrid[j][i]->getSprite( )->setFillColor( sf::Color::Red );
+                    mDrawableGrid[j][i]->getSprite( )->setOutlineColor( sf::Color::Black );
+                }
+                else if( mMovementGrid.mData[j][i].isPossibleNewLocation )
+                {
+                    mDrawableGrid[j][i]->getSprite( )->setFillColor( sf::Color::Cyan );
+                    mDrawableGrid[j][i]->getSprite( )->setOutlineColor( sf::Color::Black );
+
+                }
+                else
+                {
+                    mDrawableGrid[j][i]->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0  ) );
+                    mDrawableGrid[j][i]->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 0  ) );
+                }
+            }
+        }
+        mMovementGrid.mHasUpdated = false;
+    }
+
 /*
     try{ handleCollisions( ); }
     catch( std::exception& e ) {
@@ -104,6 +140,63 @@ bool World::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Cat
     }
 }
 
+void World::handleEvent( const sf::Event& event )
+{
+    if( event.type == sf::Event::MouseButtonReleased )
+    {
+        bool flag = false;
+        // Find Which Square on the grid the user clicked
+        for( unsigned int i = 0; i < mDrawableGrid.size(); ++i )
+        {
+            for( unsigned int j = 0; j < mDrawableGrid[i].size(); ++j )
+            {
+                if( mDrawableGrid[i][j]->getSprite( )->getGlobalBounds( ).contains( sf::Mouse::getPosition(*mWindow).x, sf::Mouse::getPosition(*mWindow).y ) )
+                {
+                    // Once you have found the square decide what to do based on the state of the square and the "game state"
+                    if( mMovementGrid.mData[j][i].isOccupied && !mUnitAwaitingOrders )
+                    {
+                        std::vector<sf::Vector2i> possibleLocations = mMovementGrid.getPossiblePositions(
+                                                                        sf::Vector2i( static_cast<int>( j ), static_cast<int>( i ) ),
+                                                                        mCurrentUnits[mMovementGrid.mData[j][i].unitID]->mUnitType,
+                                                                        static_cast<unsigned int>( mCurrentUnits[mMovementGrid.mData[j][i].unitID]->mDexterity ) );
+                        mSelectedGridIndex = sf::Vector2i( j, i );
+                        mSelectedUnitID = mMovementGrid.mData[j][i].unitID;
+                        mUnitAwaitingOrders = true;
+                        for( unsigned int g = 0; g < possibleLocations.size(); ++g )
+                        {
+                            mMovementGrid.mData[static_cast<unsigned int>( possibleLocations[g].y )][static_cast<unsigned int>( possibleLocations[g].x )].isPossibleNewLocation = true;
+                        }
+                        mMovementGrid.mHasUpdated = true;
+                    }
+                    else if( mMovementGrid.mData[j][i].isOccupied && mUnitAwaitingOrders )
+                    {
+                        // Attack???
+                    }
+                    else if( mUnitAwaitingOrders && mMovementGrid.mData[i][j].isPossibleNewLocation )
+                    {
+                        mCurrentUnits[mSelectedUnitID]->setPosition( j * 32, i * 32 );
+                        mMovementGrid.moveUnit( mSelectedGridIndex, sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
+                        mMovementGrid.clearGrid( );
+                        mSelectedUnitID = -1;
+                        mUnitAwaitingOrders = false;
+                    }
+                    else
+                    {
+                        mMovementGrid.clearGrid( );
+                        mUnitAwaitingOrders = false;
+                        mSelectedGridIndex = sf::Vector2i( 0, 0 );
+                        mSelectedUnitID = -1;
+                    }
+                    flag = true;
+                    break;
+                }
+            }
+            if( flag ) break;
+        }
+    }
+
+}
+
 void World::handleCollisions( )
 {
 
@@ -128,7 +221,6 @@ void World::buildScene( std::string tileMapFilePath )
     */
 
     // load TiledMap
-        std::cout << "World::buildScene using HARCODED filepath to load Tiled map untill levels can be loaded properly instead of using Game.lua for everything. TiledMaps get loaded from level files" << mContext.tiledMapFilePath << std::endl;
         Tiled::TiledMap map = Tiled::loadFromFile( tileMapFilePath ); //mContext.TiledMapFilePath );
 
         struct Tile {
@@ -137,9 +229,12 @@ void World::buildScene( std::string tileMapFilePath )
         };
 
         std::vector<Tile> tiles = std::vector<Tile>( );
+
+        // Add in the first tile as an empty space because the gId in tiled starts at 1
         tiles.push_back( Tile() );
         tiles[0].texID = "NONE";
         tiles[0].rect = sf::Rect<int>( 0, 0, 32, 32 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
+                                                            // Should be able to get these values from tiled file anyway....
 
         for( unsigned int i = 0; i < map.tileSets.size(); ++i )
         {
@@ -181,7 +276,7 @@ void World::buildScene( std::string tileMapFilePath )
                 /// This is a really lazy way to avoid having to deal with multiple image sources to build maps. It doen't work and it needs to be removed!!!!!!
                 /// there needs to be a universal way to use as many images as needed to build maps.
                 auto tileSets = map.tileSets[0];
-                std::cout << map.tileSets[0].name << std::endl;
+                std::cout << "Currently loading tileLayer from tileSet: " << map.tileSets[0].name << "This is hardcoded and needs to be fixed!" << std::endl;
 
                 /*
                  * This is for adding particle effects later
@@ -202,7 +297,7 @@ void World::buildScene( std::string tileMapFilePath )
                 */
                 {
                     std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode(  ) );
-                    if( !layer.get()->load( mTextures.get( TextureMap.at( map.tileSets[0].name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data , map.width, map.height ) )
+                    if( !layer.get()->load( mTextures.get( TextureMap.at( map.tileSets[0].name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data, map.width, map.height ) )
                         std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
                     else {
                         mSceneLayers.push_back( layer.get( ) );
@@ -212,6 +307,7 @@ void World::buildScene( std::string tileMapFilePath )
                         // build drawable grid
                         for( unsigned int p = 0; p < map.layers[i].height; ++p )
                         {
+                            this->mDrawableGrid.push_back( std::vector<RectangleShapeNode*>() );
                             for( unsigned int k = 0; k < map.layers[i].width; ++k )
                             {
                                 std::unique_ptr<RectangleShapeNode> rect(
@@ -219,8 +315,8 @@ void World::buildScene( std::string tileMapFilePath )
                                                                                  sf::Vector2i( static_cast<int>( tileSets.tileWidth ), static_cast<int>( tileSets.tileHeight ) ) ) ) );
                                 rect.get()->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
                                 rect.get()->getSprite()->setOutlineThickness( 1 );
-                                rect.get()->getSprite()->setOutlineColor( sf::Color::Black );
-                                this->mDrawableGrid.push_back( rect.get( ) );
+                                rect.get()->getSprite()->setOutlineColor( sf::Color(0,0,0,0) );
+                                this->mDrawableGrid.back().push_back( rect.get( ) );
                                 mSceneGraph.attachChild( std::move( rect ) );
                             }
 
@@ -235,41 +331,28 @@ void World::buildScene( std::string tileMapFilePath )
                 // Build loop through all objects
                 for( unsigned int i = 0; i < layer.objects.size(); ++i )
                 {
-                    /*
-                     *
-                     * Awesome demo for when  there is objects to add
-                     *
-                     *
-                     *
                      auto object = layer.objects.at( i );
-                     if( object.type == "Player" )
+                     if( object.type == "LightInfantry" )
                      {
-                         std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                         this->mRed = actor.get( );
-                         node.get( )->attachChild( std::move( actor ) );
+                         std::unique_ptr<Unit> unit( new Unit( mCurrentUnits.size(), UnitDataTable.at( UnitTypeMap.at( "LightInfantry" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y );
+                         mMovementGrid.addUnit( mCurrentUnits.size(), object.x, object.y );
+                         this->mCurrentUnits.push_back( unit.get( ) );
+                         node.get( )->attachChild( std::move( unit ) );
                      }
-                     else if( object.type == "Wall" )
+                     else if( object.type == "HeavyInfantry" )
                      {
-                         std::unique_ptr<Wall> wall( new Wall( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ) ) );
-                         node.get( )->attachChild( std::move( wall ) );
-                     }else if( object.type == "Warp" )
-                     {
-                         std::unique_ptr<Warp> warp( new Warp( object, sf::RectangleShape( sf::Vector2f( object.width, object.height ) ), mTextures, mFonts ) );
-                         node.get( )->attachChild( std::move( warp ) );
-                     }else if( object.type == "Cowboy" )
-                     {
-                         std::unique_ptr<Cowboy> actor( new Cowboy( object, TextureMap.at( tiles[object.gid].texID ), tiles[object.gid].rect, mTextures, &mSounds, mFonts ) );
-                         node.get( )->attachChild( std::move( actor ) );
-                     }else if( object.type == "Item" )
-                     {
-                         // std::unique_ptr<Item> item( new Item( ) );
-                         // node.get( )->attachChild( std::move( item ) );
-                     }else
+                         std::unique_ptr<Unit> unit( new Unit( mCurrentUnits.size(), UnitDataTable.at( UnitTypeMap.at( "HeavyInfantry" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y );
+                         mMovementGrid.addUnit( mCurrentUnits.size(), object.x, object.y );
+                         this->mCurrentUnits.push_back( unit.get( ) );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else
                          std::cout << "Invalid object being loaded from tile map" << std::endl;
-                         */
                 }
-                    mSceneLayers.push_back( node.get( ) );
-                    mSceneGraph.attachChild( std::move( node ) );
+                mSceneLayers.push_back( node.get( ) );
+                mSceneGraph.attachChild( std::move( node ) );
             }
             else if( map.layers[i].type == "imageLayer" )
             {
@@ -330,5 +413,10 @@ void World::buildScene( std::string tileMapFilePath )
         mSceneGraph.attachChild( std::move( networkNode ) );
         std::cout << "BuildScene Complete on a networked world!!" << std::endl;
     }
+
+}
+
+void World::loadSaveFile( std::string saveFilePath )
+{
 
 }

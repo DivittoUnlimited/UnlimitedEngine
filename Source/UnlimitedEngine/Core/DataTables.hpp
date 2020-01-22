@@ -98,10 +98,13 @@ struct ConversationData {
 };
 
 struct UnitTypeData {
+    unsigned int mID;
     int strength;
     int dexterity;
     int constitution;
     int defense;
+    std::string type;
+    std::string textureID;
 };
 
 static std::map<std::string, unsigned int> TextureMap;
@@ -110,6 +113,10 @@ static std::map<std::string, unsigned int> SoundEffectMap;
 static std::map<std::string, unsigned int> MusicMap;
 static std::map<std::string, unsigned int> LayerMap;
 static std::map<std::string, unsigned int> ObjectMap;
+static std::map<std::string, unsigned int> LevelMap;
+
+
+//// READ ME
 // Add levels here once everything is working and finally remove Game.lua in place of World1_1.lua
 // Which will have everything Game.lua has plus a optional tiledMap path that will be loaded in the World class
 
@@ -144,6 +151,7 @@ static bool loadAssetsLuaFile = []() -> bool {
         MusicMap        = getMap( "Music"        );
         LayerMap        = getMap( "Layers"       );
         ObjectMap       = getMap( "Objects"      );
+        LevelMap        = getMap( "Maps"         );
         lua_close( L );
         return true;
 }( );
@@ -211,6 +219,23 @@ static std::map<std::string, std::map<unsigned int, std::string>> MediaFileMap =
                     lua_pop( L, 1 );
                 }
                     t.insert( std::pair<std::string, std::map<unsigned int, std::string>>( "SoundEffects", soundSource ) );
+                    lua_pop( L ,1 );
+            }
+         }
+        if( lua_istable( L, -1 ) )
+        {
+            lua_pushstring( L, "Maps" );
+            lua_gettable( L, -2 );
+            if( lua_istable( L, -1 )  )
+            {
+                std::map<unsigned int, std::string> mapSource;
+                lua_pushnil( L );
+                while( lua_next( L, -2 ) != 0 )
+                {
+                    mapSource.insert( std::pair<unsigned int, std::string>( lua_tonumber( L , -2 ), lua_tostring( L , -1 ) ) );
+                    lua_pop( L, 1 );
+                }
+                    t.insert( std::pair<std::string, std::map<unsigned int, std::string>>( "Maps", mapSource ) );
                     lua_pop( L ,1 );
             }
          }
@@ -463,6 +488,10 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
                 lua_getfield( L, -1, i->first.c_str( ) );
                 if( lua_istable( L, -1 ) ) // UnitType Definition
                 {
+                    lua_getfield( L, -1, "class" );
+                    if( lua_isstring( L, -1 ) ) data[i->second].type = lua_tostring( L, -1 );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "type" << std::endl;
+                    lua_pop( L, 1 );
                     lua_getfield( L, -1, "strength" );
                     if( lua_isnumber( L, -1 ) ) data[i->second].strength = static_cast<int>( lua_tonumber( L, -1 ) );
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "strength" << std::endl;
@@ -479,6 +508,12 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
                     if( lua_isnumber( L, -1 ) ) data[i->second].defense = static_cast<int>( lua_tonumber( L, -1 ) );
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "defense" << std::endl;
                     lua_pop( L, 1 );
+                    lua_getfield( L, -1, "texture" );
+                    if( lua_isstring( L, -1 ) ) data[i->second].textureID = lua_tostring( L, -1 );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "texture" << std::endl;
+                    lua_pop( L, 1 );
+
+                    // NEED TO ADD TEXTURE RECTS FOR ANIMATIONS HERE!!!!!!!!
                 }
                 lua_pop( L, 1 ); // defintion table
             }
@@ -545,7 +580,38 @@ static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorDat
 // this is a special table designed to help the grid decide where units can move on any given turn.
 static std::vector<std::vector<int>> inititializeUnitMovementCostTable = []() -> std::vector<std::vector<int>> {
     std::vector<std::vector<int>> data;
-
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+    lua_getglobal( L, "debug" );
+    lua_getfield( L, -1, "traceback" );
+    lua_replace( L, -2 );
+    luaL_loadfile( L, "Game/UnitMovementCost.lua" );
+    if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+        luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+        std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+        throw( lua_tostring( L, -1 ) );
+    }
+    if( lua_istable( L, -1 ) ) // Anon table
+    {
+        // load data with "2d array" found in lua file
+        lua_pushnil( L );
+        while( lua_next( L, -2 ) != 0 )
+        {
+            std::cout << std::endl;
+            data.push_back( std::vector<int>( ) );
+            // iterate through numbers in array
+            lua_pushnil( L );
+            while( lua_next( L, -2 ) != 0 )
+            {
+                if( lua_isnumber( L, -1 ) ) data.back( ).push_back( static_cast<int>( lua_tonumber( L, -1 ) ) );
+                else std::cout << "ERROR reading UnitMovementCost table from lua" << std::endl;
+                lua_pop( L, 1 ); // clean up iterations
+            }
+            lua_pop( L, 1 ); // clean up iterations
+        }
+        lua_pop( L, 1 ); // anon table from the top
+    }
+    lua_close( L );
     return data;
 }( );
 

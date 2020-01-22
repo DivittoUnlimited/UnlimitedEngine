@@ -29,9 +29,6 @@ private:
     //## Attributes
     static const sf::Time TimePerFrame;
 
-    // Engine Resources
-    sf::RenderWindow	  mWindow;
-
     TextureManager		  mTextures;
     FontManager  		  mFonts;
     MusicPlayer           mMusic;

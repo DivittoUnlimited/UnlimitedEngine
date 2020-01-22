@@ -31,20 +31,26 @@
 
 const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 
+// Defined in Globals.hpp
+sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default );
+GameModes::ID GAME_MODE = GameModes::NONE;
+States::ID CURRENT_LEVEL = States::Level1;
+
+
 Application::Application( )
-    : mWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default )
-    , mTextures( )
+    : mTextures( )
     , mFonts( )
     , mMusic( )
     , mKeyBinding1( 1 )
     , mKeyBinding2( 2 )
-    , mStateStack(State::Context( States::None, mWindow, mTextures, mFonts, mMusic, mSoundEffects,  new std::vector<std::pair<std::string, int>>(), mKeyBinding1, mKeyBinding2))
+    , mStateStack(State::Context( States::None, *mWindow, mTextures, mFonts, mMusic, mSoundEffects,  new std::vector<std::pair<std::string, int>>(), mKeyBinding1, mKeyBinding2))
     , mStatisticsNumFrames( 0 )
     , mStatisticsText( )
     , mStatisticsUpdateTime( sf::Time::Zero )
 {
-    mWindow.setKeyRepeatEnabled( false );
-    mWindow.setVerticalSyncEnabled( true );
+
+    mWindow->setKeyRepeatEnabled( false );
+    mWindow->setVerticalSyncEnabled( true );
 
     mFonts.load(    FontMap.at( "Default"         ), MediaFileMap.at( "Fonts"    ).at(    FontMap.at( "Default"  ) ) );
     mTextures.load( TextureMap.at( "Buttons"         ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "Buttons"  ) ) );
@@ -65,7 +71,7 @@ void Application::run( )
 {
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
-    while( mWindow.isOpen( ) )
+    while( mWindow->isOpen( ) )
 	{
         try{
         sf::Time dt = clock.restart( );
@@ -79,7 +85,7 @@ void Application::run( )
 
 			// Check inside this loop, because stack might be empty before update() call
             if( mStateStack.isEmpty( ) )
-                mWindow.close( );
+                mWindow->close( );
 		}
         updateStatistics( dt );
         render( );
@@ -93,11 +99,11 @@ void Application::run( )
 void Application::processInput( )
 {
 	sf::Event event;
-    while( mWindow.pollEvent( event ) )
+    while( mWindow->pollEvent( event ) )
 	{
         mStateStack.handleEvent( event );
         if( event.type == sf::Event::Closed )
-            mWindow.close( );
+            mWindow->close( );
 	}
 }
 
@@ -108,11 +114,11 @@ void Application::update( sf::Time dt )
 
 void Application::render( )
 {
-    mWindow.clear( sf::Color::Black );
+    mWindow->clear( sf::Color::Black );
     mStateStack.draw( );
 
-    mWindow.draw( mStatisticsText );
-    mWindow.display( );
+    mWindow->draw( mStatisticsText );
+    mWindow->display( );
 }
 
 void Application::updateStatistics( sf::Time dt )
@@ -134,7 +140,6 @@ void Application::registerStates( )
     mStateStack.registerState<TitleState>               ( States::Title                 );
     mStateStack.registerState<LoadingState>             ( States::Loading               );
     mStateStack.registerState<MenuState>                ( States::Menu                  );
-    mStateStack.registerState<GameState>                ( States::BattleState           );
     mStateStack.registerState<MultiplayerGameState>     ( States::HostGame,      true   );
     mStateStack.registerState<MultiplayerGameState>     ( States::JoinGame,      false  );
     mStateStack.registerState<PauseState>               ( States::Pause                 );
@@ -147,6 +152,18 @@ void Application::registerStates( )
     mStateStack.registerState<ShopState>                ( States::ShopState );
     mStateStack.registerState<StoryModeSetupState>      ( States::StoryModeSetupState );
     mStateStack.registerState<BattleStatScreen>         ( States::BattleStatScreen );
+
+    // Levels
+    mStateStack.registerState<GameState>                ( States::Level1, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level2, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level3, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level4, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level5, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level6, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level7, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level8, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level9, LevelMap.at( "DemoMap" ) );
+    mStateStack.registerState<GameState>                ( States::Level10, LevelMap.at( "DemoMap" ) );
 
     // CutScenes
     mStateStack.registerState<CutSceneState>            ( States::IntroDialogState, States::Level1 );

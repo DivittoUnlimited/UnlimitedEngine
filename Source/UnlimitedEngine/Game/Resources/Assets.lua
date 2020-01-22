@@ -18,6 +18,7 @@ return {
         -- Game specific stuff
         DemoGirl                 = 4;
         DemoLevel                = 5;
+        LightInfantry            = 6;
     };
 
     SoundEffects = {            
@@ -55,5 +56,9 @@ return {
         DownSamplePass      = 1;
         GaussianBlurPass    = 3;
         addPass             = 4;
+    };
+
+    Maps = {
+        DemoMap = 0;
     };
 };

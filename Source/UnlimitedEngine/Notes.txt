@@ -1,12 +1,12 @@
 
 TO_DO LIST:
-- Add mouse support to Player class.
-
+    - Move states enum to be a lua table instead
     - figure out why vs mode and multiplayer call Host game?
         - check main menu buttons
     - how does the pause state know to call a new menuState
         -or to pop battleState back to conquestOverviewState?
             - just leave Conquest state alive and make pause state remove itself and gamestate only
-    - how does the battle overview state know how to move to the next cutScene in story mode?
-
-
+            - or use GAME_MODE
+    - Mouse should handle gui's as well.
+    - If possible movement could go off grid the game will crash
+    - Make camera pan with mouse

@@ -113,22 +113,28 @@ return {
         -- Chapter2
         Chapter2 = {
             { -- Link 0
-                    dialog = "You are about to enter level 3!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 3!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================
@@ -136,22 +142,28 @@ return {
         -- Chapter3
         Chapter3 = {
             { -- Link 0
-                    dialog = "You are about to enter level 4!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 4!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================
@@ -159,22 +171,28 @@ return {
         -- Chapter4
         Chapter4 = {
             { -- Link 0
-                    dialog = "You are about to enter level 5!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 5!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================
@@ -182,22 +200,28 @@ return {
         -- Chapter5
         Chapter5 = {
             { -- Link 0
-                    dialog = "You are about to enter level 6!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 6!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================
@@ -205,22 +229,28 @@ return {
         -- Chapter6
         Chapter6 = {
             { -- Link 0
-                    dialog = "You are about to enter level 7!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 7!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================
@@ -228,22 +258,28 @@ return {
         -- Chapter7
         Chapter7 = {
             { -- Link 0
-                    dialog = "You are about to enter level 8!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 8!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================
@@ -251,22 +287,28 @@ return {
         -- Chapter8
         Chapter8 = {
             { -- Link 0
-                    dialog = "You are about to enter level 9!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 9!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================
@@ -274,22 +316,28 @@ return {
         -- Chapter9
         Chapter9 = {
             { -- Link 0
-                    dialog = "You are about to enter level 10!";
-                    responses = {
-                            {
-                                    text = "Well that's not a very good story...";
-                                    link = 1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "You are about to enter level 10!";
+                responses = {
+                       {
+                            text = "Well that's not a very good story...";
+                            link = 1;
+                       }
+                };
             },
             { -- Link 1
-                    dialog = "Let's see you write a better story then!";
-                    responses = {
-                            {
-                                    text = "Maybe i will...";
-                                    link = -1;
-                            }
-                    };
+                portrait = textures.DemoGirl;
+                x = 100;
+                y = 50;
+                dialog = "Let's see you write a better story then!";
+                responses = {
+                        {
+                            text = "Maybe i will...";
+                            link = -1;
+                        }
+                };
             }
         };
         -- ========================================================================================

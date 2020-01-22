@@ -93,7 +93,8 @@ bool PauseState::handleEvent( const sf::Event& event )
         requestStackPop( );
 	}
     else
+    {
         mGUIContainer.handleEvent( event );
-
+    }
 	return false;
 }

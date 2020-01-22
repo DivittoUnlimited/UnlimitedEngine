@@ -25,13 +25,18 @@
 
 #include "Core/DataTables.hpp"
 #include "Tiled/TiledManager.hpp"
+#include "GameObjects/Unit.hpp"
 
 struct Square
 {
-    Square( unsigned int terrainType, sf::Vector2f gridIndex, bool isOccupied = false )
+    Square( unsigned int terrainType, sf::Vector2f gridIndex, sf::Vector2f pos, float size, bool isOccupied = false )
         : terrainType( terrainType )
         , gridIndex( gridIndex )
         , isOccupied( isOccupied )
+        , isPossibleNewLocation( false )
+        , isPossibleAttackPosition( false )
+        , mBounds( pos, sf::Vector2f( size, size ) )
+        , unitID( -1 )
     {
 
     }
@@ -39,6 +44,10 @@ struct Square
     unsigned int terrainType;
     sf::Vector2f gridIndex;
     bool isOccupied;
+    bool isPossibleNewLocation;
+    bool isPossibleAttackPosition;
+    sf::Rect<float> mBounds;
+    int unitID;
 };
 
 
@@ -47,10 +56,15 @@ public:
     Grid();
 
     bool buildGrid( Tiled::TileSet tileSet, Tiled::Layer layer );
-    std::vector<sf::Vector2i> getPossiblePositions(sf::Vector2i startingPoint, UnitTypeData unitType, unsigned int distanceLeft );
+    std::vector<sf::Vector2i> getPossiblePositions(sf::Vector2i startingPoint, unsigned int unitType, int distanceLeft );
+    void addUnit(unsigned int unitID, float x, float y );
+
+    bool moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos );
+    void clearGrid( void );
 
     // Attributes
     std::vector<std::vector<Square>> mData;
+    bool mHasUpdated;
 };
 
 #endif // GRID_H_

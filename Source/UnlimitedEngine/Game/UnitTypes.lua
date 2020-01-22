@@ -12,24 +12,30 @@ return {
     };
 
     LightInfantry = {
-        strength        = 40;
-        dexterity       = 50;
+        class           = "LightInfantry";
+        strength        = 4;
+        dexterity       = 10;
         constitution    = 100;
-        defense         = 50;
+        defense         = 5;
+        texture         = "LightInfantry";
     };
 
     HeavyInfantry = {
-        strength        = 60;
-        dexterity       = 30;
+        class           = "LightInfantry";
+        strength        = 6;
+        dexterity       = 6;
         constitution    = 100;
-        defense         = 70;
+        defense         = 7;
+        texture         = "LightInfantry";
     };
 
     Phalanx = {
-        strength        = 100;
-        dexterity       = 40;
+        class           = "LightInfantry";
+        strength        = 10;
+        dexterity       = 8;
         constitution    = 100;
-        defense         = 100;
+        defense         = 10;
+        texture         = "LightInfantry";
     };
 
 };

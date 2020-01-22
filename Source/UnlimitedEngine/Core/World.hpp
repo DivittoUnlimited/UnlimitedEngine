@@ -11,6 +11,7 @@
 
 #include "Core/ResourceManager.hpp"
 #include "Core/ResourceIdentifiers.hpp"
+#include "Core/DataTables.hpp"
 
 #include "Graphics/SceneNode.hpp"
 #include "Graphics/SpriteNode.hpp"
@@ -27,6 +28,7 @@
 #include "Graphics/EmitterNode.hpp"
 #include "Core/NetworkNode.hpp"
 #include "GameObjects/Grid.hpp"
+#include "GameObjects/Unit.hpp"
 
 
 enum Ships {
@@ -39,12 +41,10 @@ enum Ships {
     , Count
 };
 
-
-
 class World
 {
 public:
-    World( sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked = false, bool isLocalMultiplayer = false );
+    World(sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked = false, bool isLocalMultiplayer = false );
     ~World( void );
     void draw( void );
     bool update( sf::Time dt );
@@ -52,9 +52,12 @@ public:
     bool pollGameAction( GameActions::Action& out );
     bool matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Category::Type type1, Category::Type type2 );
 
+    void handleEvent( const sf::Event &event );
     void handleCollisions( void );
 
     void buildScene( std::string tileMapFilePath );
+    void loadSaveFile( std::string saveFilePath );
+
 
 private:
     sf::RenderTarget&					mTarget;
@@ -77,7 +80,13 @@ private:
 
     // Game specific
     Grid                                mMovementGrid;
-    std::vector<RectangleShapeNode*>    mDrawableGrid;
+    std::vector<std::vector<RectangleShapeNode*>>    mDrawableGrid;
+    unsigned int mLevel; // id for the current level map being loaded
+    std::vector<Unit*>                  mCurrentUnits;
+    bool                                mLoadUnitsFromFile;
+    bool                                mUnitAwaitingOrders;
+    sf::Vector2i                        mSelectedGridIndex;
+    int                                 mSelectedUnitID;
 
 };
 

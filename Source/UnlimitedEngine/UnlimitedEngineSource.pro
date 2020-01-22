@@ -33,6 +33,7 @@ DISTFILES += \
     Media/Textures/DemoLevel.png \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Media/Textures/Girl.png \
+    Media/Textures/LightInfantry.png \
     Media/Textures/Particle.png \
     Notes.txt
 
@@ -70,6 +71,7 @@ HEADERS += \
     Core/Utility.inl \
     Core/World.hpp \
     GameObjects/Grid.hpp \
+    GameObjects/Unit.hpp \
     Graphics/Animation.hpp \
     Graphics/BloomEffect.hpp \
     Graphics/EmitterNode.hpp \
@@ -155,6 +157,7 @@ SOURCES += \
     Core/Utility.cpp \
     Core/World.cpp \
     GameObjects/Grid.cpp \
+    GameObjects/Unit.cpp \
     Graphics/Animation.cpp \
     Graphics/BloomEffect.cpp \
     Graphics/EmitterNode.cpp \

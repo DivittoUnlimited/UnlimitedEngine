@@ -279,7 +279,12 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                         if( lua_istable( L, -1 ) )
                         {
                             lua_getfield( L, -1, "id" );
-                            if( lua_isnumber( L, -1 ) ) currentTileSet.tiles.insert( std::pair<unsigned int, std::map<std::string, std::string>>( static_cast<unsigned int>( lua_tonumber( L, -1 ) ), std::map<std::string, std::string>( ) ) );
+                            if( lua_isnumber( L, -1 ) )
+                                currentTileSet.tiles.insert(
+                                        std::pair<unsigned int, std::map<std::string, std::string>>(
+                                        static_cast<unsigned int>( lua_tonumber( L, -1 ) ),
+                                        std::map<std::string, std::string>( ) ) );
+
                             else throw( "Error TileSet tiles table invalid." );
                             unsigned int id = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                             lua_pop( L, 1 ); // id
@@ -291,7 +296,8 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                                 lua_pushnil( L ); // first key
                                 while( lua_next( L, -2 ) != 0 )
                                 {
-                                    currentTileSet.tiles.at( id ).insert( std::pair<std::string, std::string>( lua_tostring( L, -2 ), lua_tostring( L, -1 ) ) );
+                                    currentTileSet.tiles.at( id ).insert( std::pair<std::string, std::string>(
+                                                                              lua_tostring( L, -2 ), lua_tostring( L, -1 ) ) );
                                     lua_pop( L, 1); // removes 'value'; keeps 'key' for next iteration
                                 }
                             }

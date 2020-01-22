@@ -29,18 +29,41 @@ CutSceneState::CutSceneState( States::ID id, StateStack& stack, Context context,
     mContext.textures->load( TextureMap.at( "DemoGirl" ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "DemoGirl" ) ) );
 
 
-    switch( mNextState )
+    switch( CURRENT_LEVEL )
     {
-        case States::Level1:  mMessageBox = new MessageBoxNode( "IntroCutSceneDialog",  *context.fonts ); break;
-        case States::Level2:  mMessageBox = new MessageBoxNode( "Chapter1",             *context.fonts ); break;
-        case States::Level3:  mMessageBox = new MessageBoxNode( "Chapter2",             *context.fonts ); break;
-        case States::Level4:  mMessageBox = new MessageBoxNode( "Chapter3",             *context.fonts ); break;
-        case States::Level5:  mMessageBox = new MessageBoxNode( "Chapter4",             *context.fonts ); break;
-        case States::Level6:  mMessageBox = new MessageBoxNode( "Chapter5",             *context.fonts ); break;
-        case States::Level7:  mMessageBox = new MessageBoxNode( "Chapter6",             *context.fonts ); break;
-        case States::Level8:  mMessageBox = new MessageBoxNode( "Chapter7",             *context.fonts ); break;
-        case States::Level9:  mMessageBox = new MessageBoxNode( "Chapter8",             *context.fonts ); break;
-        case States::Level10: mMessageBox = new MessageBoxNode( "Chapter9",             *context.fonts ); break;
+        case States::Level1:
+            mMessageBox = new MessageBoxNode( "IntroCutSceneDialog",  *context.fonts );
+        break;
+        case States::Level2:
+            mMessageBox = new MessageBoxNode( "Chapter1", *context.fonts );
+        break;
+        case States::Level3:
+            mMessageBox = new MessageBoxNode( "Chapter2", *context.fonts );
+        break;
+        case States::Level4:
+            mMessageBox = new MessageBoxNode( "Chapter3", *context.fonts );
+        break;
+        case States::Level5:
+            mMessageBox = new MessageBoxNode( "Chapter4", *context.fonts );
+        break;
+        case States::Level6:
+            mMessageBox = new MessageBoxNode( "Chapter5", *context.fonts );
+        break;
+        case States::Level7:
+            mMessageBox = new MessageBoxNode( "Chapter6", *context.fonts );
+        break;
+        case States::Level8:
+            mMessageBox = new MessageBoxNode( "Chapter7", *context.fonts );
+        break;
+        case States::Level9:
+            mMessageBox = new MessageBoxNode( "Chapter8", *context.fonts );
+        break;
+        case States::Level10:
+            mMessageBox = new MessageBoxNode( "Chapter9", *context.fonts );
+            std::cout << "You Win! Role Credits..." << std::endl;
+            requestStackPop( );
+            requestStackPush( States::Menu );
+        break;
         default: break;
     }
     mMessageBox->setPosition( 50, 400 );
@@ -51,7 +74,8 @@ CutSceneState::CutSceneState( States::ID id, StateStack& stack, Context context,
 
 CutSceneState::~CutSceneState()
 {
-   // mContext.music->stop( );
+    // mContext.music->stop( );
+    mContext.textures->remove( TextureMap.at( "DemoGirl" ) );
 }
 
 void CutSceneState::draw( )
@@ -71,7 +95,40 @@ bool CutSceneState::update( sf::Time )
     if( mMessageBox->complete( ) )
     {
         requestStackPop( );
-        requestStackPush( States::BattleState );
+        requestStackPush( CURRENT_LEVEL );
+        switch( CURRENT_LEVEL )
+        {
+            case States::Level1:
+                CURRENT_LEVEL = States::Level2;
+            break;
+            case States::Level2:
+                CURRENT_LEVEL = States::Level3;
+            break;
+            case States::Level3:
+                CURRENT_LEVEL = States::Level4;
+            break;
+            case States::Level4:
+                CURRENT_LEVEL = States::Level5;
+            break;
+            case States::Level5:
+                CURRENT_LEVEL = States::Level6;
+            break;
+            case States::Level6:
+                CURRENT_LEVEL = States::Level7;
+            break;
+            case States::Level7:
+                CURRENT_LEVEL = States::Level8;
+            break;
+            case States::Level8:
+                CURRENT_LEVEL = States::Level9;
+            break;
+            case States::Level9:
+                CURRENT_LEVEL = States::Level10;
+            break;
+
+            default: break;
+        }
+
     }
     else
     {
