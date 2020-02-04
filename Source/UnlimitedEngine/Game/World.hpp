@@ -57,7 +57,7 @@ public:
     void handleCollisions( void );
 
     void changeTurn( void );
-    void spawnUnit( unsigned int unitType, unsigned int selectedBuilding );
+    void spawnUnit( unsigned int unitType, sf::Vector2i gridIndex );
 
     void buildScene( std::string tileMapFilePath );
     void loadSaveFile( std::string saveFilePath );

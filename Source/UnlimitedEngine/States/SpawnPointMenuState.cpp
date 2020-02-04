@@ -33,7 +33,7 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     lightInfantry->setText( "Light Infantry" );
     lightInfantry->setCallback( [this, world] ( )
     {
-        world->spawnUnit( UnitTypeMap.at( "LightInfantry" ), world->getSelectedBuilding( ) );
+        world->setSelectedUnit( UnitTypeMap.at( "LightInfantry" ) );
         this->requestStackPop( );
     });
     auto heavyInfantry = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

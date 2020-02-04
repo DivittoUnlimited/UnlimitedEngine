@@ -202,7 +202,7 @@ void Grid::clearGrid( void )
     mUnitAwaitingOrders = false;
 }
 
-bool Grid::handleEvent( sf::Event event , World* world )
+bool Grid::handleEvent( sf::Event event )
 {
     if( event.mouseButton.button == sf::Mouse::Button::Left )
     {
@@ -215,18 +215,16 @@ bool Grid::handleEvent( sf::Event event , World* world )
                 if( mData[i][j].mBounds.contains( sf::Mouse::getPosition(*mWindow).x, sf::Mouse::getPosition(*mWindow).y ) )
                 {
                     if( !mUnitAwaitingOrders && mData[i][j].isOccupied ) selectUnit( i, j );
-                    else if( !mUnitAwaitingOrders && world->getSelectedBuilding() > -1 )
+                    else if( !mUnitAwaitingOrders && mWorld->getSelectedBuilding( ) > -1 )
                     {
                         // building selected but not unit!!!
                         if( mData[i][j].isPossibleNewLocation )
                         {
                             // spawn unit?
-                            std::cout << "How To spawn Unit from Here Grid:: 224" << std::endl;
+                            if( mWorld->getSelectedUnit() == -1 ) std::cout << "Unit has not been selected yet!" << std::endl;
+                            else std::cout << "unitID: " << mWorld->getSelectedUnit() << std::endl;
+                            mWorld->spawnUnit( mWorld->getSelectedUnit(), sf::Vector2i( i, j ) );
                         }
-
-
-
-                        ///
                     }
                     // Units previously selected
                     else if( mData[i][j].isPossibleNewLocation )
@@ -249,19 +247,18 @@ bool Grid::handleEvent( sf::Event event , World* world )
                     {
                         if( static_cast<unsigned int>( mData[i][j].buildingID ) == BuildingTypeMap.at( "SpawnPoint" ) )
                         {
-                            clearGrid();
-                            world->setSelectedBuilding( mData[i][j].buildingID );
-                            world->mStateStack->pushState( States::SpawnPointMenuState );
+                            clearGrid( );
+                            mWorld->setSelectedBuilding( mData[i][j].buildingID );
+                            mWorld->mStateStack->pushState( States::SpawnPointMenuState );
 
                             // where to spawn the unit??
-                            std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( world->getSelectedBuilding() )->mGridIndex, world->getSelectedUnit(), 2 );
+                            std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( mWorld->getSelectedBuilding() )->mGridIndex, mWorld->getSelectedUnit(), 2 );
 
                             for( auto loc : possibleLocations )
                             {
                                 mData[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )].isPossibleNewLocation = true;
                                 mDrawableGrid[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )]->getSprite()->setFillColor( sf::Color::Cyan );
                             }
-
                         }
                         else
                             clearGrid();
@@ -277,7 +274,7 @@ bool Grid::handleEvent( sf::Event event , World* world )
     }
     else if( event.mouseButton.button == sf::Mouse::Button::Right )
     {
-        clearGrid();
+        clearGrid( );
         // Find Which Square on the grid the user clicked
         for( unsigned int i = 0; i < mData.size(); ++i )
             for( unsigned int j = 0; j < mData[i].size(); ++j )
@@ -285,7 +282,7 @@ bool Grid::handleEvent( sf::Event event , World* world )
                {
                    std::vector<sf::Vector2i> loc = getPossibleAttackPositions( sf::Vector2i( i, j ), mCurrentUnits.at( mData[i][j].unitID )->mRange.x, mCurrentUnits.at( mData[i][j].unitID )->mRange.y  );
                    // Show Squares without making them clickable
-                   for( unsigned int k = 0; k < loc.size(); ++k ) if( static_cast<unsigned int>( loc[k].x ) != i || static_cast<unsigned int>(loc[k].y) != j ) mDrawableGrid[loc[k].x][loc[k].y]->getSprite()->setFillColor( sf::Color( 255, 0, 0, 255 ) );
+                   for( unsigned int k = 0; k < loc.size( ); ++k ) if( static_cast<unsigned int>( loc[k].x ) != i || static_cast<unsigned int>(loc[k].y) != j ) mDrawableGrid[loc[k].x][loc[k].y]->getSprite()->setFillColor( sf::Color( 255, 0, 0, 255 ) );
                }
     }
     return true;

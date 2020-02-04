@@ -76,15 +76,13 @@ bool World::update( sf::Time dt )
     catch( std::exception& e ) {
         std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl;
     }
-
     /*
         try{ handleCollisions( ); }
         catch( std::exception& e ) {
             std::cout << "There was an exception during the collision update: " << e.what( ) << "\nDo all your map layer names in lua match from tiled?" << std::endl;
         }
     */
-     mSceneGraph.removeWrecks( );
-
+    mSceneGraph.removeWrecks( );
     return true;
 }
 
@@ -123,7 +121,7 @@ void World::handleEvent( const sf::Event& event )
 {
     if( event.type == sf::Event::MouseButtonReleased )
     {
-        mMovementGrid.handleEvent( event, this );
+        mMovementGrid.handleEvent( event );
     }
     else if( event.type == sf::Event::KeyReleased && (event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
     {
@@ -152,12 +150,14 @@ void World::changeTurn( void )
     }
 }
 
-void World::spawnUnit( unsigned int unitType, unsigned int selectedBuilding )
+void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
 {
-
-
-    // add unit to grid
-
+    // add unit to grid 
+    std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), CURRENT_TURN, UnitDataTable.at( unitType ), mTextures ) );
+    sf::Rect<float> object = mMovementGrid.mData[gridIndex.x][gridIndex.y].mBounds;
+    unit->setPosition( object.left, object.top - 32 );
+    mMovementGrid.addUnit( unit.get() );
+    mSceneLayers.at( LayerMap.at( "objectgroup" ) )->attachChild( std::move( unit ) );
 }
 
 
@@ -183,23 +183,18 @@ void World::buildScene( std::string tileMapFilePath )
 
 
     */
-
     // load TiledMap
         Tiled::TiledMap map = Tiled::loadFromFile( tileMapFilePath ); //mContext.TiledMapFilePath );
-
         struct Tile {
             std::string texID;
             sf::Rect<int> rect;
         };
-
         std::vector<Tile> tiles = std::vector<Tile>( );
 
-        // Add in the first tile as an empty space because the gId in tiled starts at 1
-        tiles.push_back( Tile() );
+        tiles.push_back( Tile() ); // Add in the first tile as an empty space because the gId in tiled starts at 1
         tiles[0].texID = "NONE";
         tiles[0].rect = sf::Rect<int>( 0, 0, 32, 32 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
                                                             // Should be able to get these values from tiled file anyway....
-
         for( unsigned int i = 0; i < map.tileSets.size(); ++i )
         {
             // define loops to divide up image

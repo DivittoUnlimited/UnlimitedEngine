@@ -72,7 +72,7 @@ public:
     void getTartgets(unsigned int i , unsigned int j);
     void clearGrid( void );
 
-    bool handleEvent( sf::Event event, World* world );
+    bool handleEvent(sf::Event event);
 
     // Attributes
     World* mWorld;
