@@ -9,7 +9,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 
 #include "Graphics/SceneNode.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/DialogNode.hpp"
 
 #include "Container.hpp"

@@ -11,16 +11,19 @@ DISTFILES += \
     Core/ip.txt \
     Game/Application.lua \
     Game/Game.lua \
-    Game/Resources/Actors.lua \
-    Game/Resources/Assets.lua \
-    Game/Resources/Conversations.lua \
-    Game/Resources/Maps/TacticsTribeDemoLevel.lua \
-    Game/Resources/Particles.lua \
-    Game/Resources/SourceFileMap.lua \
-    Game/Resources/Warps.lua \
-    Game/TerrainTypes.lua \
-    Game/UnitMovementCost.lua \
-    Game/UnitTypes.lua \
+    Game/Lua/Application.lua \
+    Game/Lua/Buildings.lua \
+    Game/Lua/Game.lua \
+    Game/Lua/Resources/Actors.lua \
+    Game/Lua/Resources/Assets.lua \
+    Game/Lua/Resources/Conversations.lua \
+    Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua \
+    Game/Lua/Resources/Particles.lua \
+    Game/Lua/Resources/SourceFileMap.lua \
+    Game/Lua/Resources/Warps.lua \
+    Game/Lua/TerrainTypes.lua \
+    Game/Lua/UnitMovementCost.lua \
+    Game/Lua/UnitTypes.lua \
     Media/Sansation.ttf \
     Media/Shaders/Add.frag \
     Media/Shaders/Brightness.frag \
@@ -35,6 +38,7 @@ DISTFILES += \
     Media/Textures/Girl.png \
     Media/Textures/LightInfantry.png \
     Media/Textures/Particle.png \
+    Media/Textures/SpawnPoint.png \
     Notes.txt
 
 HEADERS += \
@@ -43,7 +47,6 @@ HEADERS += \
     Core/CollisionMan.hpp \
     Core/Command.hpp \
     Core/CommandQueue.hpp \
-    Core/DataTables.hpp \
     Core/DialogNode.hpp \
     Core/Entity.hpp \
     Core/FiniteStateMachine.hpp \
@@ -69,9 +72,11 @@ HEADERS += \
     Core/SteeringBehaviors.inl \
     Core/Utility.hpp \
     Core/Utility.inl \
-    Core/World.hpp \
-    GameObjects/Grid.hpp \
-    GameObjects/Unit.hpp \
+    Game/Building.hpp \
+    Game/DataTables.hpp \
+    Game/Grid.hpp \
+    Game/Unit.hpp \
+    Game/World.hpp \
     Graphics/Animation.hpp \
     Graphics/BloomEffect.hpp \
     Graphics/EmitterNode.hpp \
@@ -94,6 +99,7 @@ HEADERS += \
     States/ConquestModeSetup.hpp \
     States/ConquestOverviewState.hpp \
     States/CutSceneState.hpp \
+    States/EndTurnMenuState.hpp \
     States/GameState.hpp \
     States/IntroCutSceneState.cpp.autosave \
     States/LoadingState.hpp \
@@ -105,6 +111,7 @@ HEADERS += \
     States/SettingsState.hpp \
     States/ShopState.hpp \
     States/SinglePlayerMenuState.hpp \
+    States/SpawnPointMenuState.hpp \
     States/SplashScreen.hpp \
     States/StoryModeSetupState.hpp \
     States/TitleState.hpp \
@@ -142,7 +149,6 @@ SOURCES += \
     Core/CollisionMan.cpp \
     Core/Command.cpp \
     Core/CommandQueue.cpp \
-    Core/DataTables.cpp \
     Core/Entity.cpp \
     Core/GameServer.cpp \
     Core/KeyBinding.cpp \
@@ -155,9 +161,11 @@ SOURCES += \
     Core/State.cpp \
     Core/StateStack.cpp \
     Core/Utility.cpp \
-    Core/World.cpp \
-    GameObjects/Grid.cpp \
-    GameObjects/Unit.cpp \
+    Game/Building.cpp \
+    Game/DataTables.cpp \
+    Game/Grid.cpp \
+    Game/Unit.cpp \
+    Game/World.cpp \
     Graphics/Animation.cpp \
     Graphics/BloomEffect.cpp \
     Graphics/EmitterNode.cpp \
@@ -179,6 +187,7 @@ SOURCES += \
     States/ConquestModeSetup.cpp \
     States/ConquestOverviewState.cpp \
     States/CutSceneState.cpp \
+    States/EndTurnMenuState.cpp \
     States/GameState.cpp \
     States/LoadingState.cpp \
     States/MenuState.cpp \
@@ -189,6 +198,7 @@ SOURCES += \
     States/SettingsState.cpp \
     States/ShopState.cpp \
     States/SinglePlayerMenuState.cpp \
+    States/SpawnPointMenuState.cpp \
     States/SplashScreen.cpp \
     States/StoryModeSetupState.cpp \
     States/TitleState.cpp \

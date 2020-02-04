@@ -9,7 +9,7 @@
 #include "Gui/Button.hpp"
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/MusicPlayer.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -40,7 +40,7 @@ StoryModeSetupState::StoryModeSetupState( States::ID id, StateStack& stack, Cont
     newGameButton->setCallback( [this] ( )
     {
         requestStackPop( );
-        requestStackPush( States::IntroDialogState );
+        requestStackPush( States::IntroCutSceneDialogState );
     });
 
     auto loadGameButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

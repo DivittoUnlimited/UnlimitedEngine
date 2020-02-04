@@ -1,10 +1,13 @@
 #include "GameState.hpp"
 #include "Core/MusicPlayer.hpp"
 #include "Core/Globals.hpp"
+#include "Core/Utility.hpp"
+#include "Gui/Button.hpp"
+#include "Gui/Container.hpp"
 
 GameState::GameState(States::ID id, StateStack& stack, Context context , unsigned int level)
     : State( id, stack, context )
-    , mWorld( *context.window, *context.fonts, *context.sounds, false, false )
+    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, false, false )
     , mPlayer( nullptr, Category::Player, context.keys1 )
     , mLevel( level )
 {
@@ -95,14 +98,13 @@ bool GameState::update( sf::Time dt )
 
 bool GameState::handleEvent( const sf::Event& event )
 {
-    mPlayer.handleEvent( event, mWorld.getCommandQueue( ) );
-
-    mWorld.handleEvent( event );
-
     // Escape pressed, trigger the pause screen -- 9 is the id of the start button
     if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )) {
         requestStackPush( States::Pause );
     }
+
+    mPlayer.handleEvent( event, mWorld.getCommandQueue( ) );
+    mWorld.handleEvent( event );
 
 	return true;
 }

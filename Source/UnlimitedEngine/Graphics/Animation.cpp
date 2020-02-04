@@ -1,5 +1,5 @@
 #include "Graphics/Animation.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 
 
 #include <SFML/Graphics/RenderTarget.hpp>

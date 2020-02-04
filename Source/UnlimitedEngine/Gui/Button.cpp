@@ -1,6 +1,6 @@
 #include "Button.hpp"
 #include "Core/Utility.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 
 
 #include <SFML/Window/Event.hpp>

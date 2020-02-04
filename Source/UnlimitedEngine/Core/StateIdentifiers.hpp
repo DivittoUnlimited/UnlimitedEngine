@@ -55,17 +55,9 @@ namespace States
         Level9,
         Level10,
 
-        // Dialogs
-        IntroDialogState,
-        Chapter1DialogState,
-        Chapter2DialogState,
-        Chapter3DialogState,
-        Chapter4DialogState,
-        Chapter5DialogState,
-        Chapter6DialogState,
-        Chapter7DialogState,
-        Chapter8DialogState,
-        Chapter9DialogState,
+        // World DialogBox States ( Unit selection, end turn ec... )
+        EndTurnMenuState,
+        SpawnPointMenuState
 
 
 	};

@@ -4,7 +4,7 @@
 #include "Graphics/PostEffect.hpp"
 #include "Core/ResourceIdentifiers.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Shader.hpp>

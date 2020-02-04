@@ -1,7 +1,7 @@
 #include "TitleState.hpp"
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/Globals.hpp"
 
 

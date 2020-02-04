@@ -1,5 +1,5 @@
 #include "Graphics/ParticleNode.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/ResourceManager.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>

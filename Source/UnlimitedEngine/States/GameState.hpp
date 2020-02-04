@@ -1,7 +1,7 @@
 #ifndef GAMESTATE_HPP
 #define GAMESTATE_HPP
 
-#include "Core/World.hpp"
+#include "Game/World.hpp"
 #include "Core/Player.hpp"
 
 // Forward declaration

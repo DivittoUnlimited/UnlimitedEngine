@@ -6,7 +6,7 @@
 #include "Gui/Button.hpp"
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/MusicPlayer.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>

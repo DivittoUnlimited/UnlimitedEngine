@@ -21,7 +21,7 @@
 #include "States/StoryModeSetupState.hpp"
 #include "States/CutSceneState.hpp"
 #include "States/BattleStatScreen.hpp"
-#include "DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Globals.hpp"
 
 
@@ -35,7 +35,7 @@ const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default );
 GameModes::ID GAME_MODE = GameModes::NONE;
 States::ID CURRENT_LEVEL = States::Level1;
-
+Category::Type CURRENT_TURN = Category::Blue;
 
 Application::Application( )
     : mTextures( )
@@ -43,7 +43,7 @@ Application::Application( )
     , mMusic( )
     , mKeyBinding1( 1 )
     , mKeyBinding2( 2 )
-    , mStateStack(State::Context( States::None, *mWindow, mTextures, mFonts, mMusic, mSoundEffects,  new std::vector<std::pair<std::string, int>>(), mKeyBinding1, mKeyBinding2))
+    , mStateStack(State::Context( States::None, *mWindow, mTextures, mFonts, mMusic, mSoundEffects, mKeyBinding1, mKeyBinding2))
     , mStatisticsNumFrames( 0 )
     , mStatisticsText( )
     , mStatisticsUpdateTime( sf::Time::Zero )
@@ -166,7 +166,7 @@ void Application::registerStates( )
     mStateStack.registerState<GameState>                ( States::Level10, LevelMap.at( "DemoMap" ) );
 
     // CutScenes
-    mStateStack.registerState<CutSceneState>            ( States::IntroDialogState, States::Level1 );
+    mStateStack.registerState<CutSceneState>            ( States::IntroCutSceneDialogState, States::Level1 );
     mStateStack.registerState<CutSceneState>            ( States::cutScene1State, States::Level2 );
     mStateStack.registerState<CutSceneState>            ( States::cutScene2State, States::Level3 );
     mStateStack.registerState<CutSceneState>            ( States::cutScene3State, States::Level4 );
@@ -176,5 +176,6 @@ void Application::registerStates( )
     mStateStack.registerState<CutSceneState>            ( States::cutScene7State, States::Level8 );
     mStateStack.registerState<CutSceneState>            ( States::cutScene8State, States::Level9 );
     mStateStack.registerState<CutSceneState>            ( States::cutScene9State, States::Level10 );
+
 }
 

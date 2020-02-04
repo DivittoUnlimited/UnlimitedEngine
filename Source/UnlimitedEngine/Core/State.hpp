@@ -31,7 +31,7 @@ public:
         }
 
         Context( States::ID stateID, sf::RenderWindow& window, TextureManager& textures, FontManager& fonts, MusicPlayer& music, SoundPlayer& sounds,
-                 std::vector<std::pair<std::string, int>>* highScores, KeyBinding& keys1, KeyBinding& keys2 )
+                  KeyBinding& keys1, KeyBinding& keys2 )
         : stateID( stateID )
         , window( &window )
         , textures( &textures )
@@ -39,7 +39,6 @@ public:
         , music( &music )
         , sounds( &sounds )
         //, player( nullptr )
-        , highScores( highScores )
         , keys1( &keys1 )
         , keys2( &keys2 )
         {
@@ -52,8 +51,6 @@ public:
         MusicPlayer*      music;
         SoundPlayer*      sounds;
         //Player*			  player;
-        std::string       tiledMapFilePath;
-        std::vector<std::pair<std::string, int>>* highScores;
         KeyBinding*			keys1;
         KeyBinding*			keys2;
     };

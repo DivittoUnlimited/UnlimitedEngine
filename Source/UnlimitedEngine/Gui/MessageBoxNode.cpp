@@ -1,6 +1,6 @@
 #include "Gui/MessageBoxNode.hpp"
 
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/Globals.hpp"
 #include "Graphics/TextNode.hpp"
 

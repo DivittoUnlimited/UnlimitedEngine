@@ -6,7 +6,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "Graphics/SceneNode.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/ResourceIdentifiers.hpp"
 #include "Core/ResourceManager.hpp"
 

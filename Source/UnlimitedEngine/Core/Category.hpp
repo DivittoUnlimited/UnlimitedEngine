@@ -15,8 +15,13 @@ enum Type
     SoundEffect			= 1 << 6,
     Network             = 1 << 7,
     TileLayer           = 1 << 8,
-    Unit                = 1 << 9, // A Soldier or other type of trooper on the field.
-
+    RedUnit             = 1 << 9,
+    BlueUnit            = 1 << 10,
+    RedBuilding         = 1 << 11,
+    BlueBuilding        = 1 << 12,
+    NeutralBuilding     = 1 << 13,
+    Red                 = RedUnit | RedBuilding,
+    Blue                = BlueUnit | BlueBuilding,
 };
 
 }

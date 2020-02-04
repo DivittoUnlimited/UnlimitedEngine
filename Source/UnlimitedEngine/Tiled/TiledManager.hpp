@@ -56,6 +56,7 @@ struct Object
     unsigned int rotation;
     unsigned int gid;
     bool visible;
+    std::map<std::string, std::string> properties;
 };
 
 struct Layer
@@ -519,14 +520,21 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                                     if( lua_isboolean( L, -1 ) ) currentObj.visible = lua_toboolean( L, -1 );
                                     else throw( "Error: Object visible invalid" );
                                     lua_pop( L, 1 ); // visible value
-    /*
+
                                     lua_getfield( L, -1, "properties" );
                                     if( lua_istable( L, -1 ) )
                                     {
+                                        lua_pushnil( L ); // first key
+                                        while( lua_next( L, -2 ) != 0 )
+                                        {
+                                            currentObj.properties.insert( std::pair<std::string, std::string>(
+                                                                                      lua_tostring( L, -2 ), lua_tostring( L, -1 ) ) );
+                                            lua_pop( L, 1); // removes 'value'; keeps 'key' for next iteration
+                                        }
                                     }
                                     else throw( "Error: Object Properties invalid" );
                                     lua_pop( L, 1 ); // Properties table
-    */
+
                                     currentLayer.objects.push_back( currentObj );
                                 }
                                 else

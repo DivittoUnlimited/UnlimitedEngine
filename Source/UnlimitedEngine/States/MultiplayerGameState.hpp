@@ -2,7 +2,7 @@
 #define MULTIPLAYERGAMESTATE_HPP
 
 #include "Core/State.hpp"
-#include "Core/World.hpp"
+#include "Game/World.hpp"
 #include "Core/Player.hpp"
 #include "Core/GameServer.hpp"
 #include "Core/Globals.hpp"

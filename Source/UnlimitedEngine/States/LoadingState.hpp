@@ -3,7 +3,7 @@
 
 #include "Core/State.hpp"
 #include "Core/ParallelTask.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>

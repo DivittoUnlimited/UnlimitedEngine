@@ -30,7 +30,7 @@ sf::IpAddress getAddressFromFile( void )
 
 MultiplayerGameState::MultiplayerGameState( States::ID id, StateStack& stack, Context context, bool isHost = false )
     : State( id, stack, context )
-    , mWorld( *context.window, *context.fonts, *context.sounds, true )
+    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, true )
     , mWindow( *context.window )
     , mTextureManager( *context.textures )
     , mConnected( false )

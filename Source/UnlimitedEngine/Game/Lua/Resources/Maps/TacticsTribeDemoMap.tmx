@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="32" height="24" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="10">
+ <editorsettings>
+  <export target="TacticsTribeDemoLevel.lua" format="lua"/>
+ </editorsettings>
+ <tileset firstgid="1" source="DemoLevel.tsx"/>
+ <tileset firstgid="193" source="LightInfantry.tsx"/>
+ <tileset firstgid="194" source="SpawnPoint.tsx"/>
+ <layer id="1" name="TileLayer1" width="32" height="24">
+  <data encoding="csv">
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,49,49,49,1,1,1,1,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,49,49,49,1,1,1,1,1,97,97,1,1,49,49,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,49,49,49,1,1,1,1,1,97,97,1,49,49,49,49,1,
+1,1,1,1,1,1,97,97,1,1,1,1,49,49,1,1,49,49,49,1,1,1,1,1,97,97,1,49,49,49,49,1,
+1,1,1,1,1,1,97,97,1,1,1,49,49,49,1,1,1,1,1,1,1,1,1,1,97,97,1,1,49,49,49,1,
+1,1,1,1,1,1,97,97,1,1,1,49,49,49,1,1,1,1,1,1,49,49,1,1,97,97,1,1,49,49,49,1,
+1,1,1,1,1,1,97,97,1,1,49,49,49,49,1,1,1,1,1,49,49,49,49,49,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,49,49,49,49,49,1,1,1,1,1,49,49,49,49,49,97,97,1,1,1,1,1,1,
+1,1,49,49,1,1,97,97,1,49,49,49,1,1,1,1,1,1,1,1,49,49,49,49,97,97,1,1,49,49,1,1,
+1,49,49,49,49,1,97,97,1,1,49,1,1,1,1,1,1,1,1,1,1,1,49,49,97,97,1,49,49,49,1,1,
+1,49,49,49,49,1,97,97,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,97,97,1,49,49,49,1,1,
+1,1,49,49,1,1,97,97,97,97,97,97,97,97,97,97,97,97,97,97,97,97,97,97,97,97,1,49,49,49,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,1,1,49,1,1,1,1,1,97,97,1,49,49,49,1,1,
+1,1,1,1,1,1,97,97,1,1,49,49,1,1,1,1,1,49,49,49,1,1,1,1,97,97,1,49,49,49,1,1,
+1,1,1,1,1,1,97,97,1,1,49,49,49,1,1,1,1,49,49,49,1,1,1,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,49,49,49,49,49,1,1,1,1,49,1,1,49,49,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,49,49,49,49,49,49,49,1,1,1,1,1,49,49,49,49,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,49,49,49,49,49,1,1,1,1,1,1,49,49,49,49,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,1,49,49,49,1,1,1,1,1,1,1,1,49,49,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,97,97,1,1,1,1,1,1,
+1,1,1,1,1,1,97,97,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,97,97,1,1,1,1,1,1
+</data>
+ </layer>
+ <objectgroup id="2" name="ObjectLayer1">
+  <object id="1" type="LightInfantry" gid="193" x="192" y="192" width="32" height="32">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+  <object id="2" type="LightInfantry" gid="193" x="768" y="416" width="32" height="32">
+   <properties>
+    <property name="Team" value="Red"/>
+   </properties>
+  </object>
+  <object id="3" type="LightInfantry" gid="193" x="480" y="416" width="32" height="32">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+  <object id="4" type="LightInfantry" gid="193" x="352" y="416" width="32" height="32">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+  <object id="5" type="LightInfantry" gid="193" x="288" y="192" width="32" height="32">
+   <properties>
+    <property name="Team" value="Red"/>
+   </properties>
+  </object>
+  <object id="6" type="LightInfantry" gid="193" x="640" y="416" width="32" height="32">
+   <properties>
+    <property name="Team" value="Red"/>
+   </properties>
+  </object>
+  <object id="7" type="SpawnPoint" gid="194" x="128" y="96" width="32" height="32">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+  <object id="8" type="SpawnPoint" gid="194" x="864" y="704" width="32" height="32">
+   <properties>
+    <property name="Team" value="Red"/>
+   </properties>
+  </object>
+  <object id="9" type="HeavyInfantry" gid="193" x="224" y="256" width="32" height="32">
+   <properties>
+    <property name="Team" value="Red"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

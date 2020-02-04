@@ -1,6 +1,5 @@
 
 TO_DO LIST:
-    - Move states enum to be a lua table instead
     - figure out why vs mode and multiplayer call Host game?
         - check main menu buttons
     - how does the pause state know to call a new menuState
@@ -8,5 +7,4 @@ TO_DO LIST:
             - just leave Conquest state alive and make pause state remove itself and gamestate only
             - or use GAME_MODE
     - Mouse should handle gui's as well.
-    - If possible movement could go off grid the game will crash
-    - Make camera pan with mouse
+    - Make camera pan with mouse, as well as arrow keys

@@ -6,6 +6,7 @@
 
 #include "Core/GameModeIdentifiers.hpp"
 #include "Core/StateIdentifiers.hpp"
+#include "Core/Category.hpp"
 
 //const static int WINDOW_WIDTH = sf::VideoMode::getDesktopMode().width;
 //const static int WINDOW_HEIGHT = sf::VideoMode::getDesktopMode().height;
@@ -19,5 +20,6 @@ extern sf::RenderWindow* mWindow; // The Main window of the game. Defined in App
 
 extern States::ID CURRENT_LEVEL; // init in application constructor
 
+extern Category::Type CURRENT_TURN; // defined in application
 
 #endif // GLOBALS_HPP
