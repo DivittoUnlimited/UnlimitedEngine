@@ -153,11 +153,18 @@ void World::changeTurn( void )
 void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
 {
     // add unit to grid 
-    std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), CURRENT_TURN, UnitDataTable.at( unitType ), mTextures ) );
+    Category::Type category = Category::None;
+    if( CURRENT_TURN == Category::Red ) category = Category::RedUnit;
+    else if( CURRENT_TURN == Category::Blue ) category = Category::BlueUnit;
+    else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+    std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), category, UnitDataTable.at( unitType ), mTextures ) );
     sf::Rect<float> object = mMovementGrid.mData[gridIndex.x][gridIndex.y].mBounds;
-    unit->setPosition( object.left, object.top - 32 );
-    mMovementGrid.addUnit( unit.get() );
-    mSceneLayers.at( LayerMap.at( "objectgroup" ) )->attachChild( std::move( unit ) );
+    unit->setPosition( object.left, object.top );
+    mMovementGrid.addUnit( unit.get( ) );
+
+    //std::cout << "LayerMap is Mis-aligned. ObjectLayer1 should be layer1"
+    mSceneLayers.at( LayerMap.at( "ObjectLayer1" ) )->attachChild( std::move( unit ) );
 }
 
 
@@ -326,7 +333,6 @@ void World::buildScene( std::string tileMapFilePath )
                          std::unique_ptr<Building> sp( new Building( mMovementGrid.mCurrentBuildings.size(), category, BuildingDataTable.at( BuildingTypeMap.at( "SpawnPoint" ) ), mTextures ) );
                          sp->setPosition( object.x, object.y - 32 );
                          mMovementGrid.addBuilding( sp.get() );
-                         mMovementGrid.mCurrentBuildings.push_back( sp.get( ) );
                          node.get( )->attachChild( std::move( sp ) );
                      }
                      else

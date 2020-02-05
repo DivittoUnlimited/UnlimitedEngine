@@ -39,9 +39,8 @@ return {
     -- it is very important that the layer names here match the layer names in the tiled files/editor
     Layers = {
         TileLayer1          = 0;
-        TileLayer2          = 1;
-        ObjectLayer         = 2;
-        TileLayer3          = 3;
+        ObjectLayer1        = 1;
+        TileLayer3          = 2;
     };
 
 -- maybe usefull in World::buildScene dont delete yet

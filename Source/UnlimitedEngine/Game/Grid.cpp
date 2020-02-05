@@ -198,6 +198,7 @@ void Grid::clearGrid( void )
         }
     }
     mWorld->setSelectedUnit( -1 );
+    mWorld->setSelectedBuilding( -1 );
     mSelectedGridIndex = sf::Vector2i( 0, 0 );
     mUnitAwaitingOrders = false;
 }
@@ -220,10 +221,9 @@ bool Grid::handleEvent( sf::Event event )
                         // building selected but not unit!!!
                         if( mData[i][j].isPossibleNewLocation )
                         {
-                            // spawn unit?
-                            if( mWorld->getSelectedUnit() == -1 ) std::cout << "Unit has not been selected yet!" << std::endl;
-                            else std::cout << "unitID: " << mWorld->getSelectedUnit() << std::endl;
                             mWorld->spawnUnit( mWorld->getSelectedUnit(), sf::Vector2i( i, j ) );
+                            mCurrentUnits.at( mCurrentUnits.size() - 1 )->mHasMoved = true;
+                            clearGrid( );
                         }
                     }
                     // Units previously selected
@@ -245,19 +245,22 @@ bool Grid::handleEvent( sf::Event event )
                     }
                     else if( mData[i][j].buildingID != -1 ) // and building a spawnPoint??????????
                     {
-                        if( static_cast<unsigned int>( mData[i][j].buildingID ) == BuildingTypeMap.at( "SpawnPoint" ) )
+                        if( mCurrentBuildings.at( mData[i][j].buildingID )->mType == "SpawnPoint" )
                         {
-                            clearGrid( );
-                            mWorld->setSelectedBuilding( mData[i][j].buildingID );
-                            mWorld->mStateStack->pushState( States::SpawnPointMenuState );
-
-                            // where to spawn the unit??
-                            std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( mWorld->getSelectedBuilding() )->mGridIndex, mWorld->getSelectedUnit(), 2 );
-
-                            for( auto loc : possibleLocations )
+                            if( mCurrentBuildings.at( mData[i][j].buildingID )->mCategory & CURRENT_TURN )
                             {
-                                mData[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )].isPossibleNewLocation = true;
-                                mDrawableGrid[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )]->getSprite()->setFillColor( sf::Color::Cyan );
+                                clearGrid( );
+                                mWorld->setSelectedBuilding( mData[i][j].buildingID );
+                                mWorld->mStateStack->pushState( States::SpawnPointMenuState );
+
+                                // where to spawn the unit??
+                                std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( mWorld->getSelectedBuilding() )->mGridIndex, mWorld->getSelectedUnit(), 1 );
+
+                                for( auto loc : possibleLocations )
+                                {
+                                    mData[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )].isPossibleNewLocation = true;
+                                    mDrawableGrid[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )]->getSprite()->setFillColor( sf::Color::Cyan );
+                                }
                             }
                         }
                         else

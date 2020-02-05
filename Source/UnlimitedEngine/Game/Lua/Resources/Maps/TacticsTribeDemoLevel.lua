@@ -281,7 +281,7 @@ return {
           type = "SpawnPoint",
           shape = "rectangle",
           x = 864,
-          y = 704,
+          y = 672,
           width = 32,
           height = 32,
           rotation = 0,
