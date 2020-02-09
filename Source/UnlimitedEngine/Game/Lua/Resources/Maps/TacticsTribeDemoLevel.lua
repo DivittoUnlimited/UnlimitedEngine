@@ -4,23 +4,23 @@ return {
   tiledversion = "1.3.2",
   orientation = "orthogonal",
   renderorder = "right-down",
-  width = 32,
-  height = 24,
-  tilewidth = 32,
-  tileheight = 32,
+  width = 16,
+  height = 12,
+  tilewidth = 64,
+  tileheight = 64,
   nextlayerid = 3,
-  nextobjectid = 10,
+  nextobjectid = 19,
   properties = {},
   tilesets = {
     {
       name = "DemoLevel",
       firstgid = 1,
       filename = "DemoLevel.tsx",
-      tilewidth = 32,
-      tileheight = 32,
+      tilewidth = 64,
+      tileheight = 64,
       spacing = 0,
       margin = 0,
-      columns = 16,
+      columns = 8,
       image = "../../../../Media/Textures/DemoLevel.png",
       imagewidth = 512,
       imageheight = 384,
@@ -30,12 +30,12 @@ return {
       },
       grid = {
         orientation = "orthogonal",
-        width = 32,
-        height = 32
+        width = 64,
+        height = 64
       },
       properties = {},
       terrains = {},
-      tilecount = 192,
+      tilecount = 48,
       tiles = {
         {
           id = 0,
@@ -44,13 +44,13 @@ return {
           }
         },
         {
-          id = 48,
+          id = 16,
           properties = {
             ["type"] = "Mud"
           }
         },
         {
-          id = 96,
+          id = 24,
           properties = {
             ["type"] = "Road"
           }
@@ -59,24 +59,24 @@ return {
     },
     {
       name = "LightInfantry",
-      firstgid = 193,
+      firstgid = 49,
       filename = "LightInfantry.tsx",
-      tilewidth = 32,
-      tileheight = 32,
+      tilewidth = 64,
+      tileheight = 64,
       spacing = 0,
       margin = 0,
       columns = 1,
       image = "../../../../Media/Textures/LightInfantry.png",
-      imagewidth = 32,
-      imageheight = 32,
+      imagewidth = 64,
+      imageheight = 64,
       tileoffset = {
         x = 0,
         y = 0
       },
       grid = {
         orientation = "orthogonal",
-        width = 32,
-        height = 32
+        width = 64,
+        height = 64
       },
       properties = {},
       terrains = {},
@@ -85,24 +85,24 @@ return {
     },
     {
       name = "SpawnPoint",
-      firstgid = 194,
+      firstgid = 50,
       filename = "SpawnPoint.tsx",
-      tilewidth = 32,
-      tileheight = 32,
+      tilewidth = 64,
+      tileheight = 64,
       spacing = 0,
       margin = 0,
       columns = 1,
       image = "../../../../Media/Textures/SpawnPoint.png",
-      imagewidth = 32,
-      imageheight = 32,
+      imagewidth = 64,
+      imageheight = 64,
       tileoffset = {
         x = 0,
         y = 0
       },
       grid = {
         orientation = "orthogonal",
-        width = 32,
-        height = 32
+        width = 64,
+        height = 64
       },
       properties = {},
       terrains = {},
@@ -117,8 +117,8 @@ return {
       name = "TileLayer1",
       x = 0,
       y = 0,
-      width = 32,
-      height = 24,
+      width = 16,
+      height = 12,
       visible = true,
       opacity = 1,
       offsetx = 0,
@@ -126,30 +126,18 @@ return {
       properties = {},
       encoding = "lua",
       data = {
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 49, 49, 49, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 49, 49, 49, 1, 1, 1, 1, 1, 97, 97, 1, 1, 49, 49, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 49, 49, 49, 1, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 49, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 49, 49, 1, 1, 49, 49, 49, 1, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 49, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 49, 49, 49, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 49, 49, 49, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 49, 49, 49, 1, 1, 1, 1, 1, 1, 49, 49, 1, 1, 97, 97, 1, 1, 49, 49, 49, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 49, 49, 49, 49, 1, 1, 1, 1, 1, 49, 49, 49, 49, 49, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 49, 49, 1, 1, 1, 1, 1, 49, 49, 49, 49, 49, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 49, 49, 1, 1, 97, 97, 1, 49, 49, 49, 1, 1, 1, 1, 1, 1, 1, 1, 49, 49, 49, 49, 97, 97, 1, 1, 49, 49, 1, 1,
-        1, 49, 49, 49, 49, 1, 97, 97, 1, 1, 49, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 49, 49, 97, 97, 1, 49, 49, 49, 1, 1,
-        1, 49, 49, 49, 49, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 1, 1,
-        1, 1, 49, 49, 1, 1, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 97, 1, 49, 49, 49, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 49, 1, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 49, 49, 1, 1, 1, 1, 1, 49, 49, 49, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 49, 49, 49, 1, 1, 1, 1, 49, 49, 49, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 49, 49, 1, 1, 1, 1, 49, 1, 1, 49, 49, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 49, 49, 49, 49, 49, 49, 49, 1, 1, 1, 1, 1, 49, 49, 49, 49, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 49, 49, 49, 49, 49, 1, 1, 1, 1, 1, 1, 49, 49, 49, 49, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 49, 49, 49, 1, 1, 1, 1, 1, 1, 1, 1, 49, 49, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 97, 97, 1, 1, 1, 1, 1, 1
+        1, 1, 1, 1, 1, 1, 1, 25, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 25, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 25, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 17, 17, 25, 17, 17, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 17, 17, 25, 17, 17, 17, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 17, 17, 17, 25, 17, 17, 17, 1, 1, 1, 1, 1,
+        25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+        1, 1, 1, 17, 17, 17, 17, 25, 17, 17, 17, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 25, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 25, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 25, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 25, 1, 1, 1, 1, 1, 1, 1, 1
       }
     },
     {
@@ -168,44 +156,12 @@ return {
           name = "",
           type = "LightInfantry",
           shape = "rectangle",
-          x = 192,
-          y = 192,
-          width = 32,
-          height = 32,
+          x = 448,
+          y = 320,
+          width = 64,
+          height = 64,
           rotation = 0,
-          gid = 193,
-          visible = true,
-          properties = {
-            ["Team"] = "Blue"
-          }
-        },
-        {
-          id = 2,
-          name = "",
-          type = "LightInfantry",
-          shape = "rectangle",
-          x = 768,
-          y = 416,
-          width = 32,
-          height = 32,
-          rotation = 0,
-          gid = 193,
-          visible = true,
-          properties = {
-            ["Team"] = "Red"
-          }
-        },
-        {
-          id = 3,
-          name = "",
-          type = "LightInfantry",
-          shape = "rectangle",
-          x = 480,
-          y = 416,
-          width = 32,
-          height = 32,
-          rotation = 0,
-          gid = 193,
+          gid = 49,
           visible = true,
           properties = {
             ["Team"] = "Blue"
@@ -216,12 +172,12 @@ return {
           name = "",
           type = "LightInfantry",
           shape = "rectangle",
-          x = 352,
-          y = 416,
-          width = 32,
-          height = 32,
+          x = 576,
+          y = 320,
+          width = 64,
+          height = 64,
           rotation = 0,
-          gid = 193,
+          gid = 49,
           visible = true,
           properties = {
             ["Team"] = "Blue"
@@ -232,76 +188,124 @@ return {
           name = "",
           type = "LightInfantry",
           shape = "rectangle",
-          x = 288,
-          y = 192,
-          width = 32,
-          height = 32,
+          x = 320,
+          y = 320,
+          width = 64,
+          height = 64,
           rotation = 0,
-          gid = 193,
-          visible = true,
-          properties = {
-            ["Team"] = "Red"
-          }
-        },
-        {
-          id = 6,
-          name = "",
-          type = "LightInfantry",
-          shape = "rectangle",
-          x = 640,
-          y = 416,
-          width = 32,
-          height = 32,
-          rotation = 0,
-          gid = 193,
-          visible = true,
-          properties = {
-            ["Team"] = "Red"
-          }
-        },
-        {
-          id = 7,
-          name = "",
-          type = "SpawnPoint",
-          shape = "rectangle",
-          x = 128,
-          y = 96,
-          width = 32,
-          height = 32,
-          rotation = 0,
-          gid = 194,
+          gid = 49,
           visible = true,
           properties = {
             ["Team"] = "Blue"
           }
         },
         {
-          id = 8,
+          id = 12,
           name = "",
-          type = "SpawnPoint",
+          type = "HeavyInfantry",
           shape = "rectangle",
-          x = 864,
-          y = 672,
-          width = 32,
-          height = 32,
+          x = 448,
+          y = 192,
+          width = 64,
+          height = 64,
           rotation = 0,
-          gid = 194,
+          gid = 49,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 13,
+          name = "",
+          type = "LightInfantry",
+          shape = "rectangle",
+          x = 320,
+          y = 576,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 49,
           visible = true,
           properties = {
             ["Team"] = "Red"
           }
         },
         {
-          id = 9,
+          id = 14,
+          name = "",
+          type = "LightInfantry",
+          shape = "rectangle",
+          x = 448,
+          y = 576,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 49,
+          visible = true,
+          properties = {
+            ["Team"] = "Red"
+          }
+        },
+        {
+          id = 15,
+          name = "",
+          type = "LightInfantry",
+          shape = "rectangle",
+          x = 576,
+          y = 576,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 49,
+          visible = true,
+          properties = {
+            ["Team"] = "Red"
+          }
+        },
+        {
+          id = 16,
           name = "",
           type = "HeavyInfantry",
           shape = "rectangle",
-          x = 224,
-          y = 256,
-          width = 32,
-          height = 32,
+          x = 448,
+          y = 704,
+          width = 64,
+          height = 64,
           rotation = 0,
-          gid = 193,
+          gid = 49,
+          visible = true,
+          properties = {
+            ["Team"] = "Red"
+          }
+        },
+        {
+          id = 17,
+          name = "",
+          type = "SpawnPoint",
+          shape = "rectangle",
+          x = 832,
+          y = 192,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 18,
+          name = "",
+          type = "SpawnPoint",
+          shape = "rectangle",
+          x = 128,
+          y = 640,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
           visible = true,
           properties = {
             ["Team"] = "Red"

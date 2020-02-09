@@ -36,7 +36,9 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mLevel( level )
     , mSelectedBuilding( -1 )
 {
-    if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
+    if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
+    //mWorldView.zoom( 2.0 );
+   // mWorldView.move( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 );
     mSceneTexture.setView( mWorldView );
 
     this->registerStates();
@@ -50,7 +52,7 @@ World::~World( void )
 
 void World::draw( )
 {
-    if( PostEffect::isSupported( ) )
+    if( !PostEffect::isSupported( ) )
     {
         mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
         mSceneTexture.setView( mWorldView );
@@ -282,7 +284,7 @@ void World::buildScene( std::string tileMapFilePath )
                                                                                  sf::Vector2i( static_cast<int>( tileSets.tileWidth ), static_cast<int>( tileSets.tileHeight ) ) ) ) );
                                 rect.get()->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
                                 rect.get()->getSprite()->setOutlineThickness( 1 );
-                                rect.get()->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 255 ) );
+                                rect.get()->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 150 ) );
                                 mMovementGrid.mDrawableGrid.back().push_back( rect.get( ) );
                                 mSceneGraph.attachChild( std::move( rect ) );
                             }
@@ -307,7 +309,7 @@ void World::buildScene( std::string tileMapFilePath )
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
                          std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "LightInfantry" ) ), mTextures ) );
-                         unit->setPosition( object.x, object.y - 32 );
+                         unit->setPosition( object.x, object.y - 96 );
                          mMovementGrid.addUnit( unit.get() );
                          node.get( )->attachChild( std::move( unit ) );
                      }
@@ -319,7 +321,7 @@ void World::buildScene( std::string tileMapFilePath )
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
                          std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "HeavyInfantry" ) ), mTextures ) );
-                         unit->setPosition( object.x, object.y - 32 );
+                         unit->setPosition( object.x, object.y - 96 );
                          mMovementGrid.addUnit( unit.get() );
                          node.get( )->attachChild( std::move( unit ) );
                      }
@@ -331,7 +333,7 @@ void World::buildScene( std::string tileMapFilePath )
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
                          std::unique_ptr<Building> sp( new Building( mMovementGrid.mCurrentBuildings.size(), category, BuildingDataTable.at( BuildingTypeMap.at( "SpawnPoint" ) ), mTextures ) );
-                         sp->setPosition( object.x, object.y - 32 );
+                         sp->setPosition( object.x, object.y - 64 );
                          mMovementGrid.addBuilding( sp.get() );
                          node.get( )->attachChild( std::move( sp ) );
                      }

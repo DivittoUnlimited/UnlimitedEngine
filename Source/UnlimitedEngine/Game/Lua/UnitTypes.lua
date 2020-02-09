@@ -14,7 +14,7 @@ return {
     LightInfantry = {
         class           = "LightInfantry";
         strength        = 4;
-        dexterity       = 10;
+        dexterity       = 5;
         constitution    = 100;
         defense         = 5;
         range           = { innerRange = 0; outerRange = 2; }; -- Can attack adjacent squares only.
@@ -24,7 +24,7 @@ return {
     HeavyInfantry = {
         class           = "HeavyInfantry";
         strength        = 6;
-        dexterity       = 6;
+        dexterity       = 3;
         constitution    = 100;
         defense         = 7;
         range           = { innerRange = 1; outerRange = 2; };

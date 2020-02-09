@@ -29,7 +29,7 @@ bool Grid::buildGrid(  Tiled::TileSet tileSet, Tiled::Layer layer )
         for( unsigned int j = 0; j < layer.width; ++j )
         {
             mData.back().push_back( Square( TerrainTypeMap.at( tileSet.tiles.at( layer.data[counter]-1 ).at( "type" ) ),
-                                            sf::Vector2f( j, i ), sf::Vector2f( j * 32, i * 32 ), 32, false ) );
+                                            sf::Vector2f( j, i ), sf::Vector2f( j * 64, i * 64), 64, false ) );
             counter++;
         }
     }
@@ -73,7 +73,7 @@ void Grid::addUnit( Unit* unit )
     {
         for( unsigned int j = 0; j < mData[i].size(); ++j )
         {
-            if( mData[i][j].mBounds.contains( unit->getPosition().x, unit->getPosition().y ) )
+            if( mData[i][j].mBounds.contains( unit->getPosition().x, unit->getPosition().y + 32 ) )
             {
                 mData[i][j].isOccupied = true;
                 mData[i][j].unitID = unit->mID;
@@ -141,7 +141,7 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
     mData[currentPos.x][currentPos.y].unitID = 0;
     mData[currentPos.x][currentPos.y].isOccupied = false;
     mData[newPos.x][newPos.y].isOccupied = true;
-    mCurrentUnits[mWorld->getSelectedUnit()]->setPosition( newPos.y * 32, newPos.x * 32 );
+    mCurrentUnits[mWorld->getSelectedUnit()]->setPosition( newPos.y * 64, newPos.x * 64 - 32 );
     mCurrentUnits[mWorld->getSelectedUnit()]->mHasMoved = true;
 
     // remove movement squares
@@ -169,6 +169,12 @@ void Grid::getTartgets( unsigned int i, unsigned int j )
         {
             Square location = mData[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )];
             if( location.isOccupied && mCurrentUnits[location.unitID]->mCategory != mCurrentUnits[mWorld->getSelectedUnit()]->mCategory )
+            {
+                mData[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )].isPossibleAttackPosition = true;
+                mDrawableGrid[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )]->getSprite()->setFillColor( sf::Color::Red );
+                flag = true;
+            }
+            else if( location.buildingID != -1 )
             {
                 mData[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )].isPossibleAttackPosition = true;
                 mDrawableGrid[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )]->getSprite()->setFillColor( sf::Color::Red );
@@ -295,7 +301,7 @@ void Grid::buildPossiblePositions( std::vector<sf::Vector2i>* mPossiblePositions
 {
     if( distanceLeft >= 0 && startingPoint.x >= 0 && startingPoint.y >= 0 && static_cast<unsigned int>(startingPoint.x) < mData.size() && static_cast<unsigned int>(startingPoint.y) < mData[startingPoint.x].size() )
     {
-        if( mData[startingPoint.x][startingPoint.y].buildingID == -1 )
+        if(  mData[startingPoint.x][startingPoint.y].buildingID == -1 || !(mCurrentBuildings.at( mData[startingPoint.x][startingPoint.y].buildingID )->mCategory & CURRENT_TURN) )
             mPossiblePositions->push_back( startingPoint );
         distanceLeft -= getMoveCost( unitType, mData[startingPoint.x][startingPoint.y].terrainType );
 
