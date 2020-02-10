@@ -19,11 +19,10 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
 
     this->mSprite = sf::Sprite( textures.get( TextureMap.at( data.textureID ) ) );
 
-
     if( mCategory & Category::Blue )
-        this->mSprite.setColor( sf::Color::Blue );
+        this->mSprite.setColor( sf::Color::Red ); // blue
     else if( mCategory & Category::Red )
-        this->mSprite.setColor( sf::Color::Red );
+        this->mSprite.setColor( sf::Color::Blue ); // red
 
 }
 

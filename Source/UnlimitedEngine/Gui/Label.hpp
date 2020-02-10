@@ -21,6 +21,7 @@ public:
     void		 setText(const std::string& text);
 
     virtual void handleEvent(const sf::Event& event);
+    virtual bool contains( float, float ) { return false; }
 
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;

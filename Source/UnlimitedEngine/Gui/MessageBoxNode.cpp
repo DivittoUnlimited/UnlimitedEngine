@@ -68,7 +68,7 @@ void MessageBoxNode::transitionDialog( int link )
         sf::Vector2f pos =  mMessage.getPosition( ) + sf::Vector2f( 0, 100 ); // this needs to be changed!!!!
         for( unsigned int i = 0; i < mAnswers.size( ); ++i )
         {
-            auto option = std::make_shared<GUI::ResponseSelector>( mAnswers[i].first.c_str( ), *mFonts );
+            auto option = std::make_shared<GUI::ResponseSelector>( mAnswers[i].first.c_str( ), *mFonts, this );
             option->setPosition( pos.x, pos.y + i * 25 );
             option->setCallback( [this, i] ( )
             {

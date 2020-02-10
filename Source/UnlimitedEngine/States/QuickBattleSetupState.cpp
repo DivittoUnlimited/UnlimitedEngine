@@ -35,7 +35,7 @@ QuickBattleSetupState::QuickBattleSetupState( States::ID id, StateStack& stack, 
     StartBattle->setCallback( [this] ( )
     {
         requestStackPop( );
-        requestStackPush( States::BattleState );
+        requestStackPush( States::Level1 );
     });
 
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

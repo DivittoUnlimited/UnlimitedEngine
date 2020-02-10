@@ -96,6 +96,8 @@ bool CutSceneState::update( sf::Time )
     {
         requestStackPop( );
         requestStackPush( CURRENT_LEVEL );
+        /*
+         *  THIS SHOULD BE HANDLED IN THE VICTORY STAT SCREEN
         switch( CURRENT_LEVEL )
         {
             case States::Level1:
@@ -128,7 +130,7 @@ bool CutSceneState::update( sf::Time )
 
             default: break;
         }
-
+        */
     }
     else
     {

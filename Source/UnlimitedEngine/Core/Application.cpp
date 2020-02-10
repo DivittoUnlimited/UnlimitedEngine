@@ -35,7 +35,7 @@ const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default );
 GameModes::ID GAME_MODE = GameModes::NONE;
 States::ID CURRENT_LEVEL = States::Level1;
-Category::Type CURRENT_TURN = Category::Blue;
+Category::Type CURRENT_TURN = Category::Red;
 
 Application::Application( )
     : mTextures( )

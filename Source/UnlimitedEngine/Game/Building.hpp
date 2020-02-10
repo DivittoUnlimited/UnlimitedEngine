@@ -26,6 +26,7 @@ public:
     std::string mTextureID;
     sf::Sprite mSprite;
     sf::Vector2i mGridIndex;
+    float mCapturePercentage;
 };
 
 #endif // BUILDING_HPP

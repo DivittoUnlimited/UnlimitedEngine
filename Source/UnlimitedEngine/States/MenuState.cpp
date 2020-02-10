@@ -72,9 +72,9 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playLocalButton->setText( "Vs. Mode (STUB)" );
     playLocalButton->setCallback( [this] ( )
     {
-        GAME_MODE = GameModes::Online;
-        //requestStackPop( );
-        //requestStackPush( States::HostGame );
+        GAME_MODE = GameModes::QuickBattle;
+        requestStackPop( );
+        requestStackPush( States::HostGame );
     });
 
     auto playMultiplayerButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -82,8 +82,8 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playMultiplayerButton->setText( "Multiplayer (STUB)" );
     playMultiplayerButton->setCallback( [this] ( )
     {
-        //requestStackPop( );
-        //requestStackPush( States::HostGame );
+        requestStackPop( );
+        requestStackPush( States::JoinGame ); // used to be hostGame not sure why
     });
 
     auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -104,12 +104,13 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStateClear( );
 	});
 
-    mGUIContainer.pack( testMap );
+
     mGUIContainer.pack( playButton );
     mGUIContainer.pack( playLocalButton );
     mGUIContainer.pack( playMultiplayerButton );
     mGUIContainer.pack( settingsButton );
     mGUIContainer.pack( exitButton );
+    mGUIContainer.pack( testMap );
 }
 
 MenuState::~MenuState()

@@ -222,12 +222,12 @@ bool Grid::handleEvent( sf::Event event )
                 if( mData[i][j].mBounds.contains( sf::Mouse::getPosition(*mWindow).x, sf::Mouse::getPosition(*mWindow).y ) )
                 {
                     if( !mUnitAwaitingOrders && mData[i][j].isOccupied ) selectUnit( i, j );
-                    else if( !mUnitAwaitingOrders && mWorld->getSelectedBuilding( ) > -1 )
+                    else if( !mUnitAwaitingOrders && mWorld->getSelectedBuilding( ) > -1 ) //this is dumb....
                     {
                         // building selected but not unit!!!
                         if( mData[i][j].isPossibleNewLocation )
                         {
-                            mWorld->spawnUnit( mWorld->getSelectedUnit(), sf::Vector2i( i, j ) );
+                            mWorld->spawnUnit( static_cast<unsigned int>(mWorld->getSelectedUnit()), sf::Vector2i( static_cast<int>(i), static_cast<int>(j) ) );
                             mCurrentUnits.at( mCurrentUnits.size() - 1 )->mHasMoved = true;
                             clearGrid( );
                         }
@@ -235,32 +235,32 @@ bool Grid::handleEvent( sf::Event event )
                     // Units previously selected
                     else if( mData[i][j].isPossibleNewLocation )
                     {
-                        if( mData[i][j].isOccupied ) clearGrid( );
+                        if( mData[i][j].isOccupied || mData[i][j].buildingID != -1 ) clearGrid( );
                         else moveUnit( mSelectedGridIndex, sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
                     }
-                    else if( mData[i][j].isOccupied && mData[i][j].isPossibleAttackPosition && ( mCurrentUnits.at( mData[i][j].unitID )->mCategory !=
-                                                                   mCurrentUnits.at( mData[mSelectedGridIndex.x][mSelectedGridIndex.y].unitID )->mCategory ) )
+                    else if( mData[i][j].isOccupied && mData[i][j].isPossibleAttackPosition && ( mCurrentUnits.at( static_cast<unsigned int>(mData[i][j].unitID) )->mCategory !=
+                                                                   mCurrentUnits.at( static_cast<unsigned int>(mData[static_cast<unsigned int>(mSelectedGridIndex.x)][static_cast<unsigned int>(mSelectedGridIndex.y)].unitID) )->mCategory ) )
                     {
                         ///
                         // ENTER COMBAT ALGORITHM HERE!!!!!!!!!!!!
                         ///
-                        mCurrentUnits.at( mData[i][j].unitID )->mConstitution = 0;
-                        mCurrentUnits[mWorld->getSelectedUnit()]->mHasSpentAction = true;
-                        removeUnit( sf::Vector2i( i, j ) );
+                        mCurrentUnits.at( static_cast<unsigned int>(mData[i][j].unitID) )->mConstitution = 0;
+                        mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mHasSpentAction = true;
+                        removeUnit( sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
                         clearGrid();
                     }
-                    else if( mData[i][j].buildingID != -1 ) // and building a spawnPoint??????????
+                    else if( mData[i][j].buildingID != -1 )
                     {
-                        if( mCurrentBuildings.at( mData[i][j].buildingID )->mType == "SpawnPoint" )
+                        if( mCurrentBuildings.at( static_cast<unsigned int>(mData[i][j].buildingID) )->mType == "SpawnPoint" )
                         {
-                            if( mCurrentBuildings.at( mData[i][j].buildingID )->mCategory & CURRENT_TURN )
+                            if( mCurrentBuildings.at( static_cast<unsigned int>(mData[i][j].buildingID) )->mCategory & CURRENT_TURN )
                             {
                                 clearGrid( );
                                 mWorld->setSelectedBuilding( mData[i][j].buildingID );
                                 mWorld->mStateStack->pushState( States::SpawnPointMenuState );
 
                                 // where to spawn the unit??
-                                std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( mWorld->getSelectedBuilding() )->mGridIndex, mWorld->getSelectedUnit(), 1 );
+                                std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( static_cast<unsigned int>(mWorld->getSelectedBuilding()) )->mGridIndex, static_cast<unsigned int>(mWorld->getSelectedUnit()), 1 );
 
                                 for( auto loc : possibleLocations )
                                 {
@@ -268,9 +268,23 @@ bool Grid::handleEvent( sf::Event event )
                                     mDrawableGrid[static_cast<unsigned int>( loc.x )][static_cast<unsigned int>( loc.y )]->getSprite()->setFillColor( sf::Color::Cyan );
                                 }
                             }
+                            else // enemy spawn point
+                            {
+                                auto building = mCurrentBuildings.at( static_cast<unsigned int>(mData[i][j].buildingID) );
+                                building->mCapturePercentage += 0.5f;
+                                if( building->mCapturePercentage >= 1.0f )
+                                {
+                                    if( building->mCategory & Category::Red )
+                                        building->mCategory = Category::BlueBuilding;
+                                    else if( building->mCategory & Category::Blue )
+                                        building->mCategory = Category::RedBuilding;
+                                    building->mCapturePercentage = 0.0f;
+                                }
+                                clearGrid( );
+                            }
                         }
                         else
-                            clearGrid();
+                            clearGrid(); // untill i add more buildings
                     }
                     else clearGrid( );
 

@@ -8,13 +8,11 @@ Building::Building( unsigned int mId, Category::Type category, BuildingData data
     this->mCategory     = category;
     this->mGoldPerTurn     = static_cast<unsigned int>( data.goldPerTurn );
     this->mTextureID    = data.textureID;
+    this->mCapturePercentage = 0.0f;
 
     this->mSprite = sf::Sprite( textures.get( TextureMap.at( data.textureID ) ) );
 
-    if( mCategory & Category::Blue )
-        this->mSprite.setColor( sf::Color::Blue );
-    else if( mCategory & Category::Red )
-        this->mSprite.setColor( sf::Color::Red );
+
 }
 
 unsigned int Building::getCategory( ) const
@@ -31,7 +29,10 @@ bool Building::isDestroyed( ) const
 }
 void Building::updateCurrent( sf::Time, CommandQueue& )
 {
-
+    if( mCategory & Category::Blue )
+        this->mSprite.setColor( sf::Color::Red ); // blue
+    else if( mCategory & Category::Red )
+        this->mSprite.setColor( sf::Color::Blue ); // red
 }
 void Building::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {

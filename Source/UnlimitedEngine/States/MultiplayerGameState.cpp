@@ -15,14 +15,14 @@
 sf::IpAddress getAddressFromFile( void )
 {
     { // Try to open existing file (RAII block)
-        std::ifstream inputFile("ip.txt");
+        std::ifstream inputFile("Core/ip.txt");
         std::string ipAddress;
         if (inputFile >> ipAddress)
             return ipAddress;
     }
 
     // If open/read failed, create new file
-    std::ofstream outputFile( "ip.txt" );
+    std::ofstream outputFile( "Core/ip.txt" );
     std::string localAddress = "127.0.0.1";
     outputFile << localAddress;
     return localAddress;
@@ -30,8 +30,7 @@ sf::IpAddress getAddressFromFile( void )
 
 MultiplayerGameState::MultiplayerGameState( States::ID id, StateStack& stack, Context context, bool isHost = false )
     : State( id, stack, context )
-    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, true )
-    , mWindow( *context.window )
+    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, LevelMap.at( "DemoMap" ), true, true )
     , mTextureManager( *context.textures )
     , mConnected( false )
     , mGameServer( nullptr )
@@ -57,19 +56,19 @@ MultiplayerGameState::MultiplayerGameState( States::ID id, StateStack& stack, Co
     mFailedConnectionText.setCharacterSize( 35 );
     mFailedConnectionText.setFillColor( sf::Color::White );
     centerOrigin( mFailedConnectionText );
-    mFailedConnectionText.setPosition( mWindow.getSize( ).x / 2.f, mWindow.getSize( ).y / 2.f );
+    mFailedConnectionText.setPosition( mWindow->getSize( ).x / 2.f, mWindow->getSize( ).y / 2.f );
 
     // Render a "establishing connection" frame for user feedback
-    mWindow.clear( sf::Color::Black );
-    mWindow.draw( mFailedConnectionText );
-    mWindow.display( );
+    mWindow->clear( sf::Color::Black );
+    mWindow->draw( mFailedConnectionText );
+    mWindow->display( );
     mFailedConnectionText.setString( "Could not connect to the remote server!" );
     centerOrigin( mFailedConnectionText );
 
     sf::IpAddress ip;
     if( isHost )
     {
-        mGameServer.reset( new GameServer( sf::Vector2f( mWindow.getSize( ) ) ) );
+        mGameServer.reset( new GameServer( sf::Vector2f( mWindow->getSize( ) ) ) );
         ip = "127.0.0.1";
     }
     else
@@ -102,17 +101,17 @@ void MultiplayerGameState::draw()
         mWorld.draw( );
 
         // Broadcast messages in default view
-        mWindow.setView( mWindow.getDefaultView( ) );
+        mWindow->setView( mWindow->getDefaultView( ) );
 
         if( !mBroadcasts.empty( ) )
-            mWindow.draw( mBroadcastText );
+            mWindow->draw( mBroadcastText );
 
         if( mLocalPlayerIdentifiers.size() < 2 && mPlayerInvitationTime < sf::seconds( 0.5f ) )
-            mWindow.draw( mPlayerInvitationText );
+            mWindow->draw( mPlayerInvitationText );
     }
     else
     {
-        mWindow.draw( mFailedConnectionText );
+        mWindow->draw( mFailedConnectionText );
     }
 }
 

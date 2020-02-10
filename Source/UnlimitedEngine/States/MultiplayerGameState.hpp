@@ -33,7 +33,6 @@ private:
 
 protected:
     World                       mWorld;
-    sf::RenderWindow&			mWindow;
     std::map<int, PlayerPtr>	mPlayers;
 
     TextureManager&             mTextureManager;

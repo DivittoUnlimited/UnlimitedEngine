@@ -6,5 +6,14 @@ TO_DO LIST:
         -or to pop battleState back to conquestOverviewState?
             - just leave Conquest state alive and make pause state remove itself and gamestate only
             - or use GAME_MODE
-    - Mouse should handle gui's as well.
     - Make camera pan with mouse, as well as arrow keys
+    - Setup "AI"'s turn in single player GameState
+        - Solve 2 player over network first
+            - use that system to abstract AI player
+            - possibly break up world into single and multiplayer children versions that have own update and handle event
+                - would then add new GameStates that call the various versions of world.
+                    - player vs AI
+                    - player vs player online
+                    - player vs player couch coop
+                    - AI vs AI
+        - flesh out grid interface (simplify handleEvent) so that AI has the same options as player.

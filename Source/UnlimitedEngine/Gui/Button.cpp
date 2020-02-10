@@ -1,6 +1,7 @@
 #include "Button.hpp"
 #include "Core/Utility.hpp"
 #include "Game/DataTables.hpp"
+#include "Core/Globals.hpp"
 
 
 #include <SFML/Window/Event.hpp>
@@ -24,7 +25,7 @@ Button::Button( const FontManager& fonts, const TextureManager& textures )
     mSprite.setTexture( mTexture );
     mSprite.setTextureRect( mNormal );
 
-    sf::FloatRect bounds = mSprite.getLocalBounds( );
+    sf::FloatRect bounds = mSprite.getGlobalBounds( );
     mText.setPosition( bounds.width / 2.f, bounds.height / 2.f );
 }
 
@@ -42,6 +43,11 @@ void Button::setText( const std::string& text )
 void Button::setToggle( bool flag )
 {
 	mIsToggle = flag;
+}
+
+bool Button::contains( float x, float y )
+{
+    return sf::FloatRect( this->getPosition(), sf::Vector2f( mSprite.getTextureRect().width, mSprite.getTextureRect().height ) ).contains( x, y );
 }
 
 bool Button::isSelectable( ) const
@@ -93,8 +99,9 @@ void Button::deactivate( )
 	}
 }
 
-void Button::handleEvent( const sf::Event& )
+void Button::handleEvent( const sf::Event& event )
 {
+
 }
 
 void Button::draw( sf::RenderTarget& target, sf::RenderStates states ) const
