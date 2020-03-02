@@ -7,22 +7,27 @@
 KeyBinding::KeyBinding( int controlPreconfiguration )
 : mKeyMap( )
 {
+    /*
+     * Demo for when you want to add camera later
+     *
+     *
 	// Set initial key bindings for player 1
     if( controlPreconfiguration == 1 )
 	{
-		mKeyMap[sf::Keyboard::Left]	 = PlayerAction::MoveLeft;
-		mKeyMap[sf::Keyboard::Right] = PlayerAction::MoveRight;
-        mKeyMap[sf::Keyboard::Up]    = PlayerAction::MoveUp;
-		mKeyMap[sf::Keyboard::Space] = PlayerAction::Fire;
+        mKeyMap[sf::Keyboard::Left]	 = PlayerAction::MoveUnit;
+        mKeyMap[sf::Keyboard::Right] = PlayerAction::AttackUnit;
+        mKeyMap[sf::Keyboard::Up]    = PlayerAction::AttackBuilding;
+        mKeyMap[sf::Keyboard::Space] = PlayerAction::CaptureBuilding;
 	}
     else if( controlPreconfiguration == 2 )
 	{
 		// Player 2
-		mKeyMap[sf::Keyboard::A] = PlayerAction::MoveLeft;
-		mKeyMap[sf::Keyboard::D] = PlayerAction::MoveRight;
-        mKeyMap[sf::Keyboard::W] = PlayerAction::MoveUp;
-        mKeyMap[sf::Keyboard::LShift] = PlayerAction::Fire;
+        mKeyMap[sf::Keyboard::A] = PlayerAction::MoveUnit;
+        mKeyMap[sf::Keyboard::D] = PlayerAction::AttackUnit;
+        mKeyMap[sf::Keyboard::W] = PlayerAction::AttackBuilding;
+        mKeyMap[sf::Keyboard::LShift] = PlayerAction::CaptureBuilding;
 	}
+    */
 }
 
 void KeyBinding::assignKey( Action action, sf::Keyboard::Key key )
@@ -80,8 +85,9 @@ std::vector<KeyBinding::Action> KeyBinding::getRealtimeActions() const
 	return actions;
 }
 
-bool isRealtimeAction( PlayerAction::Type action )
+bool isRealtimeAction( PlayerAction::Type )
 {
+    /*
 	switch (action)
 	{
 		case PlayerAction::MoveLeft:
@@ -93,4 +99,6 @@ bool isRealtimeAction( PlayerAction::Type action )
 		default:
 			return false;
 	}
+    */
+    return false; // this game has no realtime actions yet
 }

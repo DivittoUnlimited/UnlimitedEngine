@@ -21,6 +21,7 @@
 #include "States/StoryModeSetupState.hpp"
 #include "States/CutSceneState.hpp"
 #include "States/BattleStatScreen.hpp"
+#include "States/SinglePlayerBattle.hpp"
 #include "Game/DataTables.hpp"
 #include "Globals.hpp"
 
@@ -35,7 +36,7 @@ const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default );
 GameModes::ID GAME_MODE = GameModes::NONE;
 States::ID CURRENT_LEVEL = States::Level1;
-Category::Type CURRENT_TURN = Category::Red;
+Category::Type CURRENT_TURN = Category::Blue;
 
 Application::Application( )
     : mTextures( )
@@ -142,7 +143,7 @@ void Application::registerStates( )
     mStateStack.registerState<MenuState>                ( States::Menu                  );
     mStateStack.registerState<MultiplayerGameState>     ( States::HostGame,      true   );
     mStateStack.registerState<MultiplayerGameState>     ( States::JoinGame,      false  );
-    mStateStack.registerState<PauseState>               ( States::Pause                 );
+    mStateStack.registerState<PauseState>               ( States::Pause,         false  );
     mStateStack.registerState<MessageBoxState>          ( States::MessageBox            );
     mStateStack.registerState<SinglePlayerMenuState>    ( States::SinglePlayerMenuState );
     mStateStack.registerState<QuickBattleSetupState>    ( States::QuickBattleSetupState );
@@ -152,18 +153,32 @@ void Application::registerStates( )
     mStateStack.registerState<ShopState>                ( States::ShopState );
     mStateStack.registerState<StoryModeSetupState>      ( States::StoryModeSetupState );
     mStateStack.registerState<BattleStatScreen>         ( States::BattleStatScreen );
+    mStateStack.registerState<PauseState>               ( States::NetworkPause, true );
 
-    // Levels
-    mStateStack.registerState<GameState>                ( States::Level1, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level2, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level3, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level4, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level5, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level6, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level7, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level8, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level9, LevelMap.at( "DemoMap" ) );
-    mStateStack.registerState<GameState>                ( States::Level10, LevelMap.at( "DemoMap" ) );
+    // Levels 1 Player vs A.I
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel1, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel2, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel3, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel4, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel5, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel6, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel7, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel8, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel9, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel10, LevelMap.at( "TacticsTribeDemoLevel" ) );
+
+
+    // Levels (2 player local machine)
+    mStateStack.registerState<GameState>                ( States::Level1, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level2, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level3, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level4, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level5, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level6, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level7, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level8, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level9, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level10, LevelMap.at( "TacticsTribeDemoLevel" ) );
 
     // CutScenes
     mStateStack.registerState<CutSceneState>            ( States::IntroCutSceneDialogState, States::Level1 );

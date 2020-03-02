@@ -2,49 +2,20 @@
 #include "CommandQueue.hpp"
 
 #include "NetworkProtocol.hpp"
+#include "Game/Grid.hpp"
+#include "Core/Globals.hpp"
 
 #include <SFML/Network/Packet.hpp>
 #include <map>
 #include <string>
 #include <algorithm>
 #include <math.h>
-/*
-///
-/// \brief The ActorMover struct
-/// Functor to move the player based on velocity and the delta time for this frame.
-struct StarShipMover
-{
-    StarShipMover( float vx, float vy )
-    : velocity( vx, vy )
-    {
-    }
-    void operator( )( StarShip& starShip, sf::Time ) const
-    {
-        starShip.accelerate( velocity * starShip.speed( ) );
-    }
-    sf::Vector2f velocity;
-};
 
-struct AircraftFireTrigger
-{
-    AircraftFireTrigger(int identifier)
-    : ID(identifier)
-    {
-    }
 
-    void operator( ) ( StarShip& starShip, sf::Time ) const
-    {
-        if( starShip.getIdentifier( ) == ID )
-            starShip.fire( );
-    }
-
-    int ID;
-};
-*/
 Player::Player( sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding )
     : mKeyBinding( binding )
-    , mIdentifier( identifier )
     , mSocket( socket )
+    , mIdentifier( identifier )
     {
         // Set initial action bindings
         initializeActions( );
@@ -62,7 +33,31 @@ Player::Player( sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* b
 
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 {
-    if( event.type == sf::Event::KeyPressed )
+    if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
+    {
+        // Network connected -> send event over network
+        if( mSocket )
+        {
+            sf::Packet packet;
+            float x = sf::Mouse::getPosition(*mWindow).x;
+            float y = sf::Mouse::getPosition(*mWindow).y;
+            packet << static_cast<sf::Int32>( Client::LeftClick );
+            packet << mIdentifier;
+            packet << x;
+            packet << y;
+            mSocket->send( packet );
+        }
+        // Network disconnected -> local event
+        else
+        {
+            Command com;
+            com.category = Category::Grid;
+            com.action = derivedAction<Grid>( [] ( Grid& g, sf::Time ){ g.handleLeftClick( sf::Mouse::getPosition( *mWindow ) ); } );
+            commands.push( com );
+        }
+    }
+    /*
+    else if( event.type == sf::Event::KeyPressed )
     {
         PlayerAction::Type action;
         if( mKeyBinding && mKeyBinding->checkAction( event.key.code, action ) && !isRealtimeAction( action ) )
@@ -99,6 +94,7 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
             }
         }
     }
+    */
 }
 
 bool Player::isLocal( void ) const
@@ -136,30 +132,33 @@ void Player::handleRealtimeInput( CommandQueue& commands )
             // else
                  // std::cout << "Joystick " << i << " is NOT connected!" << std::endl;
          //}
+
+        /*
+         *
+         *  Demo saved for when you want to add camera control
         if( this->mIdentifier == Category::Player )
         {
             if( sf::Joystick::getAxisPosition( 0, sf::Joystick::Y ) < 0 ) // move forward
-                commands.push( mActionBinding[PlayerAction::MoveUp] );
+                commands.push( mActionBinding[PlayerAction::MoveUnit] );
             else if( sf::Joystick::getAxisPosition( 0, sf::Joystick::X ) > 0 ) // rotate right
-                commands.push( mActionBinding[PlayerAction::MoveRight] );
+                commands.push( mActionBinding[PlayerAction::AttackUnit] );
             else if( sf::Joystick::getAxisPosition( 0, sf::Joystick::X ) < 0 )
-                commands.push( mActionBinding[PlayerAction::MoveLeft] );
-
-            if( sf::Joystick::isButtonPressed( 0, 1 ) )
-                commands.push( mActionBinding[PlayerAction::Fire] );
+                commands.push( mActionBinding[PlayerAction::AttackBuilding] );
+            else if( sf::Joystick::isButtonPressed( 0, 1 ) )
+                commands.push( mActionBinding[PlayerAction::CaptureBuilding] );
         }
         else if( this->mIdentifier == Category::Player2 )
         {
             if( sf::Joystick::getAxisPosition( 1, sf::Joystick::Y ) < 0 ) // move forward
-                commands.push( mActionBinding[PlayerAction::MoveUp] );
+                commands.push( mActionBinding[PlayerAction::MoveUnit] );
             else if( sf::Joystick::getAxisPosition( 1, sf::Joystick::X ) > 0 ) // rotate right
-                commands.push( mActionBinding[PlayerAction::MoveRight] );
+                commands.push( mActionBinding[PlayerAction::AttackUnit] );
             else if( sf::Joystick::getAxisPosition( 1, sf::Joystick::X ) < 0 )
-                commands.push( mActionBinding[PlayerAction::MoveLeft] );
-            if( sf::Joystick::isButtonPressed( 1, 1 ) )
-                commands.push( mActionBinding[PlayerAction::Fire] );
+                commands.push( mActionBinding[PlayerAction::AttackBuilding] );
+            else if( sf::Joystick::isButtonPressed( 1, 1 ) )
+                commands.push( mActionBinding[PlayerAction::CaptureBuilding] );
         }
-
+*/
         // Lookup all actions and push corresponding commands to queue
         std::vector<PlayerAction::Type> activeActions = mKeyBinding->getRealtimeActions( );
         for( PlayerAction::Type action : activeActions )
@@ -180,17 +179,16 @@ void Player::handleRealtimeNetworkInput(CommandQueue& commands)
     }
 }
 
-void Player::handleNetworkEvent(PlayerAction::Type action, CommandQueue& commands )
+void Player::handleNetworkEvent(PlayerAction::Type action, CommandQueue& commands, sf::Vector2i pos )
 {
-    commands.push( mActionBinding[action] );
+    if( action == PlayerAction::LeftClick )
+    {
+        Command com;
+        com.category = Category::Grid;
+        com.action = derivedAction<Grid>( [pos] ( Grid& g, sf::Time ){ g.handleLeftClick( pos ); } );
+        commands.push( com );
+    }
 }
 
-void Player::handleNetworkRealtimeChange(PlayerAction::Type action, bool actionEnabled )
-{
-    mActionProxies[action] = actionEnabled;
-}
-
-void Player::initializeActions( )
-{
-
-}
+void Player::handleNetworkRealtimeChange(PlayerAction::Type action, bool actionEnabled ) { mActionProxies[action] = actionEnabled; }
+void Player::initializeActions( ) { }

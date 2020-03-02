@@ -13,19 +13,14 @@ GameServer::RemotePeer::RemotePeer( void )
     socket.setBlocking( false );
 }
 
-GameServer::GameServer( sf::Vector2f battlefieldSize )
+GameServer::GameServer( sf::Vector2f )
 : mThread( &GameServer::executionThread, this )
 , mListeningState( false )
-, mClientTimeoutTime( sf::seconds( 3.f ) )
-, mMaxConnectedPlayers( 2 )
+, mClientTimeoutTime( sf::seconds( 10.f ) )
+, mMaxConnectedPlayers( 5 )
 , mConnectedPlayers( 0 )
-, mBattleFieldRect( 0.f, 0.0f, battlefieldSize.x, battlefieldSize.y )
-, mShipCount( 0 )
 , mPeers( 1 )
-, mShipIdentifierCounter( 1 )
 , mWaitingThreadEnd( false )
-, mLastSpawnTime( sf::Time::Zero )
-, mTimeForNextSpawn( sf::seconds( 5.f ) )
 {
     mListenerSocket.setBlocking( false );
     mPeers[0].reset( new RemotePeer( ) );
@@ -34,11 +29,11 @@ GameServer::GameServer( sf::Vector2f battlefieldSize )
 
 GameServer::~GameServer( void )
 {
-	mWaitingThreadEnd = true;
+    mWaitingThreadEnd = true;
     mThread.wait( );
 }
 
-void GameServer::notifyPlayerRealtimeChange( sf::Int32 shipIdentifier, sf::Int32 action, bool actionEnabled )
+void GameServer::notifyPlayerRealtimeChange( sf::Int32 playerIdentifier, sf::Int32 action, bool actionEnabled )
 {
     for( std::size_t i = 0; i < mConnectedPlayers; ++i )
 	{
@@ -46,7 +41,7 @@ void GameServer::notifyPlayerRealtimeChange( sf::Int32 shipIdentifier, sf::Int32
 		{
 			sf::Packet packet;
             packet << static_cast<sf::Int32>( Server::PlayerRealtimeChange );
-            packet << shipIdentifier;
+            packet << playerIdentifier;
 			packet << action;
 			packet << actionEnabled;
 
@@ -55,31 +50,34 @@ void GameServer::notifyPlayerRealtimeChange( sf::Int32 shipIdentifier, sf::Int32
 	}
 }
 
-void GameServer::notifyPlayerEvent( sf::Int32 shipIdentifier, sf::Int32 action )
+void GameServer::notifyPlayerEvent( sf::Int32 identifier, sf::Int32 action, sf::Vector2i pos )
 {
     for( std::size_t i = 0; i < mConnectedPlayers; ++i )
 	{
         if( mPeers[i]->ready )
 		{
-			sf::Packet packet;
-            packet << static_cast<sf::Int32>( Server::PlayerEvent );
-            packet << shipIdentifier;
-			packet << action;
-
+            sf::Packet packet;
+            packet << action;
+            packet << identifier;
+            packet << pos.x;
+            packet << pos.y;
             mPeers[i]->socket.send( packet );
 		}
-	}
+	}  
 }
 
-void GameServer::notifyPlayerSpawn( sf::Int32 shipIdentifier )
+void GameServer::notifyPlayerSpawn( void )
 {
     for( std::size_t i = 0; i < mConnectedPlayers; ++i )
-	{
+    {
         if( mPeers[i]->ready )
 		{
+            broadcastMessage( "New Player!" );
 			sf::Packet packet;
             packet << static_cast<sf::Int32>( Server::PlayerConnect );
-            packet << shipIdentifier << mShipInfo[shipIdentifier].position.x << mShipInfo[shipIdentifier].position.y;
+
+            // load gold and devotion points??
+            packet << static_cast<unsigned int>( mConnectedPlayers );
             mPeers[i]->socket.send( packet );
 		}
 	}
@@ -144,80 +142,9 @@ void GameServer::tick( void )
 {
     updateClientState(  );
 
-    // Check victory conditions
-    /* BOOK Example
-	// Check for mission success = all planes with position.y < offset
-	bool allAircraftsDone = true;
-    for( auto pair : mAircraftInfo )
-	{
-		// As long as one player has not crossed the finish line yet, set variable to false
-        if( pair.second.position.y > 0.f )
-			allAircraftsDone = false;
-	}
-    if( allAircraftsDone )
-	{
-		sf::Packet missionSuccessPacket;
-        missionSuccessPacket << static_cast<sf::Int32>( Server::MissionSuccess );
-        sendToAll( missionSuccessPacket );
-	}
-    ============================================================
-    */
+    // check for victory conditions
 
-    // Remove destroyed objects (More than likely not relevant since ships don't get destroyed they get sent to Penalty box.)
-	// Remove IDs of aircraft that have been destroyed (relevant if a client has two, and loses one)
-    /* BOOK EXAMPLE
-    for( auto itr = mAircraftInfo.begin( ); itr != mAircraftInfo.end( ); )
-	{
-        if( itr->second.hitpoints <= 0 )
-            mAircraftInfo.erase( itr++ );
-		else
-			++itr;
-	}
-    ===============================================================
-    */
-
-    // run game logic
-    /* BOOK EXAMPLE
-	// Check if its time to attempt to spawn enemies
-    if( now( ) >= mTimeForNextSpawn + mLastSpawnTime )
-	{	
-		// No more enemies are spawned near the end
-        if( mBattleFieldRect.top > 600.f )
-		{
-            std::size_t enemyCount = 1u + randomInt( 2 );
-            float spawnCenter = static_cast<float>( randomInt( 500 ) - 250 );
-
-			// In case only one enemy is being spawned, it appears directly at the spawnCenter
-			float planeDistance = 0.f;
-			float nextSpawnPosition = spawnCenter;
-			
-			// In case there are two enemies being spawned together, each is spawned at each side of the spawnCenter, with a minimum distance
-            if( enemyCount == 2 )
-			{
-                planeDistance = static_cast<float>( 150 + randomInt( 250 ) );
-				nextSpawnPosition = spawnCenter - planeDistance / 2.f;
-			}
-
-			// Send the spawn orders to all clients
-            for( std::size_t i = 0; i < enemyCount; ++i )
-			{
-				sf::Packet packet;
-                packet << static_cast<sf::Int32>( Server::SpawnEnemy );
-                packet << static_cast<sf::Int32>( 1 + randomInt( Aircraft::TypeCount-1 ) );
-				packet << mWorldHeight - mBattleFieldRect.top + 500;
-				packet << nextSpawnPosition;
-
-				nextSpawnPosition += planeDistance / 2.f;
-
-                sendToAll( packet );
-			}
-
-            mLastSpawnTime = now( );
-            mTimeForNextSpawn = sf::milliseconds( 2000 + randomInt( 6000 ) );
-		}
-	}
-    ======================================================================
-    */
+    // Run Game logic here
 }
 
 sf::Time GameServer::now( void ) const
@@ -244,16 +171,16 @@ void GameServer::handleIncomingPackets( void )
                 packet.clear( );
 			}
 
-            if( now( ) >= peer->lastPacketTime + mClientTimeoutTime )
-			{
-				peer->timedOut = true;
-				detectedTimeout = true;
-			}
+            //if( now( ) >= peer->lastPacketTime + mClientTimeoutTime )
+            //{
+            //	peer->timedOut = true;
+            //	detectedTimeout = true;
+            //}
 		}
 	}
 
-    if( detectedTimeout )
-        handleDisconnections( );
+    //if( detectedTimeout )
+    //    handleDisconnections( );
 }
 
 void GameServer::handleIncomingPacket( sf::Packet& packet, RemotePeer& receivingPeer, bool& detectedTimeout )
@@ -273,82 +200,16 @@ void GameServer::handleIncomingPacket( sf::Packet& packet, RemotePeer& receiving
 		{
             sf::Int32 identifier;
 			sf::Int32 action;
-            packet >> identifier >> action;
+            sf::Vector2i pos;
+            packet >> identifier >> action >> pos.x >> pos.y;
 
-            notifyPlayerEvent( identifier, action );
+            notifyPlayerEvent( identifier, action, pos );
 		} break;
-
-		case Client::PlayerRealtimeChange:
+    case Client::GameEvent:
 		{
-            sf::Int32 shipIdentifier;
-			sf::Int32 action;
-			bool actionEnabled;
-            packet >> shipIdentifier >> action >> actionEnabled;
-            mShipInfo[shipIdentifier].realtimeActions[action] = actionEnabled;
-            notifyPlayerRealtimeChange( shipIdentifier, action, actionEnabled );
-		} break;
-
-		case Client::RequestCoopPartner:
-		{
-            std::cout << "Attempting to connect Player2" << std::endl;
-            receivingPeer.shipIdentifiers.push_back( mShipIdentifierCounter );
-            mShipInfo[mShipIdentifierCounter].position = sf::Vector2f( 512, 100 );
-            mShipInfo[mShipIdentifierCounter].hitpoints = 100;
-
-			sf::Packet requestPacket;
-			requestPacket << static_cast<sf::Int32>(Server::AcceptCoopPartner);
-            requestPacket << mShipIdentifierCounter;
-            requestPacket << mShipInfo[mShipIdentifierCounter].position.x;
-            requestPacket << mShipInfo[mShipIdentifierCounter].position.y;
-
-            receivingPeer.socket.send( requestPacket );
-            mShipCount++;
-
-			// Inform every other peer about this new plane
-            for( PeerPtr& peer : mPeers )
-			{
-                if( peer.get( ) != &receivingPeer && peer->ready )
-				{
-					sf::Packet notifyPacket;
-                    notifyPacket << static_cast<sf::Int32>( Server::PlayerConnect );
-                    notifyPacket << mShipIdentifierCounter;
-                    notifyPacket << mShipInfo[mShipIdentifierCounter].position.x;
-                    notifyPacket << mShipInfo[mShipIdentifierCounter].position.y;
-                    peer->socket.send( notifyPacket );
-				}
-			}
-            mShipIdentifierCounter++;
-		} break;
-
-		case Client::PositionUpdate:
-		{
-            sf::Int32 numShips;
-            packet >> numShips;
-
-            for( sf::Int32 i = 0; i < numShips; ++i )
-			{
-                sf::Int32 shipIdentifier;
-                sf::Int32 shipHitpoints;
-                sf::Vector2f shipPosition;
-                packet >> shipIdentifier >> shipPosition.x >> shipPosition.y >> shipHitpoints;
-                mShipInfo[shipIdentifier].position = shipPosition;
-                mShipInfo[shipIdentifier].hitpoints = shipHitpoints;
-			}
-		} break;
-
-		case Client::GameEvent:
-		{
-			sf::Int32 action;
-			float x;
-			float y;
-
-			packet >> action;
-			packet >> x;
-			packet >> y;
-
 			// Enemy explodes: With certain probability, drop pickup
 			// To avoid multiple messages spawning multiple pickups, only listen to first peer (host)
-            if( action == GameActions::EnemyExplode && randomInt( 3 ) == 0 && &receivingPeer == mPeers[0].get( ) )
+            //if( action == GameActions::EnemyExplode && randomInt( 3 ) == 0 && &receivingPeer == mPeers[0].get( ) )
 			{
                 /* BOOK EXAMPLE
 				sf::Packet packet;
@@ -360,54 +221,84 @@ void GameServer::handleIncomingPacket( sf::Packet& packet, RemotePeer& receiving
 				sendToAll(packet);
                 */
 			}
-		}
+        }break;
+    case Client::LeftClick:
+    {
+        float x;
+        float y;
+        sf::Int32 identifier;
+        packet >> identifier;
+        packet >> x;
+        packet >> y;
+        notifyPlayerEvent( identifier, Server::LeftClick, sf::Vector2i( x, y ) );
+    }break;
+    case Client::RightClick:
+    {
+
+    }break;
+    case Client::ChangeTurn:
+    {
+        sf::Packet packet;
+        packet << static_cast<sf::Int32>( Server::ChangeTurn );
+        sendToAll( packet );
+    }break;
+    case Client::SpawnUnit:
+    {
+        sf::Int32 unitType;
+        float x;
+        float y;
+        packet >> unitType;
+        packet >> x;
+        packet >> y;
+        sf::Packet unitPacket;
+        unitPacket << static_cast<sf::Int32>( Server::SpawnUnit );
+        unitPacket << unitType;
+        unitPacket << x;
+        unitPacket << y;
+        sendToAll( unitPacket );
+    }break;
 	}
 }
 
 void GameServer::updateClientState( void )
 {
-	sf::Packet updateClientStatePacket;
-    updateClientStatePacket << static_cast<sf::Int32>( Server::UpdateClientState );
-    // updateClientStatePacket << static_cast<float>( mBattleFieldRect.top + mBattleFieldRect.height );
-    updateClientStatePacket << static_cast<sf::Int32>( mShipInfo.size( ) );
+    // update the position and stats of all buildings and units to each client here
+    //sf::Packet updateClientStatePacket;
+    //updateClientStatePacket << static_cast<sf::Int32>( Server::UpdateClientState );
 
-    for( auto ship : mShipInfo )
-        updateClientStatePacket << ship.first << ship.second.position.x << ship.second.position.y;
+    // update unit positions and stats
+    //for( auto unit : this->mUnits )
+        //updateClientStatePacket << unit.first << unit.second.position.x << unit.second.position.y;
 
-    sendToAll( updateClientStatePacket );
+    // update building stats
+
+    //sendToAll( updateClientStatePacket );
 }
 
 void GameServer::handleIncomingConnections( void )
 {
-    if( !mListeningState )
-		return;
+    if( mListeningState && mListenerSocket.accept( mPeers[mConnectedPlayers]->socket ) == sf::TcpListener::Done )
+    {
+        sf::Packet packet;
+        packet << static_cast<sf::Int32>( Server::SpawnSelf );
+        packet << static_cast<sf::Int32>( mConnectedPlayers );
+        packet << 0;
+        packet << 0;
 
-    if( mListenerSocket.accept( mPeers[mConnectedPlayers]->socket ) == sf::TcpListener::Done )
-	{
-		// order the new client to spawn its own plane ( player 1 )
-        mShipInfo[mShipIdentifierCounter].position = sf::Vector2f( 512.0f, 500.0f );
-        mShipInfo[mShipIdentifierCounter].hitpoints = 100;
+        if( mConnectedPlayers > 0 ) mPeers[mConnectedPlayers]->teamColor = Category::Red;
+        else mPeers[mConnectedPlayers]->teamColor = Category::Blue;
 
-		sf::Packet packet;
-		packet << static_cast<sf::Int32>(Server::SpawnSelf);
-        packet << mShipIdentifierCounter;
-        packet << mShipInfo[mShipIdentifierCounter].position.x;
-        packet << mShipInfo[mShipIdentifierCounter].position.y;
-		
-        mPeers[mConnectedPlayers]->shipIdentifiers.push_back( mShipIdentifierCounter );
-		
-		broadcastMessage("New player!");
-		informWorldState(mPeers[mConnectedPlayers]->socket);
-        notifyPlayerSpawn(mShipIdentifierCounter++);
+        packet << static_cast<sf::Int32>( mPeers[mConnectedPlayers]->teamColor );
 
-		mPeers[mConnectedPlayers]->socket.send(packet);
+        mPeers[mConnectedPlayers]->socket.send(packet);
 		mPeers[mConnectedPlayers]->ready = true;
 		mPeers[mConnectedPlayers]->lastPacketTime = now(); // prevent initial timeouts
-        mShipCount++;
-		mConnectedPlayers++;
 
-		if (mConnectedPlayers >= mMaxConnectedPlayers)
-			setListening(false);
+        mConnectedPlayers++;
+        notifyPlayerSpawn( );
+
+        if( mConnectedPlayers >= mMaxConnectedPlayers )
+            setListening( false );
 		else // Add a new waiting peer
             mPeers.push_back( PeerPtr( new RemotePeer( ) ) );
 	}
@@ -415,25 +306,19 @@ void GameServer::handleIncomingConnections( void )
 
 void GameServer::handleDisconnections( )
 {
+    /*
     for( auto itr = mPeers.begin( ); itr != mPeers.end(); )
 	{
         if( (*itr)->timedOut )
 		{
-			// Inform everyone of the disconnection, erase 
-            for( sf::Int32 identifier : (*itr)->shipIdentifiers )
-			{
-                sendToAll( sf::Packet( ) << static_cast<sf::Int32>( Server::PlayerDisconnect ) << identifier );
-                mShipInfo.erase( identifier );
-			}
-
 			mConnectedPlayers--;
-            mShipCount -= (*itr)->shipIdentifiers.size( );
+
             itr = mPeers.erase( itr );
 
 			// Go back to a listening state if needed
             if( mConnectedPlayers < mMaxConnectedPlayers )
 			{
-                mPeers.push_back(PeerPtr(new RemotePeer( ) ) );
+                mPeers.push_back( PeerPtr( new RemotePeer( ) ) );
                 setListening( true );
 			}
 				
@@ -444,26 +329,22 @@ void GameServer::handleDisconnections( )
 			++itr;
 		}
 	}
+    */
 }
 
 // Tell the newly connected peer about how the world is currently
-void GameServer::informWorldState( sf::TcpSocket& socket )
+void GameServer::informWorldState( sf::TcpSocket& )
 {
+    /*
+     *  This packet is not handled client side.
+     *
 	sf::Packet packet;
     packet << static_cast<sf::Int32>( Server::InitialState );
     //packet << mWorldHeight << mBattleFieldRect.top + mBattleFieldRect.height;
-    packet << static_cast<sf::Int32>( mShipCount );
-
-    for( std::size_t i = 0; i < mConnectedPlayers; ++i )
-	{
-        if( mPeers[i]->ready )
-		{
-            for( sf::Int32 identifier : mPeers[i]->shipIdentifiers )
-                packet << identifier << mShipInfo[identifier].position.x << mShipInfo[identifier].position.y << mShipInfo[identifier].hitpoints;
-		}
-	}
+    packet << static_cast<sf::Int32>( mConnectedPlayers );
 
     socket.send( packet );
+    */
 }
 
 void GameServer::broadcastMessage( const std::string& message )

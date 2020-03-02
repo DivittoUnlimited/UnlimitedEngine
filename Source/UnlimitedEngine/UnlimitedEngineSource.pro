@@ -36,6 +36,7 @@ DISTFILES += \
     Media/Textures/DemoLevel.png \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Media/Textures/Girl.png \
+    Media/Textures/HeavyInfantry.png \
     Media/Textures/LightInfantry.png \
     Media/Textures/Particle.png \
     Media/Textures/SpawnPoint.png \
@@ -59,6 +60,9 @@ HEADERS += \
     Core/NetworkNode.hpp \
     Core/NetworkProtocol.hpp \
     Core/ParallelTask.hpp \
+    Core/PathFinder.cpp.autosave \
+    Core/PathFinder.hpp \
+    Core/PathFinder.inl \
     Core/Player.hpp \
     Core/ResourceIdentifiers.hpp \
     Core/ResourceManager.hpp \
@@ -76,6 +80,7 @@ HEADERS += \
     Game/DataTables.hpp \
     Game/Grid.hpp \
     Game/Unit.hpp \
+    Game/WifeBot.hpp \
     Game/World.hpp \
     Graphics/Animation.hpp \
     Graphics/BloomEffect.hpp \
@@ -110,6 +115,7 @@ HEADERS += \
     States/QuickBattleSetupState.hpp \
     States/SettingsState.hpp \
     States/ShopState.hpp \
+    States/SinglePlayerBattle.hpp \
     States/SinglePlayerMenuState.hpp \
     States/SpawnPointMenuState.hpp \
     States/SplashScreen.hpp \
@@ -165,6 +171,7 @@ SOURCES += \
     Game/DataTables.cpp \
     Game/Grid.cpp \
     Game/Unit.cpp \
+    Game/WifeBot.cpp \
     Game/World.cpp \
     Graphics/Animation.cpp \
     Graphics/BloomEffect.cpp \
@@ -197,6 +204,7 @@ SOURCES += \
     States/QuickBattleSetupState.cpp \
     States/SettingsState.cpp \
     States/ShopState.cpp \
+    States/SinglePlayerBattle.cpp \
     States/SinglePlayerMenuState.cpp \
     States/SpawnPointMenuState.cpp \
     States/SplashScreen.cpp \

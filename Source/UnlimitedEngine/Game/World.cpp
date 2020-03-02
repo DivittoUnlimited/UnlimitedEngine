@@ -5,6 +5,10 @@
 #include "Gui/Button.hpp"
 #include "States/EndTurnMenuState.hpp"
 #include "States/SpawnPointMenuState.hpp"
+#include "Core/GameServer.hpp"
+#include "Game/WifeBot.hpp"
+#include "Graphics/TextNode.hpp"
+#include <SFML/Network.hpp>
 
 enum Layers {
     ObjectLayer = 0
@@ -14,7 +18,7 @@ namespace
 {
     const std::vector<UnitTypeData> UnitDataTable = initializeUnitTypeData;  // initializeUnitTypeData in DataTable.hpp
     const std::vector<BuildingData> BuildingDataTable = initializeBuildingTypeData;  // initializeBuildingData in DataTable.hpp
-
+    const std::vector<std::vector<int>> UnitMoveCost = inititializeUnitMovementCostTable;
 }
 
 World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked, bool isLocalMultiplayer )
@@ -32,17 +36,17 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mNetworkNode( nullptr )
     , mWorldContext( *context )
     , mStateStack( stack )
-    , mMovementGrid( this )
+    , mMovementGrid( nullptr )
     , mLevel( level )
     , mSelectedBuilding( -1 )
+    , mCurrentTurn( Category::Blue )
+    , mClientTeamColor( Category::Blue )
 {
     if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
-    //mWorldView.zoom( 2.0 );
-   // mWorldView.move( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 );
+    // mWorldView.zoom( 2.0 );
+    // mWorldView.move( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 );
     mSceneTexture.setView( mWorldView );
-
-    this->registerStates();
-
+    this->registerStates( );
     buildScene( MediaFileMap.at( "Maps" ).at( mLevel ) );
 }
 
@@ -52,7 +56,7 @@ World::~World( void )
 
 void World::draw( )
 {
-    if( !PostEffect::isSupported( ) )
+    if( PostEffect::isSupported( ) )
     {
         mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
         mSceneTexture.setView( mWorldView );
@@ -71,13 +75,9 @@ void World::draw( )
 
 bool World::update( sf::Time dt )
 {
-    while( !mCommandQueue.isEmpty( ) )
-        mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
-
+    while( !mCommandQueue.isEmpty( ) ) mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     try{ mSceneGraph.update( dt, mCommandQueue ); }
-    catch( std::exception& e ) {
-        std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl;
-    }
+    catch( std::exception& e ) { std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl; }
     /*
         try{ handleCollisions( ); }
         catch( std::exception& e ) {
@@ -88,67 +88,58 @@ bool World::update( sf::Time dt )
     return true;
 }
 
-CommandQueue& World::getCommandQueue( )
-{
-    return mCommandQueue;
-}
+CommandQueue& World::getCommandQueue( ) { return mCommandQueue; }
 
-bool World::pollGameAction( GameActions::Action& out )
-{
-    return mNetworkNode->pollGameAction( out );
-}
+bool World::pollGameAction( GameActions::Action& out ) { return mNetworkNode->pollGameAction( out ); }
 
 bool World::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Category::Type type1, Category::Type type2 )
 {
     unsigned int category1 = colliders.first->getCategory( );
     unsigned int category2 = colliders.second->getCategory( );
-
     // Make sure first pair entry has category type1 and second has type2
-    if( type1 & category1 && type2 & category2 )
-    {
-        return true;
-    }
+    if( type1 & category1 && type2 & category2 ) return true;
     else if( type1 & category2 && type2 & category1 )
     {
         std::swap( colliders.first, colliders.second );
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 void World::handleEvent( const sf::Event& event )
 {
-    if( event.type == sf::Event::MouseButtonReleased )
-    {
-        mMovementGrid.handleEvent( event );
-    }
-    else if( event.type == sf::Event::KeyReleased && (event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
-    {
+    if( event.type == sf::Event::KeyReleased && (event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
         mStateStack->pushState( States::EndTurnMenuState );
-    }
 }
 
 void World::changeTurn( void )
 {
-    // reset all units temp variables
-    for( unsigned int i = 0; i < mMovementGrid.mCurrentUnits.size(); ++i )
+    if( mCurrentTurn & Category::Red )
     {
-        mMovementGrid.mCurrentUnits[i]->mHasMoved = false;
-        mMovementGrid.mCurrentUnits[i]->mHasSpentAction = false;
-    }
-
-    if( CURRENT_TURN == Category::Red )
-    {
-        CURRENT_TURN = Category::Blue;
+        mCurrentTurn = Category::Blue;
         // solve any end-of-turn buffs etc for red team here
         // solve any start-of-turn bufs etc for blue team here
     }
-    else // == Cateogry::Blue
+    // == Cateogry::Blue
+    else { mCurrentTurn = Category::Red; }
+
+    // reset all units temp variables
+    mMovementGrid->clearGrid( );
+    for( auto unit : mMovementGrid->mCurrentUnits )
     {
-        CURRENT_TURN = Category::Red;
+        if( unit.second )
+        {
+            unit.second->mHasMoved = false;
+            unit.second->mHasSpentAction = false;
+        }
+    }
+    if( !mNetworkedWorld && !mLocalMultiplayerWorld && (mCurrentTurn & Category::Red) ) // Game is Player vs AI bot is always red
+    {
+        // Must tell Wifebot to update at the beggining of her turn
+        Command com;
+        com.category = Category::WifeBot;
+        com.action = derivedAction<WifeBot>( [] ( WifeBot& bot, sf::Time ){ bot.recalculate( true ); } );
+        mCommandQueue.push( com );
     }
 }
 
@@ -156,23 +147,21 @@ void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
 {
     // add unit to grid 
     Category::Type category = Category::None;
-    if( CURRENT_TURN == Category::Red ) category = Category::RedUnit;
-    else if( CURRENT_TURN == Category::Blue ) category = Category::BlueUnit;
+    if( mCurrentTurn == Category::Red ) category = Category::RedUnit;
+    else if( mCurrentTurn == Category::Blue ) category = Category::BlueUnit;
     else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
-    std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), category, UnitDataTable.at( unitType ), mTextures ) );
-    sf::Rect<float> object = mMovementGrid.mData[gridIndex.x][gridIndex.y].mBounds;
+    std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( unitType ), mTextures ) );
+    sf::Rect<float> object = mMovementGrid->mData[gridIndex.x][gridIndex.y].mBounds;
     unit->setPosition( object.left, object.top );
-    mMovementGrid.addUnit( unit.get( ) );
+    mMovementGrid->addUnit( unit.get( ) );
 
     //std::cout << "LayerMap is Mis-aligned. ObjectLayer1 should be layer1"
     mSceneLayers.at( LayerMap.at( "ObjectLayer1" ) )->attachChild( std::move( unit ) );
 }
 
-
 void World::handleCollisions( )
 {
-
 }
 
 void World::buildScene( std::string tileMapFilePath )
@@ -180,18 +169,14 @@ void World::buildScene( std::string tileMapFilePath )
     /*
      * NON tiled levels
     // Create layers...
-
     // Object layer
     std::unique_ptr<SceneNode> objectLayer( new SceneNode( Category::ObjectLayer ) );
     mSceneLayers.push_back( objectLayer.get( ) );
     mSceneGraph.attachChild( std::move( objectLayer ) );
-
     // Create objects in the world
-
     // Players
-
-
     */
+
     // load TiledMap
         Tiled::TiledMap map = Tiled::loadFromFile( tileMapFilePath ); //mContext.TiledMapFilePath );
         struct Tile {
@@ -199,10 +184,9 @@ void World::buildScene( std::string tileMapFilePath )
             sf::Rect<int> rect;
         };
         std::vector<Tile> tiles = std::vector<Tile>( );
-
         tiles.push_back( Tile() ); // Add in the first tile as an empty space because the gId in tiled starts at 1
         tiles[0].texID = "NONE";
-        tiles[0].rect = sf::Rect<int>( 0, 0, 32, 32 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
+        tiles[0].rect = sf::Rect<int>( 0, 0, 64, 64 ); // HARD VALUES THAT NEED TO BE REMOVED DO NOT REMOVE ME UNTILL ITS DONE!!!!!!!!!!!!!!
                                                             // Should be able to get these values from tiled file anyway....
         for( unsigned int i = 0; i < map.tileSets.size(); ++i )
         {
@@ -244,12 +228,9 @@ void World::buildScene( std::string tileMapFilePath )
                 /// This is a really lazy way to avoid having to deal with multiple image sources to build maps. It doen't work and it needs to be removed!!!!!!
                 /// there needs to be a universal way to use as many images as needed to build maps.
                 auto tileSets = map.tileSets[0];
-                std::cout << "Currently loading tileLayer from tileSet: " << map.tileSets[0].name << "This is hardcoded and needs to be fixed!" << std::endl;
-
+                std::cout << "Currently loading tileLayer from tileSet: " << map.tileSets[0].name << " This is hardcoded and needs to be fixed!" << std::endl;
                 /*
                  * This is for adding particle effects later
-                 *
-                 *
                 //std::cout << "Particle Effects are being attached in a hardcoded way, NEEDS TO BE IMPROVED!" << std::endl;
                 if( map.layers[i].name == "TileLayer3" ) // this is here becuase i needed to attach the particleNode to something that would be rendered above the objects.
                 {
@@ -270,26 +251,36 @@ void World::buildScene( std::string tileMapFilePath )
                     else {
                         mSceneLayers.push_back( layer.get( ) );
                         mSceneGraph.attachChild( std::move( layer ) );
-                        mMovementGrid.buildGrid( map.tileSets[0], map.layers[i] );
 
                         // build drawable grid
-                        mMovementGrid.mDrawableGrid.clear();
-                        for( unsigned int p = 0; p < map.layers[i].height; ++p )
+                        std::unique_ptr<Grid> grid( new Grid( this ) );
+                        mMovementGrid = grid.get( );
+                        mMovementGrid->buildGrid( map.tileSets[0], map.layers[i] );
+                        mMovementGrid->mDrawableGrid.clear();
+                        for( unsigned int p = 0; p < map.layers[i].width; ++p )
                         {
-                            mMovementGrid.mDrawableGrid.push_back( std::vector<RectangleShapeNode*>( ) );
-                            for( unsigned int k = 0; k < map.layers[i].width; ++k )
+                            mMovementGrid->mDrawableGrid.push_back( std::vector<RectangleShapeNode*>( ) );
+                            for( unsigned int k = 0; k < map.layers[i].height; ++k )
                             {
                                 std::unique_ptr<RectangleShapeNode> rect(
-                                            new RectangleShapeNode( sf::IntRect( sf::Vector2i( static_cast<int>( k * tileSets.tileWidth ), static_cast<int>( p * tileSets.tileHeight ) ),
-                                                                                 sf::Vector2i( static_cast<int>( tileSets.tileWidth ), static_cast<int>( tileSets.tileHeight ) ) ) ) );
+                                            new RectangleShapeNode( sf::IntRect( sf::Vector2i( static_cast<int>( p * tileSets.tileWidth ),
+                                                                                               static_cast<int>( k * tileSets.tileHeight ) ),
+                                                                                 sf::Vector2i( static_cast<int>( tileSets.tileWidth ),
+                                                                                               static_cast<int>( tileSets.tileHeight ) ) ) ) );
                                 rect.get()->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
                                 rect.get()->getSprite()->setOutlineThickness( 1 );
                                 rect.get()->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 150 ) );
-                                mMovementGrid.mDrawableGrid.back().push_back( rect.get( ) );
-                                mSceneGraph.attachChild( std::move( rect ) );
+                                mMovementGrid->mDrawableGrid.back().push_back( rect.get( ) );
+                                std::unique_ptr<TextNode> terrainDebugText( new TextNode( mFonts, std::to_string( UnitMoveCost.at( 0 ).at( mMovementGrid->mData[p][k].terrainType ) ) ) );
+                                terrainDebugText.get()->setPosition( p*tileSets.tileWidth+10, k*tileSets.tileHeight+10 );
+                                terrainDebugText.get()->setColor( sf::Color::Black );
+                                rect.get()->attachChild( std::move( terrainDebugText ) );
+                                mMovementGrid->attachChild( std::move( rect ) );
+
                             }
 
                         }
+                        mSceneGraph.attachChild( std::move( grid ) );
                     }
                 }
             }
@@ -308,9 +299,9 @@ void World::buildScene( std::string tileMapFilePath )
                          else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
-                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "LightInfantry" ) ), mTextures ) );
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "LightInfantry" ) ), mTextures ) );
                          unit->setPosition( object.x, object.y - 96 );
-                         mMovementGrid.addUnit( unit.get() );
+                         mMovementGrid->addUnit( unit.get() );
                          node.get( )->attachChild( std::move( unit ) );
                      }
                      else if( object.type == "HeavyInfantry" )
@@ -320,9 +311,9 @@ void World::buildScene( std::string tileMapFilePath )
                          else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
-                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid.mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "HeavyInfantry" ) ), mTextures ) );
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "HeavyInfantry" ) ), mTextures ) );
                          unit->setPosition( object.x, object.y - 96 );
-                         mMovementGrid.addUnit( unit.get() );
+                         mMovementGrid->addUnit( unit.get() );
                          node.get( )->attachChild( std::move( unit ) );
                      }
                      else if( object.type == "SpawnPoint" )
@@ -332,9 +323,9 @@ void World::buildScene( std::string tileMapFilePath )
                          else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueBuilding;
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
-                         std::unique_ptr<Building> sp( new Building( mMovementGrid.mCurrentBuildings.size(), category, BuildingDataTable.at( BuildingTypeMap.at( "SpawnPoint" ) ), mTextures ) );
+                         std::unique_ptr<Building> sp( new Building( mMovementGrid->mCurrentBuildings.size(), category, BuildingDataTable.at( BuildingTypeMap.at( "SpawnPoint" ) ), mTextures ) );
                          sp->setPosition( object.x, object.y - 64 );
-                         mMovementGrid.addBuilding( sp.get() );
+                         mMovementGrid->addBuilding( sp.get() );
                          node.get( )->attachChild( std::move( sp ) );
                      }
                      else
@@ -402,6 +393,9 @@ void World::buildScene( std::string tileMapFilePath )
         mSceneGraph.attachChild( std::move( networkNode ) );
         std::cout << "BuildScene Complete on a networked world!!" << std::endl;
     }
+    else
+        std::cout << "BuildScene Complete!!" << std::endl;
+
 
 }
 

@@ -11,12 +11,8 @@ namespace PlayerAction
 {
 	enum Type
 	{
-		MoveLeft,
-		MoveRight,
-		MoveUp,
-		MoveDown,
-		Fire,
-		LaunchMissile,
+        LeftClick,
+        RightClick,
 		Count
 	};
 }

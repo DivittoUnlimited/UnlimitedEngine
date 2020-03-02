@@ -43,7 +43,19 @@ namespace States
         cutScene8State,
         cutScene9State,
 
-        // Story Mode Levels
+        // Single Player vs AI
+        SinglePlayerLevel1,
+        SinglePlayerLevel2,
+        SinglePlayerLevel3,
+        SinglePlayerLevel4,
+        SinglePlayerLevel5,
+        SinglePlayerLevel6,
+        SinglePlayerLevel7,
+        SinglePlayerLevel8,
+        SinglePlayerLevel9,
+        SinglePlayerLevel10,
+
+        // 2 Player Mode Levels
         Level1,
         Level2,
         Level3,
@@ -58,8 +70,6 @@ namespace States
         // World DialogBox States ( Unit selection, end turn ec... )
         EndTurnMenuState,
         SpawnPointMenuState
-
-
 	};
 }
 

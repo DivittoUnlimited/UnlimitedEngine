@@ -45,7 +45,7 @@ enum Ships {
 class World
 {
 public:
-    World( State::Context *context, StateStack *stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked = false, bool isLocalMultiplayer = false );
+    World( State::Context *context, StateStack *stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked = true, bool isLocalMultiplayer = true );
     ~World( void );
     void draw( void );
     bool update( sf::Time dt );
@@ -83,23 +83,26 @@ private:
     sf::Sprite                          mWindowSprite;
     CommandQueue						mCommandQueue;
     BloomEffect							mBloomEffect;
+public:
     SceneNode							mSceneGraph;
-
-    std::vector<SceneNode*>          	mSceneLayers;   
+private:
+    std::vector<SceneNode*>          	mSceneLayers;
+public:
     bool								mNetworkedWorld;
     bool                                mLocalMultiplayerWorld;
+
     NetworkNode*						mNetworkNode;
-public:
+
     // public so grid can access, consider making grid a friend class
     // Friends can touch your privates!!! :p
     State::Context                      mWorldContext;
     StateStack*                         mStateStack;
-private:
+
     // Game specific
     ///
     /// \brief mMovementGrid
     /// The main data structure that houses all the information about the current battlefield
-    Grid                                mMovementGrid;
+    Grid*                                mMovementGrid;
 
     ///
     /// \brief mLevel
@@ -115,13 +118,19 @@ private:
     int mSelectedBuilding;
 
     ///
+    /// \brief mCurrentTurn
+    /// The currently active team. (RED or BLUE)
+    Category::Type                      mCurrentTurn;
+
+    ///
+    /// \brief mClientTeamColor
+    /// Used in networked games to tell if this world should react to events or not.
+    Category::Type                      mClientTeamColor;
+
+    ///
     /// \brief mLoadUnitsFromFile
     /// Flag to tell build scene to load from Tiled map or a player's save file
     bool                                mLoadUnitsFromFile;
-
-
-
-
 };
 
 #endif // WORLD_HPP

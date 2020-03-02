@@ -39,7 +39,7 @@ void ParallelTask::runTask()
     lua_getglobal( L, "debug" );
     lua_getfield( L, -1, "traceback" );
     lua_replace( L, -2 );
-    luaL_loadfile( L, "Game/Game.lua" );
+    luaL_loadfile( L, "Game/Lua/Game.lua" );
     if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
         luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
         std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;

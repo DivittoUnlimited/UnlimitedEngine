@@ -10,14 +10,15 @@
 class PauseState : public State
 {
 public:
-    PauseState( States::ID id, StateStack& stack, Context context );
+    PauseState( States::ID id, StateStack& stack, Context context, bool allowUpdates = false );
     virtual void draw();
     virtual bool update(sf::Time dt);
     virtual bool handleEvent(const sf::Event& event);
 
 private:
-    GUI::Container mGUIContainer;
-    sf::Text   mPausedText;
+    GUI::Container  mGUIContainer;
+    sf::Text        mPausedText;
+    bool            mAllowUpdates;
 };
 
 #endif // PAUSESTATE_HPP

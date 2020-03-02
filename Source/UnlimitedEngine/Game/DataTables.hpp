@@ -477,7 +477,6 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
         lua_close( L );
         return data;
 }( ); // initializeConversationData
-
 static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<UnitTypeData> {
         std::vector<UnitTypeData> data( UnitTypeMap.size( ) );
         lua_State* L = luaL_newstate();
@@ -545,13 +544,10 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
                 lua_pop( L, 1 ); // defintion table
             }
             lua_pop( L, 1 ); // anon table
-        }else std::cout << "Error reading Warps.lua" << std::endl;
+        }else std::cout << "Error reading UnitTypes.lua" << std::endl;
         lua_close( L );
         return data;
 }( ); // initializeUnitTypesData
-
-
-
  static std::vector<BuildingData> initializeBuildingTypeData = []( ) -> std::vector<BuildingData> {
     std::vector<BuildingData> data( BuildingTypeMap.size( ) );
     lua_State* L = luaL_newstate();
@@ -610,9 +606,6 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
     lua_close( L );
     return data;
 }( ); // initializeBuildingTypesData
-
-
-
 // Left over from western rpg game
 static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorData> {
         std::vector<ActorData> data( ActorMap.size( ) );
@@ -666,7 +659,6 @@ static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorDat
     lua_close( L );
     return data;
 }( );
-
 // this is a special table designed to help the grid decide where units can move on any given turn.
 static std::vector<std::vector<int>> inititializeUnitMovementCostTable = []() -> std::vector<std::vector<int>> {
     std::vector<std::vector<int>> data;
@@ -687,7 +679,6 @@ static std::vector<std::vector<int>> inititializeUnitMovementCostTable = []() ->
         lua_pushnil( L );
         while( lua_next( L, -2 ) != 0 )
         {
-            std::cout << std::endl;
             data.push_back( std::vector<int>( ) );
             // iterate through numbers in array
             lua_pushnil( L );

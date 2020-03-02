@@ -20,6 +20,6 @@ extern sf::RenderWindow* mWindow; // The Main window of the game. Defined in App
 
 extern States::ID CURRENT_LEVEL; // init in application constructor
 
-extern Category::Type CURRENT_TURN; // defined in application
+//extern Category::Type CURRENT_TURN; // defined in application
 
 #endif // GLOBALS_HPP

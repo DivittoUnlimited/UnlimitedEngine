@@ -4,7 +4,8 @@
 #include <SFML/Config.hpp>
 #include <SFML/System/Vector2.hpp>
 
-const unsigned short ServerPort = 5000;
+
+const unsigned short ServerPort = 4000;
 
 namespace Server
 {
@@ -12,17 +13,17 @@ namespace Server
 	enum PacketType
 	{
 		BroadcastMessage,	// format: [Int32:packetType] [string:message]
-		SpawnSelf,			// format: [Int32:packetType]
-		InitialState,
 		PlayerEvent,
 		PlayerRealtimeChange,
 		PlayerConnect,
 		PlayerDisconnect,
-		AcceptCoopPartner,
-		SpawnEnemy,
-		SpawnPickup,
-		UpdateClientState,
-		MissionSuccess
+        MissionSuccess,
+        UpdateClientState,
+        LeftClick,
+        RightClick,
+        ChangeTurn,
+        SpawnSelf,
+        SpawnUnit
 	};
 }
 
@@ -33,10 +34,12 @@ namespace Client
 	{
 		PlayerEvent,
 		PlayerRealtimeChange,
-		RequestCoopPartner,
-		PositionUpdate,
 		GameEvent,
-		Quit
+        Quit,
+        LeftClick,
+        RightClick,
+        ChangeTurn,
+        SpawnUnit
 	};
 }
 
@@ -44,10 +47,8 @@ namespace PlayerActions
 {
 	enum Action
 	{
-		MoveLeft,
-		MoveRight,
-		MoveUp,
-		Fire,
+        LeftClick,
+        RightClick,
 		ActionCount
 	};
 }
@@ -56,7 +57,11 @@ namespace GameActions
 {
 	enum Type
 	{
-		EnemyExplode,
+        LeftClick,
+        RightClick,
+        ChangeTurn,
+        SpawnUnit,
+        ActionCount
 	};
 
 	struct Action

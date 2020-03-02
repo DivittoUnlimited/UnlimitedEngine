@@ -23,7 +23,7 @@ EndTurnMenuState::EndTurnMenuState( States::ID id, StateStack& stack, Context co
     mChangeTurnBackground = sf::RectangleShape( sf::Vector2f( 500, 125 ) );
     centerOrigin( mChangeTurnBackground );
     mChangeTurnBackground.setPosition( WINDOW_WIDTH / 2, 200 );
-    mChangeTurnBackground.setFillColor( sf::Color( 0, 255, 0, 200 ) );
+    mChangeTurnBackground.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     mChangeTurnBackground.setOutlineThickness( 3 );
     mChangeTurnBackground.setOutlineColor( sf::Color::Black );
 
@@ -32,11 +32,15 @@ EndTurnMenuState::EndTurnMenuState( States::ID id, StateStack& stack, Context co
     yesButton->setText( "YES" );
     yesButton->setCallback( [this] ( )
     {
-        mNewTurnPopTimer = sf::milliseconds( 2000 );
-        if( CURRENT_TURN == Category::Red ) mNewTurnPopUpText.setString( "Blue Team's\n\tTurn!" );
+        mNewTurnPopTimer = sf::milliseconds( 5000 );
+        if( mWorld->mCurrentTurn == Category::Red ) mNewTurnPopUpText.setString( "Blue Team's\n\tTurn!" );
         else mNewTurnPopUpText.setString( "Red Team's\n\tTurn!" );
-
-        mWorld->changeTurn();
+        if( mWorld->mNetworkedWorld )
+            mWorld->mNetworkNode->notifyGameAction( GameActions::ChangeTurn, sf::Vector2f( 0, 0 ) );
+        else
+        {
+            mWorld->changeTurn();
+        }
         mWorld->mStateStack->popState();
     });
     auto noButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

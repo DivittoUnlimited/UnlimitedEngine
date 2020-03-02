@@ -3,14 +3,17 @@ return {
                     [0] = "DivittoUnlimitedLogo"
                     ,     "Default"
                     ,     "Particle"
-                    ,     "trainers"
-                    ,     "tiles"
-                    ,     "cowboy"
-                    ,     "SevenSunSetDemoTexture"
+                    ,     "Buttons"
+                   -- ,     "DemoGirl"
+                   -- ,     "DemoLevel"
+                   -- ,     "LightInfantry"
+                   -- ,     "HeavyInfantry"
+                   -- ,     "SpawnPoint"
     };
 
 
     Fonts               = {
+        [0] = "Default"
     };
     Music               = {
     };
@@ -21,6 +24,6 @@ return {
     };
 
     PlayerTexture       = "Default";
-    TiledMapFilePath    = "Game/Lua/Resources/Maps/DemoLevel.lua";
+    TiledMapFilePath    = "Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua";
 
 };

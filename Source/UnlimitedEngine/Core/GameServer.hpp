@@ -13,40 +13,29 @@
 #include <memory>
 #include <map>
 
+#include "Core/Category.hpp"
+
 class GameServer
 {
 	public:
         explicit GameServer( sf::Vector2f battlefieldSize );
         ~GameServer( void );
-
-        void notifyPlayerSpawn( sf::Int32 shipIdentifier );
-        void notifyPlayerRealtimeChange( sf::Int32 shipIdentifier, sf::Int32 action, bool shipEnabled );
-        void notifyPlayerEvent( sf::Int32 shipIdentifier, sf::Int32 action );
-
+        void notifyPlayerSpawn( void );
+        void notifyPlayerRealtimeChange(sf::Int32 playerIdentifier, sf::Int32 action, bool shipEnabled );
+        void notifyPlayerEvent(sf::Int32 identifier, sf::Int32 action , sf::Vector2i pos);
 	private:
 		// A GameServerRemotePeer refers to one instance of the game, may it be local or from another computer
 		struct RemotePeer
 		{
             RemotePeer( void );
-
 			sf::TcpSocket			socket;
 			sf::Time				lastPacketTime;
-            std::vector<sf::Int32>	shipIdentifiers;
 			bool					ready;
 			bool					timedOut;
+            Category::Type          teamColor;
 		};
-
-		// Structure to store information about current aircraft state
-        struct ShipInfo
-		{
-			sf::Vector2f				position;
-			sf::Int32					hitpoints;
-			std::map<sf::Int32, bool>	realtimeActions;
-		};
-
 		// Unique pointer to remote peers
 		typedef std::unique_ptr<RemotePeer> PeerPtr;
-
 	private:
         void setListening( bool enable );
         void executionThread( void );
@@ -55,16 +44,12 @@ class GameServer
 
         void handleIncomingPackets( );
         void handleIncomingPacket(sf::Packet& packet, RemotePeer& receivingPeer, bool& detectedTimeout);
-
         void handleIncomingConnections( );
         void handleDisconnections( );
-
         void informWorldState( sf::TcpSocket& socket );
         void broadcastMessage(const std::string& message);
         void sendToAll( sf::Packet& packet );
         void updateClientState( );
-
-
 	private:
 		sf::Thread							mThread;
 		sf::Clock							mClock;
@@ -74,20 +59,9 @@ class GameServer
 
 		std::size_t							mMaxConnectedPlayers;
 		std::size_t							mConnectedPlayers;
-
-		float								mWorldHeight;
-		sf::FloatRect						mBattleFieldRect;
-		float								mBattleFieldScrollSpeed;
-
-        std::size_t							mShipCount;
-        std::map<sf::Int32, ShipInfo>   	mShipInfo;
-
+        unsigned int                        mPlayerIDCounter;
 		std::vector<PeerPtr>				mPeers;
-        sf::Int32							mShipIdentifierCounter;
-		bool								mWaitingThreadEnd;
-		
-		sf::Time							mLastSpawnTime;
-		sf::Time							mTimeForNextSpawn;
+		bool								mWaitingThreadEnd;		
 };
 
 #endif // GAMESERVER_HPP

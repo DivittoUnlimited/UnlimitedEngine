@@ -48,17 +48,17 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     mTitleText.setStyle( sf::Text::Bold );
 
     auto testMap = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    testMap->setPosition( WINDOW_WIDTH / 2 - 100, 390 );
+    testMap->setPosition( WINDOW_WIDTH / 2 - 100, 330 );
     testMap->setText( "TEST_MAP" );
     testMap->setCallback( [this] ( )
     {
         GAME_MODE = GameModes::QuickBattle;
         requestStackPop( );
-        requestStackPush( States::Level1 );
+        requestStackPush( States::SinglePlayerLevel1 );
     });
 
     auto playButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
+    playButton->setPosition( WINDOW_WIDTH / 2 - 100, 390 );
     playButton->setText( "Single Player" );
     playButton->setCallback( [this] ( )
 	{
@@ -67,9 +67,20 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStackPush( States::SinglePlayerMenuState );
 	});
 
+    auto splitScreenButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    splitScreenButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
+    splitScreenButton->setText( "Couch Co-op" );
+    splitScreenButton->setCallback( [this] ( )
+    {
+        // need to make this go to the proper state maybe add a co-op setup state instead of quickBattleSetupState
+        GAME_MODE = GameModes::NONE;
+        requestStackPop( );
+        requestStackPush( States::QuickBattleSetupState );
+    });
+
     auto playLocalButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playLocalButton->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
-    playLocalButton->setText( "Vs. Mode (STUB)" );
+    playLocalButton->setText( "Create Server" );
     playLocalButton->setCallback( [this] ( )
     {
         GAME_MODE = GameModes::QuickBattle;
@@ -79,9 +90,10 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 
     auto playMultiplayerButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playMultiplayerButton->setPosition( WINDOW_WIDTH / 2 - 100, 570 );
-    playMultiplayerButton->setText( "Multiplayer (STUB)" );
+    playMultiplayerButton->setText( "Join Server" );
     playMultiplayerButton->setCallback( [this] ( )
     {
+        GAME_MODE = GameModes::Online;
         requestStackPop( );
         requestStackPush( States::JoinGame ); // used to be hostGame not sure why
     });
@@ -106,6 +118,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 
 
     mGUIContainer.pack( playButton );
+    mGUIContainer.pack( splitScreenButton );
     mGUIContainer.pack( playLocalButton );
     mGUIContainer.pack( playMultiplayerButton );
     mGUIContainer.pack( settingsButton );

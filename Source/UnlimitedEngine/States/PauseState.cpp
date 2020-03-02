@@ -9,9 +9,10 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
 
-PauseState::PauseState( States::ID id, StateStack& stack, Context context )
+PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool allowUpdates )
 : State( id, stack, context )
 , mPausedText( )
+, mAllowUpdates( allowUpdates )
 {
     sf::Font& font = context.fonts->get( FontMap.at( "Default" ) );
     sf::Vector2f viewSize = context.window->getView( ).getSize( );
@@ -82,7 +83,7 @@ void PauseState::draw( )
 
 bool PauseState::update( sf::Time )
 {
-	return false;
+    return mAllowUpdates;
 }
 
 bool PauseState::handleEvent( const sf::Event& event )

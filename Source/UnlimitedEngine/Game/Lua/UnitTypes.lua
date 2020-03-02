@@ -28,7 +28,7 @@ return {
         constitution    = 100;
         defense         = 7;
         range           = { innerRange = 1; outerRange = 2; };
-        texture         = "LightInfantry";
+        texture         = "HeavyInfantry";
     };
 
     Phalanx = {

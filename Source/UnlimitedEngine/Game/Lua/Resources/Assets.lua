@@ -19,7 +19,8 @@ return {
         DemoGirl                 = 4;
         DemoLevel                = 5;
         LightInfantry            = 6;
-        SpawnPoint               = 7;
+        HeavyInfantry            = 7;
+        SpawnPoint               = 8;
     };
 
     SoundEffects = {            
@@ -59,6 +60,6 @@ return {
     };
 
     Maps = {
-        DemoMap = 0;
+        TacticsTribeDemoLevel = 0;
     };
 };

@@ -7,13 +7,11 @@ TO_DO LIST:
             - just leave Conquest state alive and make pause state remove itself and gamestate only
             - or use GAME_MODE
     - Make camera pan with mouse, as well as arrow keys
-    - Setup "AI"'s turn in single player GameState
-        - Solve 2 player over network first
-            - use that system to abstract AI player
-            - possibly break up world into single and multiplayer children versions that have own update and handle event
-                - would then add new GameStates that call the various versions of world.
-                    - player vs AI
-                    - player vs player online
-                    - player vs player couch coop
-                    - AI vs AI
-        - flesh out grid interface (simplify handleEvent) so that AI has the same options as player.
+    - WifeBot able to stack units on to the same square need to adjust path finder for blocked squares
+    - and terrain difficulty.
+    - WifeBot stops pathfinding all units once one unit reaches the goal
+    - add terrain difficulty to unit map building
+    - stop player input on grid during WifeBots turn.
+
+
+
