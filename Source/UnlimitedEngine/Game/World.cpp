@@ -18,7 +18,7 @@ namespace
 {
     const std::vector<UnitTypeData> UnitDataTable = initializeUnitTypeData;  // initializeUnitTypeData in DataTable.hpp
     const std::vector<BuildingData> BuildingDataTable = initializeBuildingTypeData;  // initializeBuildingData in DataTable.hpp
-    const std::vector<std::vector<int>> UnitMoveCost = inititializeUnitMovementCostTable;
+    const std::vector<std::vector<float>> UnitMoveCost = inititializeUnitMovementCostTable;
 }
 
 World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked, bool isLocalMultiplayer )
@@ -152,7 +152,7 @@ void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
     else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
     std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( unitType ), mTextures ) );
-    sf::Rect<float> object = mMovementGrid->mData[gridIndex.x][gridIndex.y].mBounds;
+    sf::Rect<float> object = mMovementGrid->mData[gridIndex.y * (WINDOW_WIDTH / TILE_SIZE) + gridIndex.x].mBounds;
     unit->setPosition( object.left, object.top );
     mMovementGrid->addUnit( unit.get( ) );
 
@@ -176,7 +176,6 @@ void World::buildScene( std::string tileMapFilePath )
     // Create objects in the world
     // Players
     */
-
     // load TiledMap
         Tiled::TiledMap map = Tiled::loadFromFile( tileMapFilePath ); //mContext.TiledMapFilePath );
         struct Tile {
@@ -193,8 +192,6 @@ void World::buildScene( std::string tileMapFilePath )
             // define loops to divide up image
             int y = 0;
             int x = 0;
-            int tileWidth = static_cast<int>( map.tileSets[i].tileWidth );
-            int tileHeight =  static_cast<int>( map.tileSets[i].tileHeight );
             std::string name = map.tileSets[i].name;
 
             // load image into memory
@@ -208,13 +205,13 @@ void World::buildScene( std::string tileMapFilePath )
                     // Create tile
                     Tile tile;
                     tile.texID = name;
-                    tile.rect = sf::Rect<int>( x, y, tileWidth, tileHeight );
+                    tile.rect = sf::Rect<int>( x, y, TILE_SIZE, TILE_SIZE );
                     // add tile to set of possible tiles to use later it's index in vector is it's id as found in testMap.lua
                     tiles.push_back( tile );
-                    x += tileWidth;
+                    x += TILE_SIZE;
                 }
                 x = 0;
-                y += tileHeight;
+                y += TILE_SIZE;
             }
         }
 
@@ -229,6 +226,7 @@ void World::buildScene( std::string tileMapFilePath )
                 /// there needs to be a universal way to use as many images as needed to build maps.
                 auto tileSets = map.tileSets[0];
                 std::cout << "Currently loading tileLayer from tileSet: " << map.tileSets[0].name << " This is hardcoded and needs to be fixed!" << std::endl;
+
                 /*
                  * This is for adding particle effects later
                 //std::cout << "Particle Effects are being attached in a hardcoded way, NEEDS TO BE IMPROVED!" << std::endl;
@@ -251,38 +249,13 @@ void World::buildScene( std::string tileMapFilePath )
                     else {
                         mSceneLayers.push_back( layer.get( ) );
                         mSceneGraph.attachChild( std::move( layer ) );
-
-                        // build drawable grid
-                        std::unique_ptr<Grid> grid( new Grid( this ) );
-                        mMovementGrid = grid.get( );
-                        mMovementGrid->buildGrid( map.tileSets[0], map.layers[i] );
-                        mMovementGrid->mDrawableGrid.clear();
-                        for( unsigned int p = 0; p < map.layers[i].width; ++p )
-                        {
-                            mMovementGrid->mDrawableGrid.push_back( std::vector<RectangleShapeNode*>( ) );
-                            for( unsigned int k = 0; k < map.layers[i].height; ++k )
-                            {
-                                std::unique_ptr<RectangleShapeNode> rect(
-                                            new RectangleShapeNode( sf::IntRect( sf::Vector2i( static_cast<int>( p * tileSets.tileWidth ),
-                                                                                               static_cast<int>( k * tileSets.tileHeight ) ),
-                                                                                 sf::Vector2i( static_cast<int>( tileSets.tileWidth ),
-                                                                                               static_cast<int>( tileSets.tileHeight ) ) ) ) );
-                                rect.get()->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
-                                rect.get()->getSprite()->setOutlineThickness( 1 );
-                                rect.get()->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 150 ) );
-                                mMovementGrid->mDrawableGrid.back().push_back( rect.get( ) );
-                                std::unique_ptr<TextNode> terrainDebugText( new TextNode( mFonts, std::to_string( UnitMoveCost.at( 0 ).at( mMovementGrid->mData[p][k].terrainType ) ) ) );
-                                terrainDebugText.get()->setPosition( p*tileSets.tileWidth+10, k*tileSets.tileHeight+10 );
-                                terrainDebugText.get()->setColor( sf::Color::Black );
-                                rect.get()->attachChild( std::move( terrainDebugText ) );
-                                mMovementGrid->attachChild( std::move( rect ) );
-
-                            }
-
-                        }
-                        mSceneGraph.attachChild( std::move( grid ) );
                     }
                 }
+                // init grid
+                std::unique_ptr<Grid> grid( new Grid( this, WINDOW_WIDTH / TILE_SIZE, WINDOW_HEIGHT / TILE_SIZE ) );
+                mMovementGrid = grid.get();
+                mMovementGrid->buildGrid( map.tileSets[0], map.layers[i] );
+                mSceneGraph.attachChild( std::move( grid ) );
             }
             else if( map.layers[i].type == "objectgroup" )
             {
@@ -300,7 +273,7 @@ void World::buildScene( std::string tileMapFilePath )
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
                          std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "LightInfantry" ) ), mTextures ) );
-                         unit->setPosition( object.x, object.y - 96 );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
                          mMovementGrid->addUnit( unit.get() );
                          node.get( )->attachChild( std::move( unit ) );
                      }
@@ -312,7 +285,7 @@ void World::buildScene( std::string tileMapFilePath )
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
                          std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "HeavyInfantry" ) ), mTextures ) );
-                         unit->setPosition( object.x, object.y - 96 );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
                          mMovementGrid->addUnit( unit.get() );
                          node.get( )->attachChild( std::move( unit ) );
                      }
@@ -324,7 +297,7 @@ void World::buildScene( std::string tileMapFilePath )
                          else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
                          std::unique_ptr<Building> sp( new Building( mMovementGrid->mCurrentBuildings.size(), category, BuildingDataTable.at( BuildingTypeMap.at( "SpawnPoint" ) ), mTextures ) );
-                         sp->setPosition( object.x, object.y - 64 );
+                         sp->setPosition( object.x, object.y - TILE_SIZE );
                          mMovementGrid->addBuilding( sp.get() );
                          node.get( )->attachChild( std::move( sp ) );
                      }
@@ -395,8 +368,6 @@ void World::buildScene( std::string tileMapFilePath )
     }
     else
         std::cout << "BuildScene Complete!!" << std::endl;
-
-
 }
 
 void World::loadSaveFile( std::string )

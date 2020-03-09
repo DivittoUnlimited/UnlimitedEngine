@@ -1,10 +1,11 @@
 #include "WifeBot.hpp"
 #include "Core/CommandQueue.hpp"
 #include "Game/DataTables.hpp"
+#include "Game/World.hpp"
 
 namespace
 {
-    const std::vector<std::vector<int>> MoveCostTable = inititializeUnitMovementCostTable;
+    const std::vector<std::vector<float>> MoveCostTable = inititializeUnitMovementCostTable;
 }
 
 WifeBot::WifeBot( Grid* grid, std::map<unsigned int, Unit*>* units,
@@ -16,6 +17,7 @@ WifeBot::WifeBot( Grid* grid, std::map<unsigned int, Unit*>* units,
     , mRecalculate( true )
     , mAnimationTimer( sf::Time::Zero )
     , mCurrentTurn( currentTurn )
+    , mAllUnitsMoved( false )
 {
     for( auto unit : (*mUnits) )
         if( unit.second->mCategory & Category::RedUnit )
@@ -46,27 +48,23 @@ void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
             {
                 if( unit.second && (unit.second->mCategory & Category::RedUnit) ) // wifeBot is always red
                 {
-                    mUnitPathFinders.at( unit.second->mID ) = new PathFinder<Square>(
-                                mGrid->mData, &mGrid->mData[unit.second->mGridIndex.x][unit.second->mGridIndex.y], &mGrid->mData[10][9],
-                                [=]( Square* start, Square* goal )->float {
-                                    // consider terrain and blocked spaces in calculation.
-                                    mGrid->mData[start->gridIndex.x][start->gridIndex.y].influence = .5;
+                    mUnitPathFinders.at( unit.second->mID ) = new PathFinder<Square>( mGrid->mData, &mGrid->mData[unit.second->mGridIndex.y * (WINDOW_WIDTH / TILE_SIZE) + unit.second->mGridIndex.x],
+                                                                                                    &mGrid->mData[4 * ( WINDOW_WIDTH / TILE_SIZE) + 3],
+                        [=]( Square* start, Square* goal )->float {
+                            mGrid->mData[start->gridIndex.y * (WINDOW_WIDTH / TILE_SIZE) + start->gridIndex.x].influence = .5;
 
-                                    //float distance = std::sqrt( ( goal->gridIndex.x - start->gridIndex.x )*( goal->gridIndex.x - start->gridIndex.x ) -
-                                    //        ( goal->gridIndex.y - start->gridIndex.y )*( goal->gridIndex.y - start->gridIndex.y ));
-
-                                    float distance = std::abs( start->gridIndex.x - goal->gridIndex.x )+std::abs( start->gridIndex.y - goal->gridIndex.y );
-                                    if( distance > 1 ){
-                                        distance += (mGrid->getMoveCost( unit.second->mUnitType, mGrid->mData[start->gridIndex.x][start->gridIndex.y].terrainType ));
-                                    //distance /= 2;
-                                    std::cout << "Pos: " << start->gridIndex.x << ", " << start->gridIndex.y << " MC: " << (mGrid->getMoveCost( unit.second->mUnitType, mGrid->mData[start->gridIndex.x][start->gridIndex.y].terrainType )) << " Distance: " << distance << std::endl;
-}
-                                    return distance;
-
-                                } );
+                            float distance = std::abs( start->gridIndex.x - goal->gridIndex.x )+std::abs( start->gridIndex.y - goal->gridIndex.y );
+                            if( distance > 1 )
+                            {
+                                distance *= .5;
+                                distance += mGrid->getMoveCost( unit.second->mUnitType, start->terrainType );
+                            }
+                            return distance;
+                         } );
                     for( auto a : mUnitPathFinders.at( unit.second->mID )->mPath )
                     {
-                        mGrid->mData[a.x][a.y].influence = -.5;
+                        //mGrid->mData[a.y * (WINDOW_WIDTH / TILE_SIZE) + a.x].debugText->setString( std::to_string( mGrid->mData[a.y * (WINDOW_WIDTH / TILE_SIZE) + a.x].costSoFar + mGrid->mData[a.y * (WINDOW_WIDTH / TILE_SIZE) + a.x].heuristicCost ) );
+                        mGrid->mData[a.y * (WINDOW_WIDTH / TILE_SIZE) + a.x].influence = -.5;
                     }
                 }
             }
@@ -74,85 +72,101 @@ void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
         }
         if( mAnimationTimer <= sf::Time::Zero )
         {
-            for( auto unit : (*mUnits) )
+            if( !mAllUnitsMoved )
             {
-                if( unit.second && (unit.second->mCategory & Category::RedUnit) && !unit.second->mHasMoved )
+                mAllUnitsMoved = true;
+                for( auto unit : (*mUnits) )
                 {
-                    if( unit.second->mIsSelectedUnit )
+                    if( unit.second && (unit.second->mCategory & Category::RedUnit) && !unit.second->mHasMoved )
                     {
-                        if( mUnitPathFinders.at( unit.second->mID ) && mUnitPathFinders.at( unit.second->mID )->size() )
+                        if( unit.second->mIsSelectedUnit )
                         {
-                            std::vector<sf::Vector2i> posMoves = mGrid->getPossiblePositions( unit.second->mGridIndex, unit.second->mUnitType, unit.second->mDexterity );
-                            auto path = mUnitPathFinders.at( unit.second->mID );
-                            sf::Vector2i bestMove;
-
-                            // look ahead in pathfinder to units dex distance or last element in path and find match in pos Moves
-                            if( path->size() > unit.second->mDexterity )
-                                for( unsigned int i = 0; i < unit.second->mDexterity; ++i ) path->getNextMove( );
-                            // path less then the distance the unit can move look at last element in path list.
-                            else while( path->mPath.size() > 1 ) path->getNextMove();
-
-                            sf::Vector2i farthestPos = path->getNextMove( );
-                            // traverse posMoves and find the closest square to the farthest point in the pathfinder
-                            bool flag = false;
-                            for( auto move : posMoves )
-                                if( move == farthestPos )
-                                {
-                                    bestMove = move;
-                                    flag = true;
-                                    break;
-                                }
-                            if( !flag ) // optimal solution doesn't exist find closest option
+                            if( mUnitPathFinders.at( unit.second->mID ) && mUnitPathFinders.at( unit.second->mID )->size() )
                             {
-                                float distance = -1.0f;
+                                std::vector<sf::Vector2i> posMoves = mGrid->getPossiblePositions( unit.second->mGridIndex, unit.second->mUnitType, unit.second->mDexterity );
+                                auto path = mUnitPathFinders.at( unit.second->mID );
+                                sf::Vector2i bestMove;
+
+                                // look ahead in pathfinder to units dex distance or last element in path and find match in pos Moves
+                                if( path->size() > unit.second->mDexterity )
+                                    for( unsigned int i = 0; i < unit.second->mDexterity-1; ++i ) path->getNextMove( );
+                                // path less then the distance the unit can move look at last element in path list.
+                                else while( path->mPath.size() > 1 ) path->getNextMove();
+                                sf::Vector2i farthestPos = path->getNextMove( );
+
+                                // traverse posMoves and find the closest square to the farthest point in the pathfinder
+                                bool flag = false;
                                 for( auto move : posMoves )
-                                {
-                                    float temp = std::abs( move.x - farthestPos.x ) + std::abs( move.y - farthestPos.y );
-                                    if( distance == -1.0f || temp <= distance )
+                                    if( move == farthestPos )
                                     {
-                                        distance = temp;
                                         bestMove = move;
+                                        flag = true;
+                                        break;
+                                    }
+                                if( !flag ) // optimal solution doesn't exist find closest option
+                                {
+                                    float distance = -1.0f;
+                                    for( auto move : posMoves )
+                                    {
+                                        float temp = std::abs( move.x - farthestPos.x ) + std::abs( move.y - farthestPos.y );
+                                        if( distance == -1.0f || temp < distance )
+                                        {
+                                            distance = temp;
+                                            bestMove = move;
+                                        }
                                     }
                                 }
-                            }
-                            // create command to click on the destination square.
-                            Command command;
-                            command.category = Category::Grid;
-                            command.action = derivedAction<Grid>( [unit, bestMove] ( Grid& g, sf::Time ){
-                                    g.moveUnit( unit.second->mGridIndex, bestMove ); } );
-                            commands.push( command );
-                        }
-                        unit.second->mIsSelectedUnit = false;
-                        unit.second->mHasMoved = true;
-                    }
-                    else // select the next unit to update
-                    {
-                        if( mUnitPathFinders.at( unit.second->mID ) && mUnitPathFinders.at( unit.second->mID )->size() > 0 )
-                        {
-                            // create command to click on unit
-                            Command command;
-                            command.category = Category::Grid;
-                            command.action = derivedAction<Grid>( [unit] ( Grid& g, sf::Time ){
-                                    g.selectUnit( unit.second->mGridIndex.x, unit.second->mGridIndex.y ); } );
-                            commands.push( command );
 
-                            mAnimationTimer = sf::seconds(2);
-                        }
-                        else
-                        {
+                                // create command to click on the destination square.
+                                Command command;
+                                command.category = Category::Grid;
+                                command.action = derivedAction<Grid>( [unit, bestMove] ( Grid& g, sf::Time ){
+                                        g.moveUnit( unit.second->mGridIndex, bestMove ); } );
+                                commands.push( command );
+                            }
+                            unit.second->mIsSelectedUnit = false;
                             unit.second->mHasMoved = true;
                         }
+                        else // select the next unit to update
+                        {
+                            if( mUnitPathFinders.at( unit.second->mID ) && mUnitPathFinders.at( unit.second->mID )->size() > 0 )
+                            {
+                                // create command to click on unit
+                                Command command;
+                                command.category = Category::Grid;
+                                command.action = derivedAction<Grid>( [unit] ( Grid& g, sf::Time ){
+                                        g.selectUnit( unit.second->mGridIndex.x, unit.second->mGridIndex.y ); } );
+                                commands.push( command );
+
+                                mAnimationTimer = sf::seconds(2);
+                            }
+                            else
+                            {
+                                unit.second->mHasMoved = true;
+                            }
+                        }
+                        mAllUnitsMoved = false;
+                        break; // only handle one unit per frame
                     }
-                    break; // only handle one unit per frame
                 }
             }
-
-            // Activate buildings based on current plan
-
-            // end turn
         }
         else
             mAnimationTimer -= dt;
+        // Activate buildings based on current plan
+
+        if( mAllUnitsMoved && mAnimationTimer <= sf::Time::Zero )
+        {
+            mAllUnitsMoved = false;
+            // end turn
+            Command command;
+            command.category = Category::Grid;
+            command.action = derivedAction<Grid>( [] ( Grid& g, sf::Time ){
+                g.mWorld->changeTurn( );
+            } );
+            commands.push( command );
+        }
+
     }
 }
 

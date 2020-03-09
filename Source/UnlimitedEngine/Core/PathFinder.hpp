@@ -13,7 +13,7 @@ template <class T>
 class PathFinder
 {
 public:
-    PathFinder(std::vector<std::vector<T>> grid, T* start, T* goal, std::function<float(T* start, T* goal)> heuristic );
+    PathFinder(std::vector<T> grid, T* start, T* goal, std::function<float(T* start, T* goal)> heuristic );
     sf::Vector2i getNextMove( void );
     unsigned int size( void ) { return mPath.size(); }
 
@@ -21,7 +21,7 @@ public:
     std::vector<sf::Vector2i> mPath;
 
 private:
-    std::vector<sf::Vector2i> calculatePath(std::vector<std::vector<T>> grid, T* start, T* goal , std::function<float(T *, T *)> heuristic);
+    std::vector<sf::Vector2i> calculatePath(std::vector<T> grid, T* start, T* goal , std::function<float(T *, T *)> heuristic);
     ///
     /// \brief isValid
     /// Will be used someday to block the unit from going to impossible Ts such as walls, rivers, and the edge of te map.

@@ -660,8 +660,8 @@ static std::vector<ActorData> initializeActorData = []() -> std::vector<ActorDat
     return data;
 }( );
 // this is a special table designed to help the grid decide where units can move on any given turn.
-static std::vector<std::vector<int>> inititializeUnitMovementCostTable = []() -> std::vector<std::vector<int>> {
-    std::vector<std::vector<int>> data;
+static std::vector<std::vector<float>> inititializeUnitMovementCostTable = []() -> std::vector<std::vector<float>> {
+    std::vector<std::vector<float>> data;
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
     lua_getglobal( L, "debug" );
@@ -679,12 +679,12 @@ static std::vector<std::vector<int>> inititializeUnitMovementCostTable = []() ->
         lua_pushnil( L );
         while( lua_next( L, -2 ) != 0 )
         {
-            data.push_back( std::vector<int>( ) );
+            data.push_back( std::vector<float>( ) );
             // iterate through numbers in array
             lua_pushnil( L );
             while( lua_next( L, -2 ) != 0 )
             {
-                if( lua_isnumber( L, -1 ) ) data.back( ).push_back( static_cast<int>( lua_tonumber( L, -1 ) ) );
+                if( lua_isnumber( L, -1 ) ) data.back( ).push_back( static_cast<float>( lua_tonumber( L, -1 ) ) );
                 else std::cout << "ERROR reading UnitMovementCost table from lua" << std::endl;
                 lua_pop( L, 1 ); // clean up iterations
             }

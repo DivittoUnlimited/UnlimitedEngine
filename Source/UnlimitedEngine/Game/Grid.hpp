@@ -28,6 +28,7 @@
 #include "Game/Unit.hpp"
 #include "Game/Building.hpp"
 #include "Graphics/RectangleShapeNode.hpp"
+#include "Graphics/TextNode.hpp"
 
 class World;
 class Unit;
@@ -74,6 +75,9 @@ public:
     /// positive values represent blue control and vice-versa 0 if unneeded or out of range of both teams
     float threatLevel;
 
+    RectangleShapeNode* rect;
+
+    TextNode* debugText;
 
     // used by WifeBot
     float costSoFar;
@@ -83,7 +87,7 @@ public:
 
 class Grid : public SceneNode {
 public:
-    Grid(World *world);
+    Grid( World *world, unsigned int gridWidth, unsigned int gridHeight );
     ~Grid( void );
 
     virtual unsigned int	getCategory( ) const;
@@ -117,7 +121,7 @@ public:
     /// \brief mData
     /// The main data structure for the whole battle has info on unit and building positions as well as the terrain type
     /// of the grid squares, the influence each team has on a square, and how much of a threat a square is to each team.
-    std::vector<std::vector<Square>> mData;
+    std::vector<Square> mData;
     ///
     /// \brief mCurrentUnits
     /// List of all the units currently on the field
@@ -135,10 +139,10 @@ public:
     /// The index of the grid square that was previously selected, if any.
     /// allows for easy access to elements in the mMovementGrid structure
     sf::Vector2i                        mSelectedGridIndex;
-    ///
-    /// \brief mDrawableGrid
-    /// The Graphical representation of the grid, (outline of squares, highlighting moves/attacks etc...)
-    std::vector<std::vector<RectangleShapeNode*>>    mDrawableGrid;
+    unsigned int    mGridWidth;
+    unsigned int    mGridHeight;
+
+
     bool mUpdateInfluenceMap;
     bool mUpdateThreatLevelMap;
     bool mShowInfluenceMap;

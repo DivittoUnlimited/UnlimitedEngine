@@ -77,7 +77,9 @@ private:
     sf::RenderTexture					mSceneTexture;
     sf::View							mWorldView;
     TextureManager						mTextures;
-    FontManager&						mFonts;
+public:
+    FontManager&						mFonts;  // made private becuase grid needed it and i am lazy
+private:
     MusicPlayer*                        mMusic;
     SoundPlayer&						mSounds;
     sf::Sprite                          mWindowSprite;

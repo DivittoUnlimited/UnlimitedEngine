@@ -35,6 +35,7 @@ public:
     bool mRecalculate;
     sf::Time mAnimationTimer;
     Category::Type* mCurrentTurn;
+    bool mAllUnitsMoved;
 };
 
 #endif // WIFEBOT_HPP

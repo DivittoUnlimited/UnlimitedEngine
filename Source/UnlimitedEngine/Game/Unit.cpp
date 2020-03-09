@@ -60,7 +60,6 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
         mDestination.x *= 64;
         mDestination.y *= 64;
     }
-
     // is currently following a path
     if( mDestination != sf::Vector2f( -1.0f, -1.0f ) )
     {
@@ -83,7 +82,6 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
             else mDestination = sf::Vector2f( -1.0f, -1.0f );
         }
     }
-
 }
 void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {

@@ -2,7 +2,7 @@
 #include "Core/Globals.hpp"
 
 template<class T>
-PathFinder<T>::PathFinder(std::vector<std::vector<T>> grid, T* start, T* goal, std::function<float(T *, T *)> heuristic )
+PathFinder<T>::PathFinder(std::vector<T> grid, T* start, T* goal, std::function<float(T *, T *)> heuristic )
 {
    mPath = calculatePath( grid, start, goal, heuristic );
 }
@@ -16,8 +16,9 @@ sf::Vector2i PathFinder<T>::getNextMove( void )
 }
 
 template<class T>
-std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<std::vector<T>> grid, T* start, T* goal, std::function<float(T*,T*)> heuristic )
-{
+std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<T> grid, T* start, T* goal, std::function<float(T*,T*)> heuristic )
+{   
+    //goal->gridIndex = sf::Vector2i( goal->gridIndex.y, goal->gridIndex.x );
     std::vector<sf::Vector2i> path;
     std::set<T*> openList;
     std::set<T*> closedList;
@@ -30,9 +31,9 @@ std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<std::vector<
             {
                 node->parent = current;
                 node->costSoFar = current->costSoFar + heuristic( current, node );
-                node->heuristicCost = heuristic( node, goal );
-                openList.insert( node );
+                node->heuristicCost = heuristic( node, start );
 
+                openList.insert( node );
                 //std::cout << "New Node added to possibles: " << node->gridIndex.x << ", " << node->gridIndex.y << std::endl;
             }
             else // node already on the open list.
@@ -49,55 +50,58 @@ std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<std::vector<
         }
     };
 
+    // no path can be made becuase it is unreachable, or the user is already there.
     if( !isValid( goal ) || *start == goal ) return path;
 
     // add the starting element to the open list to start the algorithm
-    start->parent = nullptr;
-    openList.insert( start );
+    goal->parent = nullptr;
+    openList.insert( goal );
 
     // run loop untill the goal has been found or you have run out of options to check (invalid path)
-    while( ( start->gridIndex != goal->gridIndex ) && !openList.empty() ) // DOES THIS EVEN MAKE SENSE???????????????????????????//
-    {
-        closedList.insert( start );
-        if( start->gridIndex.y >= 0 && static_cast<unsigned int>( start->gridIndex.y) < grid.at( start->gridIndex.x ).size( ))
-        {
-            if( (start->gridIndex.x > 0 ) )
-                calcT( start, &grid.at( start->gridIndex.x - 1 ).at( start->gridIndex.y ) );
-            if( static_cast<unsigned int>(start->gridIndex.x + 1) < grid.size( ) )
-                calcT( start, &grid.at( start->gridIndex.x + 1 ).at( start->gridIndex.y ) );
-        }
-        if( (start->gridIndex.x >= 0 && static_cast<unsigned int>(start->gridIndex.x) < grid.size( ) ) )
-        {
-            if( start->gridIndex.y > 0 )
-                calcT( start, &grid.at( start->gridIndex.x ).at( start->gridIndex.y - 1 ) );
-            if( static_cast<unsigned int>( start->gridIndex.y + 1) < grid.at( start->gridIndex.x ).size( ) )
-                calcT( start, &grid.at( start->gridIndex.x ).at( start->gridIndex.y + 1 ) );
-        }
+      while( ( goal->gridIndex != start->gridIndex ) && !openList.empty() ) // DOES THIS EVEN MAKE SENSE???????????????????????????//
+      {
+          closedList.insert( goal );
+          if( goal->gridIndex.y * 16 + goal->gridIndex.x > 0 && static_cast<unsigned int>( goal->gridIndex.y * 16 + goal->gridIndex.x) < grid.size( ) )
+          {
+              if( goal->gridIndex.y - 1 > 0 )
+                calcT( goal, &grid.at( ( goal->gridIndex.y - 1 ) * 16 + goal->gridIndex.x ) );
+              if( goal->gridIndex.y + 1 < 12 )
+                calcT( goal, &grid.at( ( goal->gridIndex.y + 1 ) * 16 + goal->gridIndex.x ) );
+              if( goal->gridIndex.x - 1 > 0 )
+                calcT( goal, &grid.at( goal->gridIndex.y * 16 + ( goal->gridIndex.x - 1 ) ) );
+              if( goal->gridIndex.x + 1 < 16 )
+                calcT( goal, &grid.at( goal->gridIndex.y * 16 + ( goal->gridIndex.x + 1 ) ) );
+          }
+          T* cheapest = (*openList.begin());
+          for( auto i : openList )
+          {
+              if( (*i) < cheapest )
+                  cheapest = i;
+          }
+          // this doesn't return the node with the lowest cost
+          goal = *openList.find( cheapest );
 
-        T* cheapest = (*openList.begin());
-        for( auto i : openList )
-        {
-            if( (*i) < cheapest )
-                *cheapest = *i;
-        }
-        // this doesn't return the node with the lowest cost
-        start = *openList.find( cheapest );
-
-        openList.erase( cheapest );
-    }
-    // build path here by reversing nodes taken to get to the goal
-    if( start->gridIndex == goal->gridIndex )
-    {
-        // path found just have to save it
-        while( start->parent != nullptr )
-        {
-            path.push_back( sf::Vector2i( start->gridIndex.x, start->gridIndex.y ) );
-            //std::cout << "Pos: " << start->gridIndex.y << ", " << start->gridIndex.x << " has been added to the PATH" << std::endl;
-            start = start->parent;
-        }
-
-    }
-    return path;
+          openList.erase( cheapest );
+      }
+      // build path here by reversing nodes taken to get to the goal
+      if( goal->gridIndex == start->gridIndex )
+      {
+          // path found just have to save it
+          while( goal->parent != nullptr )
+          {
+              goal = goal->parent;
+              path.push_back( sf::Vector2i( goal->gridIndex.x, goal->gridIndex.y ) );
+              std::cout << "Pos: " << goal->gridIndex.x << ", " << goal->gridIndex.y << " Pos Cost: " << goal->costSoFar + goal->heuristicCost << std::endl;
+          }
+          std::cout << "======================" << std::endl;
+      }
+      std::vector<sf::Vector2i> final;
+      while( path.size() > 0 )
+      {
+          final.push_back( path.back() );
+          path.pop_back();
+      }
+      return final;
 }
 
 template<class T>

@@ -12,6 +12,7 @@
 //const static int WINDOW_HEIGHT = sf::VideoMode::getDesktopMode().height;
 const static int   WINDOW_HEIGHT = 768;
 const static int   WINDOW_WIDTH  = 1024;
+const static int   TILE_SIZE     = 64;
 const static float FRAMES_PER_SECOND = 1.0f / 60.0f;
 
 extern GameModes::ID GAME_MODE; // init in Application Constructor
