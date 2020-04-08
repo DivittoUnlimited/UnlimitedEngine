@@ -28,27 +28,76 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     centerOrigin( mText );
     mText.setPosition( WINDOW_WIDTH / 2, 200 );
 
-    auto lightInfantry = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    lightInfantry->setPosition( WINDOW_WIDTH / 2 - 300, 300 );
-    lightInfantry->setText( "Light Infantry" );
-    lightInfantry->setCallback( [this, world] ( )
+    auto fighter = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    fighter->setPosition( WINDOW_WIDTH / 2 - 300, 300 );
+    fighter->setText( "Fighter" );
+    fighter->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "LightInfantry" ) );
+        world->setSelectedUnit( UnitTypeMap.at( "Fighter" ) );
         this->requestStackPop( );
     });
-    auto heavyInfantry = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    heavyInfantry->setPosition( WINDOW_WIDTH / 2 - 300, 400 );
-    heavyInfantry->setText( "Heavy Infantry" );
-    heavyInfantry->setCallback( [this] ( )
+
+    auto templar = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    templar->setPosition( WINDOW_WIDTH / 2 - 300, 360 );
+    templar->setText( "Templar" );
+    templar->setCallback( [this, world] ( )
     {
-        requestStackPop( );
+        world->setSelectedUnit( UnitTypeMap.at( "Templar" ) );
+        this->requestStackPop( );
     });
-    auto phalanx = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    phalanx->setPosition( WINDOW_WIDTH / 2 - 300, 500 );
-    phalanx->setText( "Phalanx" );
-    phalanx->setCallback( [this] ( )
+
+    auto medic = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    medic->setPosition( WINDOW_WIDTH / 2 - 300, 420 );
+    medic->setText( "Medic" );
+    medic->setCallback( [this, world] ( )
     {
-        requestStackPop( );
+        world->setSelectedUnit( UnitTypeMap.at( "Medic" ) );
+        this->requestStackPop( );
+    });
+
+    auto rogue = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    rogue->setPosition( WINDOW_WIDTH / 2 - 300, 480 );
+    rogue->setText( "Rogue" );
+    rogue->setCallback( [this, world] ( )
+    {
+        world->setSelectedUnit( UnitTypeMap.at( "Rogue" ) );
+        this->requestStackPop( );
+    });
+
+    auto archer = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    archer->setPosition( WINDOW_WIDTH / 2, 300 );
+    archer->setText( "Archer" );
+    archer->setCallback( [this, world] ( )
+    {
+        world->setSelectedUnit( UnitTypeMap.at( "Archer" ) );
+        this->requestStackPop( );
+    });
+
+    auto scout = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    scout->setPosition( WINDOW_WIDTH / 2, 360 );
+    scout->setText( "Scout" );
+    scout->setCallback( [this, world] ( )
+    {
+        world->setSelectedUnit( UnitTypeMap.at( "Scout" ) );
+        this->requestStackPop( );
+    });
+
+    auto wizard = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    wizard->setPosition( WINDOW_WIDTH / 2, 420 );
+    wizard->setText( "Wizard" );
+    wizard->setCallback( [this, world] ( )
+    {
+        world->setSelectedUnit( UnitTypeMap.at( "Wizard" ) );
+        this->requestStackPop( );
+    });
+
+    auto bard = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    bard->setPosition( WINDOW_WIDTH / 2, 480 );
+    bard->setText( "Bard" );
+    bard->setCallback( [this, world] ( )
+    {
+        world->setSelectedUnit( UnitTypeMap.at( "Bard" ) );
+        this->requestStackPop( );
     });
 
     auto none = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -59,9 +108,14 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
         requestStackPop( );
     });
 
-    mGUIContainer.pack( lightInfantry );
-    mGUIContainer.pack( heavyInfantry );
-    mGUIContainer.pack( phalanx );
+    mGUIContainer.pack( fighter );
+    mGUIContainer.pack( templar );
+    mGUIContainer.pack( medic );
+    mGUIContainer.pack( rogue );
+    mGUIContainer.pack( archer );
+    mGUIContainer.pack( scout );
+    mGUIContainer.pack( wizard );
+    mGUIContainer.pack( bard );
     mGUIContainer.pack( none );
 }
 

@@ -59,7 +59,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 
     auto playButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playButton->setPosition( WINDOW_WIDTH / 2 - 100, 390 );
-    playButton->setText( "Single Player" );
+    playButton->setText( "Local Game" );
     playButton->setCallback( [this] ( )
 	{
         GAME_MODE = GameModes::Online;
@@ -67,19 +67,8 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStackPush( States::SinglePlayerMenuState );
 	});
 
-    auto splitScreenButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    splitScreenButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
-    splitScreenButton->setText( "Couch Co-op" );
-    splitScreenButton->setCallback( [this] ( )
-    {
-        // need to make this go to the proper state maybe add a co-op setup state instead of quickBattleSetupState
-        GAME_MODE = GameModes::NONE;
-        requestStackPop( );
-        requestStackPush( States::QuickBattleSetupState );
-    });
-
     auto playLocalButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playLocalButton->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
+    playLocalButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
     playLocalButton->setText( "Create Server" );
     playLocalButton->setCallback( [this] ( )
     {
@@ -89,7 +78,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     });
 
     auto playMultiplayerButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playMultiplayerButton->setPosition( WINDOW_WIDTH / 2 - 100, 570 );
+    playMultiplayerButton->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
     playMultiplayerButton->setText( "Join Server" );
     playMultiplayerButton->setCallback( [this] ( )
     {
@@ -99,7 +88,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     });
 
     auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 630 );
+    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 570 );
     settingsButton->setText( "Settings" );
     settingsButton->setCallback([this] ( )
 	{
@@ -108,7 +97,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 	});
 
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 690 );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 630 );
     exitButton->setText( "Exit" );
     exitButton->setCallback([this] ( )
 	{
@@ -118,7 +107,6 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 
 
     mGUIContainer.pack( playButton );
-    mGUIContainer.pack( splitScreenButton );
     mGUIContainer.pack( playLocalButton );
     mGUIContainer.pack( playMultiplayerButton );
     mGUIContainer.pack( settingsButton );

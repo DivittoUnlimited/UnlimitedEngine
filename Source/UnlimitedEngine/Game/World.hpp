@@ -22,6 +22,7 @@
 #include "Core/State.hpp"
 #include "Graphics/PostEffect.hpp"
 #include "Graphics/BloomEffect.hpp"
+#include "Graphics/TextNode.hpp"
 #include "Core/Globals.hpp"
 #include "Core/Player.hpp"
 #include "Core/CollisionMan.hpp"
@@ -90,6 +91,10 @@ public:
 private:
     std::vector<SceneNode*>          	mSceneLayers;
 public:
+    /// \brief mDeltaMousePosition
+    /// used to track mouse position considering the offset caused by moving the worldView (Camera)
+    sf::Vector2f                        mDeltaMousePosition;
+    float                               mCameraPanSpeed;
     bool								mNetworkedWorld;
     bool                                mLocalMultiplayerWorld;
 
@@ -133,6 +138,17 @@ public:
     /// \brief mLoadUnitsFromFile
     /// Flag to tell build scene to load from Tiled map or a player's save file
     bool                                mLoadUnitsFromFile;
+
+    ///
+    /// \brief mChangeTurnText
+    /// Text that pops up on screen to tell the players that the turn has changed
+    sf::Text                            mChangeTurnText;
+
+    ///
+    /// \brief mChangeTurnTextTimer
+    /// The length of time that the change turn text should be displayed over the game.
+    sf::Time                            mChangeTurnTextTimer;
+
 };
 
 #endif // WORLD_HPP

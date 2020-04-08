@@ -16,12 +16,11 @@ Grid::Grid( World* world, unsigned int gridWidth, unsigned int gridHeight )
     , mUnitAwaitingOrders( false )
     , mGridWidth( gridWidth )
     , mGridHeight( gridHeight )
+    , mUpdateFogOfWar( true )
     , mUpdateInfluenceMap( true )
     , mUpdateThreatLevelMap( false )
     , mShowInfluenceMap( true )
     , mShowThreatLevelMap( false )
-
-
 {
 
 }
@@ -44,8 +43,16 @@ bool Grid::isDestroyed( ) const
 }
 void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
+    //if( mUpdateFogOfWar )
+    {
+        //updateFogOfWar( );
+        //mUpdateFogOfWar = false;
+    }
+
+    // The onscreen debugging view of influence set to show offensive influence by default
     if( mUpdateInfluenceMap ) updateInfluenceMap( );
-    if( mUpdateThreatLevelMap ) updateThreatLevelMap( );
+
+    // Handle relevant commands
     while( !commands.isEmpty() )
     {
         Command com = commands.pop();
@@ -97,12 +104,14 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                     ///
                     // ENTER COMBAT ALGORITHM HERE!!!!!!!!!!!!
                     ///
-                    mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mConstitution = 0;
-                    mCurrentUnits.erase( static_cast<unsigned int>(square->unitID) );
+                    mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->takeDamage( 75 );
                     mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mHasSpentAction = true;
                     mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mIsSelectedUnit = false;
-
-                    removeUnit( sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
+                    if( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mConstitution <= 0 )
+                    {
+                        mCurrentUnits.erase( static_cast<unsigned int>(square->unitID) );
+                        removeUnit( sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
+                    }
                     clearGrid();
                 }
                 else if( square->buildingID != -1 )
@@ -155,7 +164,6 @@ void Grid::handleLeftClick( sf::Vector2i pos )
     }
 }
 
-
 bool Grid::buildGrid(  Tiled::TileSet tileSet, Tiled::Layer layer )
 {
     unsigned int counter = 0;
@@ -165,7 +173,6 @@ bool Grid::buildGrid(  Tiled::TileSet tileSet, Tiled::Layer layer )
         {
             mData.push_back( Square( TerrainTypeMap.at( tileSet.tiles.at( layer.data[counter]-1 ).at( "type" ) ),
                                             sf::Vector2i( i, j ), sf::Vector2f( i * TILE_SIZE, j * TILE_SIZE), TILE_SIZE, false ) );
-
             mData.back().gridIndex = sf::Vector2i( i, j );
             std::unique_ptr<RectangleShapeNode> rect(
                         new RectangleShapeNode( sf::IntRect( sf::Vector2i( static_cast<int>( i * tileSet.tileWidth ),
@@ -176,19 +183,19 @@ bool Grid::buildGrid(  Tiled::TileSet tileSet, Tiled::Layer layer )
             rect.get()->getSprite()->setOutlineThickness( 1 );
             rect.get()->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 150 ) );
 
-
-
-            std::unique_ptr<TextNode> debugText( new TextNode( mWorld->mFonts, std::to_string( mData.size()-1 ) + "\n" + std::to_string( mData[j * mGridWidth + i].unitID ) ) );
+            ++counter;
+            std::unique_ptr<TextNode> debugText( new TextNode( mWorld->mFonts, "X" ) );
             debugText.get()->setPosition( rect.get()->getSprite()->getPosition().x + 25, rect.get()->getSprite()->getPosition().y + 25 );
             mData.back().debugText = debugText.get();
             mData.back().rect = rect.get();
-
             this->attachChild( std::move( rect ) );
             this->attachChild( std::move( debugText ) );
-
-            ++counter;
         }
     }
+    // turn off fog of war if both players are using the same screen.
+    if( mWorld->mLocalMultiplayerWorld )
+        for( unsigned int i = 0; i < mData.size(); ++i )
+            mData[i].isVisible = true;
     return true;
 }
 
@@ -229,12 +236,11 @@ void Grid::addUnit( Unit* unit )
         if( mData[i].mBounds.contains( unit->getPosition().x, unit->getPosition().y + TILE_SIZE / 2 ) )
         {
             unit->mGridIndex = mData[i].gridIndex;
-            //int index = ((unit->mGridIndex.x) * (unit->mGridIndex.y) + unit->mGridIndex.y);
             mData[i].isOccupied = true;
             mData[i].unitID = unit->mID;
-            mData[i].debugText->setString( std::to_string( mData[i].unitID ) );
-            mData[i].debugText->setColor( sf::Color::Yellow );
             mCurrentUnits.insert( std::pair<unsigned int, Unit*>( unit->mID, unit ) );
+            // mData[i].debugText->setString( std::to_string( mData[i].unitID ) );
+            // mData[i].debugText->setColor( sf::Color::Yellow );
             break;
         }
     }
@@ -247,6 +253,7 @@ void Grid::addBuilding( Building* building )
         if( mData[j].mBounds.contains( building->getPosition().x, building->getPosition().y ) )
         {
             mData[j].buildingID = building->mID;
+            mData[j].isVisible = true;
             building->mGridIndex = sf::Vector2i( building->getPosition().x / TILE_SIZE, building->getPosition().y / TILE_SIZE );
             mCurrentBuildings.push_back( building );
             break;
@@ -256,8 +263,10 @@ void Grid::addBuilding( Building* building )
 
 void Grid::removeUnit( sf::Vector2i position )
 {
-    mData[position.x * mGridWidth + position.y].unitID = -1;
-    mData[position.x * mGridWidth + position.y].isOccupied = false;
+    mCurrentUnits.erase( mData[position.y * mGridWidth + position.x].unitID );
+    mData[position.y * mGridWidth + position.x].unitID = -1;
+    mData[position.y * mGridWidth + position.x].isOccupied = false;
+    mUpdateFogOfWar = true;
 }
 
 void Grid::selectUnit( unsigned int i, unsigned int j )
@@ -273,7 +282,9 @@ void Grid::selectUnit( unsigned int i, unsigned int j )
             for( auto loc : possibleLocations )
             {
                 mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
-                mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
+                if( unit->mIsVisible && (( !mWorld->mNetworkedWorld && !mWorld->mLocalMultiplayerWorld && mWorld->mCurrentTurn & Category::Blue ) ||
+                        mWorld->mNetworkedWorld || mWorld->mLocalMultiplayerWorld ) )
+                    mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
             }
             mSelectedGridIndex = sf::Vector2i( i, j );
             mWorld->setSelectedUnit( unit->mID );
@@ -287,37 +298,45 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
 {
     Square* newSquare = &mData[newPos.y * mGridWidth + newPos.x];
     Square* oldSquare = &mData[currentPos.y * mGridWidth + currentPos.x];
-    newSquare->unitID = oldSquare->unitID;
-    newSquare->isOccupied = true;
-    Unit* unit = mCurrentUnits[oldSquare->unitID];
-    oldSquare->unitID = -1;
-    oldSquare->isOccupied = false;
-    unit->mHasMoved = true;
-    unit->mGridIndex = newPos;
-    mSelectedGridIndex = newPos;
-
-    std::cout << "Grid::MoveUnit Unit Path:" << std::endl;
-    unit->mPath = new PathFinder<Square>( mData, oldSquare, newSquare,
-            [=]( Square* start, Square* goal )->float {
-            float distance = std::abs( start->gridIndex.x - goal->gridIndex.x )+std::abs( start->gridIndex.y - goal->gridIndex.y );
-                if( distance > 1 )
-                {
-                    distance *= .5;
-                    distance += getMoveCost( unit->mUnitType, start->terrainType );
-                }
-                return distance;
-
-        //return (std::abs( start->gridIndex.x - goal->gridIndex.x ) +
-        //       std::abs( ( start->gridIndex.y - goal->gridIndex.y )));
-            } );
-
-    // remove movement squares
-    for( unsigned int i = 0; i < mData.size(); ++i )
+    if( newSquare->isOccupied ) clearGrid();
+    else
     {
-        mData[i].isPossibleNewLocation = false;
-        mData[i].rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+        oldSquare->isVisible = false;
+        newSquare->isVisible = true;
+        newSquare->unitID = oldSquare->unitID;
+        newSquare->isOccupied = true;
+        Unit* unit = mCurrentUnits[oldSquare->unitID];
+        oldSquare->unitID = -1;
+        oldSquare->isOccupied = false;
+        newSquare->isOccupied = true;
+        unit->mHasMoved = true;
+        unit->mGridIndex = newPos;
+        mSelectedGridIndex = newPos;
+
+        // std::cout << "Grid::MoveUnit Unit Path:" << std::endl;
+        unit->mPath = new PathFinder<Square>( mData, sf::Vector2i( mGridWidth, mGridHeight ), oldSquare, newSquare,
+                [=]( Square* start, Square* goal )->float {
+                float distance = std::abs( start->gridIndex.x - goal->gridIndex.x )+std::abs( start->gridIndex.y - goal->gridIndex.y );
+                    if( distance > 1 )
+                    {
+                        distance *= .5;
+                        distance += getMoveCost( unit->mUnitType, start->terrainType );
+                    }
+                    return distance;
+
+            //return (std::abs( start->gridIndex.x - goal->gridIndex.x ) +
+            //       std::abs( ( start->gridIndex.y - goal->gridIndex.y )));
+                } );
+
+        // remove movement squares
+        for( unsigned int i = 0; i < mData.size(); ++i )
+        {
+            mData[i].isPossibleNewLocation = false;
+            mData[i].rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+        }
+        getTartgets( newPos.x, newPos.y );
+        mUpdateFogOfWar = true;
     }
-    getTartgets( newPos.x, newPos.y );
     return true;
 }
 
@@ -356,23 +375,23 @@ void Grid::clearGrid( void )
 {
     for( unsigned int i = 0; i < mData.size(); ++i )
     {
-            mData[i].isPossibleNewLocation = false;
-            mData[i].isPossibleAttackPosition = false;
-            mData[i].rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+        mData[i].isPossibleNewLocation = false;
+        mData[i].isPossibleAttackPosition = false;
+        mData[i].rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+        // clear influence map before update
+        mData[i].offensiveInfluence = 0.0f;
+        mData[i].defensiveInfluence = 0.0f;
+        mData[i].tacticalInfluence = 0.0f;
     }
-    // clear influence map before update
-    for( unsigned int i = 0; i < mData.size(); ++i )
-               mData[i].influence = 0.0f;
-
     mWorld->setSelectedUnit( -1 );
     mWorld->setSelectedBuilding( -1 );
     mSelectedGridIndex = sf::Vector2i( 0, 0 );
     mUnitAwaitingOrders = false;
+    mUpdateFogOfWar = true;
 }
 
 bool Grid::handleEvent( sf::Event )
 {
-
     return true;
 }
 
@@ -381,14 +400,17 @@ void Grid::buildPossiblePositions( std::vector<sf::Vector2i>* mPossiblePositions
     if( distanceLeft >= 0 && static_cast<unsigned int>( startingPoint.y * mGridWidth + startingPoint.x ) < mData.size() )
     {
         Square* square = &mData[startingPoint.y * mGridWidth + startingPoint.x];
-        if( square->buildingID == -1 || !(mCurrentBuildings.at( square->buildingID )->mCategory & mWorld->mCurrentTurn) )
+        if(square->buildingID == -1 || !(mCurrentBuildings.at( square->buildingID )->mCategory & mWorld->mCurrentTurn) )
             mPossiblePositions->push_back( startingPoint );
         distanceLeft -= getMoveCost( unitType, square->terrainType );
 
         buildPossiblePositions( mPossiblePositions, sf::Vector2i( startingPoint.x, startingPoint.y - 1 ), unitType, distanceLeft );
         buildPossiblePositions( mPossiblePositions, sf::Vector2i( startingPoint.x, startingPoint.y + 1 ), unitType, distanceLeft );
-        buildPossiblePositions( mPossiblePositions, sf::Vector2i( startingPoint.x - 1, startingPoint.y ), unitType, distanceLeft );
-        buildPossiblePositions( mPossiblePositions, sf::Vector2i( startingPoint.x + 1, startingPoint.y ), unitType, distanceLeft );
+
+        if( square != &mData[startingPoint.y * mGridWidth + 0] ) // square != farthest left square in a row
+            buildPossiblePositions( mPossiblePositions, sf::Vector2i( startingPoint.x - 1, startingPoint.y ), unitType, distanceLeft );
+        if( square != &mData[startingPoint.y * mGridWidth + (mGridWidth-1)] ) // square != farthest right squre in a row
+            buildPossiblePositions( mPossiblePositions, sf::Vector2i( startingPoint.x + 1, startingPoint.y ), unitType, distanceLeft );
     }
 }
 
@@ -398,20 +420,66 @@ unsigned int Grid::getMoveCost( int unitType, unsigned int terrainType )
     return MoveCostTable[unitType][terrainType];
 }
 
-void Grid::updateInfluenceMap()
+void Grid::updateFogOfWar( void )
 {
-    for( auto square : mData )
+    if( mUpdateFogOfWar && !mWorld->mLocalMultiplayerWorld )
     {
-        if( square.influence > 0 )
-            square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 255, 255 * (-1*square.influence) ) ); // blue
-        else if( square.influence < 0 )
-            square.rect->getSprite()->setFillColor( sf::Color( 255, 0, 0, 255 * square.influence ) ); // Red
-        square.influence = 0;
+        // Fill fog completly
+        for( unsigned int i = 0; i < mData.size(); ++i )
+            mData[i].isVisible = false;
+
+        // traverse units and buildPos using perception to mark visible squares
+        for( auto unit : mCurrentUnits )
+        {
+            unit.second->mIsVisible = false;
+            if( unit.second->mCategory & Category::Type::Blue )
+            {
+                std::vector<sf::Vector2i> visibleSquares;
+                buildPossiblePositions( &visibleSquares, unit.second->mGridIndex, -1, unit.second->mPerception );
+                for( auto loc : visibleSquares )
+                    mData[loc.y * mGridWidth + loc.x].isVisible = true;
+            }
+            if( mData[unit.second->mGridIndex.y * mGridWidth + unit.second->mGridIndex.x].isVisible ) unit.second->mIsVisible = true;
+        }
+
+        // update fog based on new data
+        for( auto square : mData )
+            if( !square.isPossibleAttackPosition && !square.isPossibleNewLocation )
+            {
+                if( square.isVisible ) square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+                else square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 100 ) );
+            }
     }
 }
 
-void Grid::updateThreatLevelMap()
-{
 
+void Grid::updateInfluenceMap( InfluenceType type)
+{
+    for( auto square : mData )
+        switch( type )
+        {
+            case InfluenceType::Offensive:
+                if( square.offensiveInfluence > 0 )
+                    square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 255, 255 * (-1*square.offensiveInfluence) ) ); // blue
+                else if( square.offensiveInfluence < 0 )
+                    square.rect->getSprite()->setFillColor( sf::Color( 255, 0, 0, 255 * square.offensiveInfluence ) ); // Red
+                square.offensiveInfluence = 0;
+            break;
+            case InfluenceType::Defensive:
+                if( square.defensiveInfluence > 0 )
+                    square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 255, 255 * (-1*square.defensiveInfluence) ) ); // blue
+                else if( square.defensiveInfluence < 0 )
+                    square.rect->getSprite()->setFillColor( sf::Color( 255, 0, 0, 255 * square.defensiveInfluence ) ); // Red
+                square.defensiveInfluence = 0;
+            break;
+            case InfluenceType::BuidingInfluence:
+                if( square.tacticalInfluence > 0 )
+                    square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 255, 255 * (-1*square.tacticalInfluence) ) ); // blue
+                else if( square.tacticalInfluence < 0 )
+                    square.rect->getSprite()->setFillColor( sf::Color( 255, 0, 0, 255 * square.tacticalInfluence ) ); // Red
+                square.tacticalInfluence = 0;
+            break;
+        }
 }
+
 

@@ -99,12 +99,22 @@ bool GameState::update( sf::Time dt )
 bool GameState::handleEvent( const sf::Event& event )
 {
     // Escape pressed, trigger the pause screen -- 9 is the id of the start button
-    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )) {
+    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape ) )
         requestStackPush( States::Pause );
+    else if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
+    {
+        // create a new event with delta mouse pos
+        sf::Event newEvent;
+        newEvent.type = sf::Event::MouseButtonReleased;
+        newEvent.mouseButton.button = sf::Mouse::Left;
+        newEvent.mouseButton.x = event.mouseButton.x + mWorld.mDeltaMousePosition.x;
+        newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
+
+        mPlayer.handleEvent( newEvent, mWorld.getCommandQueue( ) );
     }
-
-    mPlayer.handleEvent( event, mWorld.getCommandQueue( ) );
-    mWorld.handleEvent( event );
-
+    else
+    {
+        mWorld.handleEvent( event );
+    }
 	return true;
 }

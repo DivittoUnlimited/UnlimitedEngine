@@ -35,7 +35,7 @@ const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 // Defined in Globals.hpp
 sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default );
 GameModes::ID GAME_MODE = GameModes::NONE;
-States::ID CURRENT_LEVEL = States::Level1;
+States::ID CURRENT_LEVEL = States::SinglePlayerLevel1;
 Category::Type CURRENT_TURN = Category::Blue;
 
 Application::Application( )
@@ -156,7 +156,7 @@ void Application::registerStates( )
     mStateStack.registerState<PauseState>               ( States::NetworkPause, true );
 
     // Levels 1 Player vs A.I
-    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel1, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel1, LevelMap.at( "Courtyard" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel2, LevelMap.at( "TacticsTribeDemoLevel" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel3, LevelMap.at( "TacticsTribeDemoLevel" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel4, LevelMap.at( "TacticsTribeDemoLevel" ) );
@@ -181,16 +181,16 @@ void Application::registerStates( )
     mStateStack.registerState<GameState>                ( States::Level10, LevelMap.at( "TacticsTribeDemoLevel" ) );
 
     // CutScenes
-    mStateStack.registerState<CutSceneState>            ( States::IntroCutSceneDialogState, States::Level1 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene1State, States::Level2 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene2State, States::Level3 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene3State, States::Level4 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene4State, States::Level5 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene5State, States::Level6 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene6State, States::Level7 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene7State, States::Level8 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene8State, States::Level9 );
-    mStateStack.registerState<CutSceneState>            ( States::cutScene9State, States::Level10 );
+    mStateStack.registerState<CutSceneState>            ( States::IntroCutSceneDialogState, States::SinglePlayerLevel1 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene1State, States::SinglePlayerLevel2 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene2State, States::SinglePlayerLevel3 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene3State, States::SinglePlayerLevel4 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene4State, States::SinglePlayerLevel5 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene5State, States::SinglePlayerLevel6 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene6State, States::SinglePlayerLevel7 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene7State, States::SinglePlayerLevel8 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene8State, States::SinglePlayerLevel9 );
+    mStateStack.registerState<CutSceneState>            ( States::cutScene9State, States::SinglePlayerLevel10 );
 
 }
 

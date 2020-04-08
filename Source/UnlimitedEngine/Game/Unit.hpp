@@ -3,6 +3,7 @@
 
 #include "Graphics/SceneNode.hpp"
 #include <SFML/Graphics/Sprite.hpp>
+#include "Graphics/RectangleShapeNode.hpp"
 
 #include "Core/PathFinder.hpp"
 #include "Game/DataTables.hpp"
@@ -20,6 +21,8 @@ public:
     virtual void			updateCurrent( sf::Time dt, CommandQueue& commands );
     virtual void			drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const;
 
+    void                    takeDamage( int amount );
+
     //## Attributes
     unsigned int mID;
     sf::Sprite mSprite;
@@ -29,15 +32,21 @@ public:
 
     unsigned int mStrength;
     unsigned int mDexterity;
-    unsigned int mConstitution;
+    int mConstitution;
+    int mMaxConstitution;
     unsigned int mDefense;
     sf::Vector2i mRange;
+    unsigned int mPerception;
     bool mHasMoved;
     bool mHasSpentAction;
     bool mIsSelectedUnit;
     float mSpeed; // used to controll how fast the unit moves around the map
     PathFinder<Square>* mPath;
     sf::Vector2f mDestination;
+    bool mIsVisible;
+
+    RectangleShapeNode* mHealthBarBorder;
+    RectangleShapeNode* mHealthBar;
 };
 
 #endif // UNIT_HPP

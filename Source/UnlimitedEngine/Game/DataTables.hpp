@@ -106,7 +106,9 @@ struct UnitTypeData {
     int defense;
     std::string type;
     sf::Vector2i range;
+    unsigned int perception;
     std::string textureID;
+    sf::Rect<int> textureRect;
 };
 
 struct BuildingData {
@@ -534,12 +536,39 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "range" << std::endl;
                     lua_pop( L, 1 );
 
+                    lua_getfield( L, -1, "perception" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].perception = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "perception" << std::endl;
+                    lua_pop( L, 1 );
+
                     lua_getfield( L, -1, "texture" );
                     if( lua_isstring( L, -1 ) ) data[i->second].textureID = lua_tostring( L, -1 );
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "texture" << std::endl;
                     lua_pop( L, 1 );
 
-                    // NEED TO ADD TEXTURE RECTS FOR ANIMATIONS HERE!!!!!!!!
+                    lua_getfield( L, -1, "textureRect" );
+                    if( lua_istable( L, -1 ) )
+                    {
+                        lua_getfield( L, -1, "top" );
+                        if( lua_isnumber( L, -1 ) ) data[i->second].textureRect.top = static_cast<int>( lua_tonumber( L, -1 ) );
+                        else std::cout << "Error loading UnitType " << i->first.c_str() << "TextureRect" << std::endl;
+                        lua_pop( L, 1 );
+                        lua_getfield( L, -1, "left" );
+                        if( lua_isnumber( L, -1 ) ) data[i->second].textureRect.left = static_cast<int>( lua_tonumber( L, -1 ) );
+                        else std::cout << "Error loading UnitType " << i->first.c_str() << "TextureRect" << std::endl;
+                        lua_pop( L, 1 );
+                        lua_getfield( L, -1, "width" );
+                        if( lua_isnumber( L, -1 ) ) data[i->second].textureRect.width = static_cast<int>( lua_tonumber( L, -1 ) );
+                        else std::cout << "Error loading UnitType " << i->first.c_str() << "TextureRect" << std::endl;
+                        lua_pop( L, 1 );
+                        lua_getfield( L, -1, "height" );
+                        if( lua_isnumber( L, -1 ) ) data[i->second].textureRect.height = static_cast<int>( lua_tonumber( L, -1 ) );
+                        else std::cout << "Error loading UnitType " << i->first.c_str() << "TextureRect" << std::endl;
+                        lua_pop( L, 1 );
+                    }
+                    // Commented out because not all units have texRects. Not having one indicates that they use the entire texture.
+                    //else std::cout << "Error loading UnitType " << i->first.c_str() << " range" << std::endl;
+                    lua_pop( L, 1 );
                 }
                 lua_pop( L, 1 ); // defintion table
             }

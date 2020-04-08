@@ -29,36 +29,36 @@ CutSceneState::CutSceneState( States::ID id, StateStack& stack, Context context,
     mContext.textures->load( TextureMap.at( "DemoGirl" ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "DemoGirl" ) ) );
 
 
-    switch( CURRENT_LEVEL )
+    switch( mNextState )
     {
-        case States::Level1:
+        case States::SinglePlayerLevel1:
             mMessageBox = new MessageBoxNode( "IntroCutSceneDialog",  *context.fonts );
         break;
-        case States::Level2:
+        case States::SinglePlayerLevel2:
             mMessageBox = new MessageBoxNode( "Chapter1", *context.fonts );
         break;
-        case States::Level3:
+        case States::SinglePlayerLevel3:
             mMessageBox = new MessageBoxNode( "Chapter2", *context.fonts );
         break;
-        case States::Level4:
+        case States::SinglePlayerLevel4:
             mMessageBox = new MessageBoxNode( "Chapter3", *context.fonts );
         break;
-        case States::Level5:
+        case States::SinglePlayerLevel5:
             mMessageBox = new MessageBoxNode( "Chapter4", *context.fonts );
         break;
-        case States::Level6:
+        case States::SinglePlayerLevel6:
             mMessageBox = new MessageBoxNode( "Chapter5", *context.fonts );
         break;
-        case States::Level7:
+        case States::SinglePlayerLevel7:
             mMessageBox = new MessageBoxNode( "Chapter6", *context.fonts );
         break;
-        case States::Level8:
+        case States::SinglePlayerLevel8:
             mMessageBox = new MessageBoxNode( "Chapter7", *context.fonts );
         break;
-        case States::Level9:
+        case States::SinglePlayerLevel9:
             mMessageBox = new MessageBoxNode( "Chapter8", *context.fonts );
         break;
-        case States::Level10:
+        case States::SinglePlayerLevel10:
             mMessageBox = new MessageBoxNode( "Chapter9", *context.fonts );
             std::cout << "You Win! Role Credits..." << std::endl;
             requestStackPop( );
@@ -67,8 +67,6 @@ CutSceneState::CutSceneState( States::ID id, StateStack& stack, Context context,
         default: break;
     }
     mMessageBox->setPosition( 50, 400 );
-
-
 
 }
 
@@ -95,7 +93,7 @@ bool CutSceneState::update( sf::Time )
     if( mMessageBox->complete( ) )
     {
         requestStackPop( );
-        requestStackPush( CURRENT_LEVEL );
+        requestStackPush( mNextState );
         /*
          *  THIS SHOULD BE HANDLED IN THE VICTORY STAT SCREEN
         switch( CURRENT_LEVEL )

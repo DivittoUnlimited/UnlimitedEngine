@@ -31,15 +31,24 @@ QuickBattleSetupState::QuickBattleSetupState( States::ID id, StateStack& stack, 
 
     auto StartBattle = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     StartBattle->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
-    StartBattle->setText( "Start Battle!(TEST_MAP)" );
+    StartBattle->setText( "Player Vs. AI" );
     StartBattle->setCallback( [this] ( )
+    {
+        requestStackPop( );
+        requestStackPush( States::SinglePlayerLevel1 );
+    });
+
+    auto StartCoopBattle = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    StartCoopBattle->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
+    StartCoopBattle->setText( "Player Vs. Player" );
+    StartCoopBattle->setCallback( [this] ( )
     {
         requestStackPop( );
         requestStackPush( States::Level1 );
     });
 
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 570 );
     exitButton->setText( "Return to Menu" );
     exitButton->setCallback( [this] ( )
     {
@@ -48,6 +57,7 @@ QuickBattleSetupState::QuickBattleSetupState( States::ID id, StateStack& stack, 
     });
 
     mGUIContainer.pack( StartBattle );
+    mGUIContainer.pack( StartCoopBattle );
     mGUIContainer.pack( exitButton );
 }
 

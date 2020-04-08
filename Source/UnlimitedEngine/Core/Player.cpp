@@ -39,8 +39,10 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
         if( mSocket )
         {
             sf::Packet packet;
-            float x = sf::Mouse::getPosition(*mWindow).x;
-            float y = sf::Mouse::getPosition(*mWindow).y;
+            float x = event.mouseButton.x;
+            float y = event.mouseButton.y;
+            //float x = sf::Mouse::getPosition(*mWindow).x;
+            //float y = sf::Mouse::getPosition(*mWindow).y;
             packet << static_cast<sf::Int32>( Client::LeftClick );
             packet << mIdentifier;
             packet << x;
@@ -52,7 +54,7 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
         {
             Command com;
             com.category = Category::Grid;
-            com.action = derivedAction<Grid>( [] ( Grid& g, sf::Time ){ g.handleLeftClick( sf::Mouse::getPosition( *mWindow ) ); } );
+            com.action = derivedAction<Grid>( [event] ( Grid& g, sf::Time ){ g.handleLeftClick( sf::Vector2i( event.mouseButton.x, event.mouseButton.y ) ); } );
             commands.push( com );
         }
     }

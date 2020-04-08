@@ -212,7 +212,21 @@ bool MultiplayerGameState::handleEvent( const sf::Event& event )
 
     // Forward event to all players ----
     if( mClientTeamColor & mWorld.mCurrentTurn )
-        mPlayer->handleEvent( event, commands );
+    {
+        if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
+        {
+            // create a new event with delta mouse pos
+            sf::Event newEvent;
+            newEvent.type = sf::Event::MouseButtonReleased;
+            newEvent.mouseButton.button = sf::Mouse::Left;
+            newEvent.mouseButton.x = event.mouseButton.x + mWorld.mDeltaMousePosition.x;
+            newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
+
+            mPlayer->handleEvent( newEvent, commands );
+        }
+        else
+            mPlayer->handleEvent( event, commands );
+    }
 
     mWorld.handleEvent( event );
 

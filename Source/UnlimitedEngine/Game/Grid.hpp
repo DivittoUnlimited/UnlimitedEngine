@@ -33,6 +33,13 @@
 class World;
 class Unit;
 
+enum InfluenceType
+{
+    Offensive,
+    Defensive,
+    BuidingInfluence
+};
+
 class Square
 {
 public:
@@ -45,8 +52,12 @@ public:
         , mBounds( pos, sf::Vector2f( size, size ) )
         , unitID( -1 )
         , buildingID( -1 )
-        , influence( 0.0f )
-        , threatLevel( 0.0f )
+        , offensiveInfluence( 0.0f )
+        , defensiveInfluence( 0.0f )
+        , tacticalInfluence( 0.0f )
+        , importance( 0.0f )
+        , isVisible( true )
+        , debugText( nullptr )
         , costSoFar( 0.0f )
         , heuristicCost( 0.0f )
         , parent( nullptr )
@@ -65,15 +76,30 @@ public:
     int unitID;
     int buildingID;
     ///
-    /// \brief influence
+    /// \brief offensiveInfluence
     /// range of -1.0 -> 1.0
     /// positive values represent blue control and vice-versa 0 if unneeded or out of range of both teams
-    float influence;
+    float offensiveInfluence;
     ///
-    /// \brief influence
+    /// \brief defensiveInfluence
     /// range of -1.0 -> 1.0
     /// positive values represent blue control and vice-versa 0 if unneeded or out of range of both teams
-    float threatLevel;
+    float defensiveInfluence;
+    ///
+    /// \brief tacticalInfluence
+    /// range of -1.0 -> 1.0
+    /// positive values represent blue control and vice-versa 0 if unneeded or out of range of both teams
+    float tacticalInfluence;
+    ///
+    /// \brief importance
+    /// Manually loaded from lua in the buildScene method this is the value the AI should place on this
+    /// location
+    float importance;
+
+    ///
+    /// \brief isVisible
+    /// used to check if this square should be covered by the fog of war(give the rect below a grey transparent fill color)
+    bool isVisible;
 
     RectangleShapeNode* rect;
 
@@ -113,7 +139,7 @@ public:
 
     bool handleEvent(sf::Event event);
     unsigned int getMoveCost( int unitType, unsigned int terrainType );
-
+    void updateFogOfWar( void );
 
     // Attributes
     World* mWorld;
@@ -142,6 +168,7 @@ public:
     unsigned int    mGridWidth;
     unsigned int    mGridHeight;
 
+    bool                                mUpdateFogOfWar;
 
     bool mUpdateInfluenceMap;
     bool mUpdateThreatLevelMap;
@@ -151,8 +178,7 @@ public:
 private:
     void buildPossiblePositions(std::vector<sf::Vector2i> *mPossiblePositions, sf::Vector2i startingPoint, unsigned int unitType, int distanceLeft );
     void buildPossibleTargets( std::vector<sf::Vector2i> *mPossiblePositions, sf::Vector2i startingPoint, int distanceLeft );
-    void updateInfluenceMap();
-    void updateThreatLevelMap();
+    void updateInfluenceMap( InfluenceType type = InfluenceType::Offensive );
 
 };
 

@@ -14,9 +14,11 @@ DISTFILES += \
     Game/Lua/Application.lua \
     Game/Lua/Buildings.lua \
     Game/Lua/Game.lua \
+    Game/Lua/InfluenceMaps.lua \
     Game/Lua/Resources/Actors.lua \
     Game/Lua/Resources/Assets.lua \
     Game/Lua/Resources/Conversations.lua \
+    Game/Lua/Resources/Maps/Courtyard.lua \
     Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua \
     Game/Lua/Resources/Particles.lua \
     Game/Lua/Resources/SourceFileMap.lua \
@@ -40,6 +42,7 @@ DISTFILES += \
     Media/Textures/LightInfantry.png \
     Media/Textures/Particle.png \
     Media/Textures/SpawnPoint.png \
+    Media/Textures/UnitSpriteSheet.png \
     Notes.txt
 
 HEADERS += \

@@ -14,12 +14,11 @@ SinglePlayerBattle::SinglePlayerBattle(States::ID id, StateStack& stack, Context
     , mLevel( level )
     , mWifeBot( nullptr )
 {
-
     std::unique_ptr<WifeBot> bot( new WifeBot( mWorld.mMovementGrid,
                                                &mWorld.mMovementGrid->mCurrentUnits,
                                                &mWorld.mMovementGrid->mCurrentBuildings,
                                                &mWorld.mCurrentTurn ) );
-    this->mWifeBot = bot.get();
+    this->mWifeBot = bot.get( );
     mWorld.mSceneGraph.attachChild( std::move( bot ) );
 }
 
@@ -102,20 +101,29 @@ bool SinglePlayerBattle::update( sf::Time dt )
     catch( std::exception& e ) {
         std::cout << "There was an exception during the Player1_Input update: " << e.what( ) << std::endl;
     }
-
     return true;
 }
 
 bool SinglePlayerBattle::handleEvent( const sf::Event& event )
 {
     // Escape pressed, trigger the pause screen -- 9 is the id of the start button
-    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )) {
+    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape ))
         requestStackPush( States::Pause );
+    else if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
+    {
+        // create a new event with delta mouse pos
+        sf::Event newEvent;
+        newEvent.type = sf::Event::MouseButtonReleased;
+        newEvent.mouseButton.button = sf::Mouse::Left;
+        newEvent.mouseButton.x = event.mouseButton.x + mWorld.mDeltaMousePosition.x;
+        newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
+
+        mPlayer.handleEvent( newEvent, mWorld.getCommandQueue( ) );
     }
-
-    mWifeBot->handleEvent( event );
-    mPlayer.handleEvent( event, mWorld.getCommandQueue( ) );
-    mWorld.handleEvent( event );
-
+    else
+    {
+        mWorld.handleEvent( event );
+        mWifeBot->handleEvent( event );
+    }
     return true;
 }

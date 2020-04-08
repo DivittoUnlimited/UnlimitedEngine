@@ -24,7 +24,7 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
     mPausedText.setPosition( 0.5f * viewSize.x, 0.2f * viewSize.y );
 
     auto ResumeGame = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    ResumeGame->setPosition( WINDOW_WIDTH / 2 - 100, 390 );
+    ResumeGame->setPosition( WINDOW_WIDTH / 2 - 100, 290 );
     ResumeGame->setText( "Resume" );
     ResumeGame->setCallback( [this] ( )
     {
@@ -32,7 +32,7 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
     });
 
     auto playerWins = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playerWins->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
+    playerWins->setPosition( WINDOW_WIDTH / 2 - 100, 350 );
     playerWins->setText( "Player Wins!" );
     playerWins->setCallback( [this] ( )
     {
@@ -41,7 +41,7 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
     });
 
     auto playerLoses = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playerLoses->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
+    playerLoses->setPosition( WINDOW_WIDTH / 2 - 100, 410 );
     playerLoses->setText( "Player Loses!" );
     playerLoses->setCallback( [this] ( )
     {
@@ -50,7 +50,7 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
     });
 
     auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 570 );
+    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 470 );
     settingsButton->setText( "Settings" );
     settingsButton->setCallback([this] ( )
     {
@@ -58,7 +58,7 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
     });
 
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 630 );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 530 );
     exitButton->setText( "Return to Menu" );
     exitButton->setCallback([this] ( )
     {

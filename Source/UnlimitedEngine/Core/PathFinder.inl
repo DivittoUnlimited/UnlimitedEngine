@@ -2,7 +2,8 @@
 #include "Core/Globals.hpp"
 
 template<class T>
-PathFinder<T>::PathFinder(std::vector<T> grid, T* start, T* goal, std::function<float(T *, T *)> heuristic )
+PathFinder<T>::PathFinder(std::vector<T> grid, sf::Vector2i gridSize, T* start, T* goal, std::function<float(T *, T *)> heuristic )
+    : mGridSize( gridSize )
 {
    mPath = calculatePath( grid, start, goal, heuristic );
 }
@@ -62,15 +63,15 @@ std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<T> grid, T* 
       {
           closedList.insert( goal );
           if( goal->gridIndex.y * 16 + goal->gridIndex.x > 0 && static_cast<unsigned int>( goal->gridIndex.y * 16 + goal->gridIndex.x) < grid.size( ) )
-          {
+          {              
               if( goal->gridIndex.y - 1 > 0 )
-                calcT( goal, &grid.at( ( goal->gridIndex.y - 1 ) * 16 + goal->gridIndex.x ) );
-              if( goal->gridIndex.y + 1 < 12 )
-                calcT( goal, &grid.at( ( goal->gridIndex.y + 1 ) * 16 + goal->gridIndex.x ) );
+                calcT( goal, &grid.at( ( goal->gridIndex.y - 1 ) * mGridSize.x + goal->gridIndex.x ) );
+              if( goal->gridIndex.y + 1 < mGridSize.y )
+                calcT( goal, &grid.at( ( goal->gridIndex.y + 1 ) * mGridSize.x + goal->gridIndex.x ) );
               if( goal->gridIndex.x - 1 > 0 )
-                calcT( goal, &grid.at( goal->gridIndex.y * 16 + ( goal->gridIndex.x - 1 ) ) );
-              if( goal->gridIndex.x + 1 < 16 )
-                calcT( goal, &grid.at( goal->gridIndex.y * 16 + ( goal->gridIndex.x + 1 ) ) );
+                calcT( goal, &grid.at( goal->gridIndex.y * mGridSize.x + ( goal->gridIndex.x - 1 ) ) );
+              if( goal->gridIndex.x + 1 < mGridSize.x )
+                calcT( goal, &grid.at( goal->gridIndex.y * mGridSize.x + ( goal->gridIndex.x + 1 ) ) );
           }
           T* cheapest = (*openList.begin());
           for( auto i : openList )
@@ -91,9 +92,9 @@ std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<T> grid, T* 
           {
               goal = goal->parent;
               path.push_back( sf::Vector2i( goal->gridIndex.x, goal->gridIndex.y ) );
-              std::cout << "Pos: " << goal->gridIndex.x << ", " << goal->gridIndex.y << " Pos Cost: " << goal->costSoFar + goal->heuristicCost << std::endl;
+              //std::cout << "Pos: " << goal->gridIndex.x << ", " << goal->gridIndex.y << " Pos Cost: " << goal->costSoFar + goal->heuristicCost << std::endl;
           }
-          std::cout << "======================" << std::endl;
+          //std::cout << "======================" << std::endl;
       }
       std::vector<sf::Vector2i> final;
       while( path.size() > 0 )

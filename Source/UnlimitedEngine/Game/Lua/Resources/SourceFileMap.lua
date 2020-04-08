@@ -24,6 +24,7 @@ return {
         [Tex.LightInfantry]             = "Media/Textures/LightInfantry.png";
         [Tex.HeavyInfantry]             = "Media/Textures/HeavyInfantry.png";
         [Tex.SpawnPoint]                = "Media/Textures/SpawnPoint.png";
+        [Tex.UnitSpriteSheet]           = "Media/Textures/UnitSpriteSheet.png";
     };
     Fonts = {
         [Font.Default]              = "Media/Sansation.ttf";
@@ -35,5 +36,7 @@ return {
     Maps =
     {
         [Map.TacticsTribeDemoLevel] = "Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua";
+        [Map.Courtyard] = "Game/Lua/Resources/Maps/Courtyard.lua";
+
     };
 }

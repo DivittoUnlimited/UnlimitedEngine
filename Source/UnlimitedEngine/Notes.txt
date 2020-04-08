@@ -1,17 +1,110 @@
+BUGS and ISSUES:
+    - ConquestMode start battle crashes game.
+    - Errors when attempting to connect to the server happen to often.
+        - Clicking while "ERROR could not connect" is shown causes crash.
+        - Server often can't be started more than once per session
+        - Project must be cleaned every time the server is run for it to work again.
+    - Slow down unit movement "animation" proccess clicking the unit, selecting a square to move to etc...
 
-TO_DO LIST:
-    - figure out why vs mode and multiplayer call Host game?
-        - check main menu buttons
-    - how does the pause state know to call a new menuState
-        -or to pop battleState back to conquestOverviewState?
-            - just leave Conquest state alive and make pause state remove itself and gamestate only
-            - or use GAME_MODE
-    - Make camera pan with mouse, as well as arrow keys
-    - WifeBot able to stack units on to the same square need to adjust path finder for blocked squares
-    - and terrain difficulty.
-    - WifeBot stops pathfinding all units once one unit reaches the goal
-    - add terrain difficulty to unit map building
-    - stop player input on grid during WifeBots turn.
+FEATURES:
+    - Fog of war
+        - How will fog of war work in online games?
+            - Fix server issues above first.
+            - Solution 1: Make each player "Blue" locally, run fog of war locally.
+            - Solution 2: (better) Match unit color with world->clientColor when updating fog of war
+        - Hide building color if under fog of war
+    - WifeBot
+        - Add Zones
+            - units should have importance
+            - importance should radiate from origin
+            - zones should be considered offensive or defensive goals with zone->importance - defensiveInfluence <= 0 as the best scenario
+            - zones should be able to switch if they are offensive or defensive goals
+            - zones with spawn points should always be considered highly important
+            - if moving a unit out of a zone towards a new goal would cause the current zone to be incomplete, dont.
+                - should add more units to the current zone before removing units to next objective
+            - zones closer to units should emmit more importance to stop units from B-lining to spawn points
 
+        - Add AI Attacking spawn points
+        - Add AI Spawning units
+            - add currency first
 
+    - Game Currency
+        - Morale
+            - the in-game currency
+            - Units should be given a morale bar below their health if morale falls to low they will stop fighting.
+            - Player given points for total unit morale that can be used to spawn more units.
+        - Player Exp
+            - Level that goes up more when attacking then defending
+            - Gain exp per morale points earned
+            - Player can use exp points to unlock new units.
+
+Notes:
+    - WifeBot Overview:
+        - Levels of "Thought":
+            - Team Tactics: How the whole team should play.
+               - Combine world data to generate mathematical representation of world state
+               - Apply AI Bias towards goals
+                    - Some might be defensive others might go for buildings first etc...
+               - Use pathfinding on zone grid to build list of objectives to capture all bases.
+                    - an objective here is a zone along the best path to the next spawn point.
+                    - The heuristic for building this list of zones must include the zone's tactical
+                      importance as well as both teams offensive and defensive influence in the zone
+                    - Zone's overall tactical, offensive, and defensive scores should be affected by zones around them
+
+               - Unit tactics: How each should play to support team tactics.
+                    - based on goals build list of actions for units
+                        - Move To
+                        - Attack Square
+                        - Heal
+                        - Special Ability
+            - path finding: Moving around the grid.
+        - Needed Data structures:
+            - List of goals
+                - Capture Spawn points
+                - Defeat all enemy units
+                - Capture signifigant locations
+                - Capture zones
+                - Defend zone
+                - Defend square
+                - Spawn units
+                - Generate funds
+            - List of actions
+                - Move unit
+                    - list of possible new positions
+                - Attack Position ( unit/building )
+                - Heal unit
+                - Use unit ability
+                - Spawn unit
+            - Grid data
+        - Influence types:
+            - Offensive
+            - Defensive
+            - Tactical
+            - Building influence
+                - has spawn point or doesn't
+            - Importance
+    - Archers should get more range if they are on higher ground (i.e Standing on a wall)
+    - Archers should have a posibilty of hitting adjacent squares to their target.(MISS)
+    - Scouts should have invisibility mode even when exposed from fog of war.
+    - Add Level of exp multplier to units
+    - initiative per unit instead of turn based?
+        - needs a lot more research!
+    - Unit capture abillity
+        - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all
+ART:
+    - Needed Maps:
+        - (tutorial) Small street/alley
+        - (Level1/Final level?) Main castle Gates Large map with tall walls, a gate to defend, and the
+            - inner courtyard where most of the battle will take place.
+        - (Level2) Grass plains outside of main castle. Mostly flat grass with some mud traps and sporatic mountains.
+            - Their is a large trade road running through it.
+    - Needed Sprites:
+        - King portrait
+        - SpawnPoint
+    - Needed Tiles:
+        - Castle walls
+        - Castle floors
+        - Grass
+        - Coblestone road
+        - dirt road
 

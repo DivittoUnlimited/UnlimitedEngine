@@ -1,7 +1,7 @@
 return {
   version = "1.2",
   luaversion = "5.1",
-  tiledversion = "1.3.2",
+  tiledversion = "1.3.3",
   orientation = "orthogonal",
   renderorder = "right-down",
   width = 16,
@@ -9,7 +9,7 @@ return {
   tilewidth = 64,
   tileheight = 64,
   nextlayerid = 4,
-  nextobjectid = 14,
+  nextobjectid = 40,
   properties = {},
   tilesets = {
     {
@@ -134,6 +134,32 @@ return {
       terrains = {},
       tilecount = 1,
       tiles = {}
+    },
+    {
+      name = "UnitSpriteSheet",
+      firstgid = 52,
+      filename = "UnitSpriteSheet.tsx",
+      tilewidth = 64,
+      tileheight = 64,
+      spacing = 0,
+      margin = 0,
+      columns = 10,
+      image = "../../../../Media/Textures/UnitSpriteSheet.png",
+      imagewidth = 640,
+      imageheight = 640,
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      grid = {
+        orientation = "orthogonal",
+        width = 64,
+        height = 64
+      },
+      properties = {},
+      terrains = {},
+      tilecount = 100,
+      tiles = {}
     }
   },
   layers = {
@@ -152,18 +178,18 @@ return {
       properties = {},
       encoding = "lua",
       data = {
-        1, 25, 25, 25, 25, 25, 25, 1, 1, 1, 1, 1, 25, 25, 25, 1,
-        25, 25, 25, 25, 25, 1, 25, 1, 1, 25, 25, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 1, 25, 25, 1, 25, 1, 1, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 1, 25, 25, 25, 25, 1, 1, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 1, 1, 1, 1, 1, 1, 1, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 25, 25, 25, 1, 25, 25, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 25, 25, 25, 1, 25, 25, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 25, 25, 25, 1, 25, 25, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 25, 25, 25, 1, 25, 25, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 25, 25, 25, 1, 25, 25, 25, 25, 25, 25, 25,
-        1, 25, 25, 25, 25, 25, 25, 25, 1, 25, 25, 25, 25, 25, 25, 1
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        17, 17, 17, 17, 17, 17, 17, 1, 1, 17, 17, 17, 17, 17, 17, 17,
+        17, 17, 17, 17, 17, 17, 17, 1, 1, 17, 17, 17, 17, 17, 17, 17,
+        17, 17, 17, 17, 17, 17, 17, 1, 1, 17, 17, 17, 17, 17, 17, 17,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
       }
     },
     {
@@ -177,22 +203,6 @@ return {
       draworder = "topdown",
       properties = {},
       objects = {
-        {
-          id = 4,
-          name = "",
-          type = "LightInfantry",
-          shape = "rectangle",
-          x = 384,
-          y = 512,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 49,
-          visible = true,
-          properties = {
-            ["Team"] = "Blue"
-          }
-        },
         {
           id = 11,
           name = "",
@@ -226,19 +236,159 @@ return {
           }
         },
         {
-          id = 13,
+          id = 15,
           name = "",
-          type = "LightInfantry",
+          type = "Fighter",
           shape = "rectangle",
-          x = 768,
+          x = 640,
+          y = 576,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 52,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 24,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 640,
           y = 128,
           width = 64,
           height = 64,
           rotation = 0,
-          gid = 49,
+          gid = 52,
           visible = true,
           properties = {
             ["Team"] = "Red"
+          }
+        },
+        {
+          id = 27,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 320,
+          y = 576,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 52,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 28,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 448,
+          y = 448,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 52,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 29,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 768,
+          y = 256,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 52,
+          visible = true,
+          properties = {
+            ["Team"] = "Red"
+          }
+        },
+        {
+          id = 30,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 256,
+          y = 320,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 52,
+          visible = true,
+          properties = {
+            ["Team"] = "Red"
+          }
+        },
+        {
+          id = 33,
+          name = "",
+          type = "TacticalLocation",
+          shape = "rectangle",
+          x = 512,
+          y = 384,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["Importance"] = "10"
+          }
+        },
+        {
+          id = 34,
+          name = "",
+          type = "TacticalLocation",
+          shape = "rectangle",
+          x = 448,
+          y = 384,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["Importance"] = "5"
+          }
+        },
+        {
+          id = 35,
+          name = "",
+          type = "TacticalLocation",
+          shape = "rectangle",
+          x = 128,
+          y = 576,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["Importance"] = "5"
+          }
+        },
+        {
+          id = 39,
+          name = "",
+          type = "TacticalLocation",
+          shape = "rectangle",
+          x = 832,
+          y = 128,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["Importance"] = "5"
           }
         }
       }

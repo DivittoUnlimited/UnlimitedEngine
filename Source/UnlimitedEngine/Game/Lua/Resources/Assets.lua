@@ -21,6 +21,7 @@ return {
         LightInfantry            = 6;
         HeavyInfantry            = 7;
         SpawnPoint               = 8;
+        UnitSpriteSheet          = 9;
     };
 
     SoundEffects = {            
@@ -60,6 +61,7 @@ return {
     };
 
     Maps = {
-        TacticsTribeDemoLevel = 0;
+        Courtyard             = 0;
+        TacticsTribeDemoLevel = 1;
     };
 };

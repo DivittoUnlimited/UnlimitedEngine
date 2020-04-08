@@ -4,11 +4,12 @@ return {
                     ,     "Default"
                     ,     "Particle"
                     ,     "Buttons"
+                    ,     "UnitSpriteSheet"
                    -- ,     "DemoGirl"
                    -- ,     "DemoLevel"
                    -- ,     "LightInfantry"
                    -- ,     "HeavyInfantry"
-                   -- ,     "SpawnPoint"
+                   ,     "SpawnPoint"
     };
 
 
@@ -24,6 +25,6 @@ return {
     };
 
     PlayerTexture       = "Default";
-    TiledMapFilePath    = "Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua";
+    TiledMapFilePath    = "Game/Lua/Resources/Maps/Courtyard.lua";
 
 };

@@ -11,7 +11,7 @@
 class EndTurnMenuState : public State
 {
 public:
-    EndTurnMenuState( States::ID id, StateStack& stack, Context context, World* world );
+    EndTurnMenuState(States::ID id, StateStack& stack, Context context, World* world );
     virtual void draw();
     virtual bool update(sf::Time dt);
     virtual bool handleEvent(const sf::Event& event);
@@ -33,16 +33,8 @@ private:
     /// The text above the buttons that informs the player they are aboutto end their turn.
     sf::Text   mChangeTurnText;
 
-    ///
-    /// \brief mNewTurnPopUpText
-    /// Graphical display of whose turn it is now shows up on screen for a second and then fades
-    sf::Text                            mNewTurnPopUpText;
-
     sf::RectangleShape  mChangeTurnBackground;
-    ///
-    /// \brief mNewTurnPopTimer
-    /// The timer to display the text over the screen
-    sf::Time                            mNewTurnPopTimer;
+
 };
 
 

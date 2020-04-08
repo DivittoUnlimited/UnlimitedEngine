@@ -9,6 +9,7 @@
 #include "Game/WifeBot.hpp"
 #include "Graphics/TextNode.hpp"
 #include <SFML/Network.hpp>
+#include "Core/Globals.hpp"
 
 enum Layers {
     ObjectLayer = 0
@@ -31,6 +32,8 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mWindowSprite(  )
     , mSceneGraph( )
     , mSceneLayers( )
+    , mDeltaMousePosition( 0, 0 )
+    , mCameraPanSpeed( 8 )
     , mNetworkedWorld( networked )
     , mLocalMultiplayerWorld( isLocalMultiplayer )
     , mNetworkNode( nullptr )
@@ -41,6 +44,8 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mSelectedBuilding( -1 )
     , mCurrentTurn( Category::Blue )
     , mClientTeamColor( Category::Blue )
+    , mChangeTurnText( "Blue\nTeam's turn!" , mFonts.get( FontMap.at( "Default" ) ), 72 )
+    , mChangeTurnTextTimer( sf::Time::Zero )
 {
     if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     // mWorldView.zoom( 2.0 );
@@ -48,6 +53,11 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     mSceneTexture.setView( mWorldView );
     this->registerStates( );
     buildScene( MediaFileMap.at( "Maps" ).at( mLevel ) );
+    centerOrigin( mChangeTurnText );
+    mChangeTurnText.setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 200 );
+    mChangeTurnText.setOutlineThickness( 3 );
+    mChangeTurnText.setOutlineColor( sf::Color( 79, 67, 174, 255 ) );
+    mChangeTurnText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
 }
 
 World::~World( void )
@@ -56,11 +66,16 @@ World::~World( void )
 
 void World::draw( )
 {
-    if( PostEffect::isSupported( ) )
+    if( !PostEffect::isSupported( ) )
     {
         mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
+        if( mChangeTurnTextTimer > sf::Time::Zero )
+        {
+            mChangeTurnText.setPosition( WINDOW_WIDTH / 2 + mDeltaMousePosition.x, WINDOW_HEIGHT / 2 - 200 + mDeltaMousePosition.y );
+            mSceneTexture.draw( mChangeTurnText );
+        }
         mSceneTexture.display( );
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
         mTarget.draw( sf::Sprite( mWindowSprite ) );
@@ -70,6 +85,11 @@ void World::draw( )
     {
         mTarget.setView( mWorldView );
         mTarget.draw( mSceneGraph );
+        if( mChangeTurnTextTimer > sf::Time::Zero )
+        {
+            mChangeTurnText.setPosition( WINDOW_WIDTH / 2 + mDeltaMousePosition.x, WINDOW_HEIGHT / 2 - 200 + mDeltaMousePosition.y );
+            mTarget.draw( mChangeTurnText );
+        }
     }
 }
 
@@ -85,6 +105,31 @@ bool World::update( sf::Time dt )
         }
     */
     mSceneGraph.removeWrecks( );
+    if( mChangeTurnTextTimer > sf::Time::Zero )
+        mChangeTurnTextTimer -= dt;
+
+    // Update the view
+    if( sf::Keyboard::isKeyPressed( sf::Keyboard::Up ) ) // || sf::Mouse::getPosition().y < 100 )
+    {
+        mWorldView.move( 0.0f, -1 * mCameraPanSpeed );
+        mDeltaMousePosition.y -= mCameraPanSpeed;
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Down  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
+    {
+        mWorldView.move( 0.0f, mCameraPanSpeed );
+        mDeltaMousePosition.y += mCameraPanSpeed;
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Left  ) ) //  || sf::Mouse::getPosition().x < 100 )
+    {
+        mWorldView.move( -1 * mCameraPanSpeed, 0.0f );
+        mDeltaMousePosition.x -= mCameraPanSpeed;
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Right ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
+    {
+        mWorldView.move( mCameraPanSpeed, 0.0f );
+        mDeltaMousePosition.x += mCameraPanSpeed;
+    }
+
     return true;
 }
 
@@ -108,7 +153,8 @@ bool World::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Cat
 
 void World::handleEvent( const sf::Event& event )
 {
-    if( event.type == sf::Event::KeyReleased && (event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
+    if( event.type == sf::Event::KeyReleased &&
+            ( event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
         mStateStack->pushState( States::EndTurnMenuState );
 }
 
@@ -117,11 +163,17 @@ void World::changeTurn( void )
     if( mCurrentTurn & Category::Red )
     {
         mCurrentTurn = Category::Blue;
+        mChangeTurnText.setString( "\t  BLUE\nPLAYER GO!" );
         // solve any end-of-turn buffs etc for red team here
         // solve any start-of-turn bufs etc for blue team here
     }
     // == Cateogry::Blue
-    else { mCurrentTurn = Category::Red; }
+    else
+    {
+        mCurrentTurn = Category::Red;
+        mChangeTurnText.setString( "\t   RED\nPLAYER GO!" );
+    }
+    mChangeTurnTextTimer = sf::milliseconds( 2000 );
 
     // reset all units temp variables
     mMovementGrid->clearGrid( );
@@ -154,6 +206,7 @@ void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
     std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( unitType ), mTextures ) );
     sf::Rect<float> object = mMovementGrid->mData[gridIndex.y * (WINDOW_WIDTH / TILE_SIZE) + gridIndex.x].mBounds;
     unit->setPosition( object.left, object.top );
+    unit->mSprite.setTextureRect( UnitDataTable.at( unitType ).textureRect );
     mMovementGrid->addUnit( unit.get( ) );
 
     //std::cout << "LayerMap is Mis-aligned. ObjectLayer1 should be layer1"
@@ -224,8 +277,10 @@ void World::buildScene( std::string tileMapFilePath )
                 /// DO NOT REMOVE ME UNTILL IT HAS BEEN DONE!!!!
                 /// This is a really lazy way to avoid having to deal with multiple image sources to build maps. It doen't work and it needs to be removed!!!!!!
                 /// there needs to be a universal way to use as many images as needed to build maps.
+                ///
+                /// WHY? just use one image per map....
                 auto tileSets = map.tileSets[0];
-                std::cout << "Currently loading tileLayer from tileSet: " << map.tileSets[0].name << " This is hardcoded and needs to be fixed!" << std::endl;
+                std::cout << "Currently loading tileLayer from tileSet: " << tileSets.name << " This is hardcoded and needs to be fixed!" << std::endl;
 
                 /*
                  * This is for adding particle effects later
@@ -248,14 +303,16 @@ void World::buildScene( std::string tileMapFilePath )
                         std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
                     else {
                         mSceneLayers.push_back( layer.get( ) );
+                        // init grid
+                        std::unique_ptr<Grid> grid( new Grid( this, map.layers[i].width, map.layers[i].height ) );
+                        mMovementGrid = grid.get();
+                        mMovementGrid->buildGrid( tileSets, map.layers[i] );
                         mSceneGraph.attachChild( std::move( layer ) );
+                        mSceneGraph.attachChild( std::move( grid ) );
+
+
                     }
                 }
-                // init grid
-                std::unique_ptr<Grid> grid( new Grid( this, WINDOW_WIDTH / TILE_SIZE, WINDOW_HEIGHT / TILE_SIZE ) );
-                mMovementGrid = grid.get();
-                mMovementGrid->buildGrid( map.tileSets[0], map.layers[i] );
-                mSceneGraph.attachChild( std::move( grid ) );
             }
             else if( map.layers[i].type == "objectgroup" )
             {
@@ -265,31 +322,8 @@ void World::buildScene( std::string tileMapFilePath )
                 for( unsigned int i = 0; i < layer.objects.size(); ++i )
                 {
                      auto object = layer.objects.at( i );
-                     if( object.type == "LightInfantry" )
-                     {
-                         Category::Type category = Category::None;
-                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
-                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
-                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
-                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "LightInfantry" ) ), mTextures ) );
-                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
-                         mMovementGrid->addUnit( unit.get() );
-                         node.get( )->attachChild( std::move( unit ) );
-                     }
-                     else if( object.type == "HeavyInfantry" )
-                     {
-                         Category::Type category = Category::None;
-                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
-                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
-                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
-
-                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "HeavyInfantry" ) ), mTextures ) );
-                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
-                         mMovementGrid->addUnit( unit.get() );
-                         node.get( )->attachChild( std::move( unit ) );
-                     }
-                     else if( object.type == "SpawnPoint" )
+                     if( object.type == "SpawnPoint" )
                      {
                          Category::Type category = Category::None;
                          if( object.properties.at( "Team" ) == "Red" ) category = Category::RedBuilding;
@@ -300,6 +334,116 @@ void World::buildScene( std::string tileMapFilePath )
                          sp->setPosition( object.x, object.y - TILE_SIZE );
                          mMovementGrid->addBuilding( sp.get() );
                          node.get( )->attachChild( std::move( sp ) );
+                     }
+                     else if( object.type == "Fighter" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Fighter" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Fighter" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "Templar" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Templar" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Templar" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "Archer" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Archer" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Archer" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "Medic" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Medic" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Medic" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "Wizard" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Wizard" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Wizard" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "Rogue" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Rogue" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Rogue" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "Scout" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Scout" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Scout" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "Bard" )
+                     {
+                         Category::Type category = Category::None;
+                         if( object.properties.at( "Team" ) == "Red" ) category = Category::RedUnit;
+                         else if( object.properties.at( "Team" ) == "Blue" ) category = Category::BlueUnit;
+                         else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
+
+                         std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( UnitTypeMap.at( "Bard" ) ), mTextures ) );
+                         unit->setPosition( object.x, object.y - TILE_SIZE - (TILE_SIZE * .5) );
+                         unit->mSprite.setTextureRect( UnitDataTable.at( UnitTypeMap.at( "Bard" ) ).textureRect );
+                         mMovementGrid->addUnit( unit.get() );
+                         node.get( )->attachChild( std::move( unit ) );
+                     }
+                     else if( object.type == "TacticalLocation" )
+                     {
+                         // set value of importance property to the tile found at the same location as this object
+                         mMovementGrid->mData[object.y/TILE_SIZE * mMovementGrid->mGridWidth + object.x/TILE_SIZE].importance = std::atof( object.properties.at( "Importance" ).c_str( ) );
+                         //mMovementGrid->mData[object.y/TILE_SIZE * mMovementGrid->mGridWidth + object.x/TILE_SIZE].debugText->setString( object.properties.at( "Importance" ).c_str( ) )  ;
                      }
                      else
                          std::cout << "Invalid object being loaded from tile map" << std::endl;

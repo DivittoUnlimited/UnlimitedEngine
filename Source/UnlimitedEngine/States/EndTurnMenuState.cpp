@@ -10,7 +10,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
 
-EndTurnMenuState::EndTurnMenuState( States::ID id, StateStack& stack, Context context, World* world )
+EndTurnMenuState::EndTurnMenuState(States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
     , mWorld( world )
 {
@@ -22,7 +22,7 @@ EndTurnMenuState::EndTurnMenuState( States::ID id, StateStack& stack, Context co
 
     mChangeTurnBackground = sf::RectangleShape( sf::Vector2f( 500, 125 ) );
     centerOrigin( mChangeTurnBackground );
-    mChangeTurnBackground.setPosition( WINDOW_WIDTH / 2, 200 );
+    mChangeTurnBackground.setPosition( WINDOW_WIDTH / 2, 200  );
     mChangeTurnBackground.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     mChangeTurnBackground.setOutlineThickness( 3 );
     mChangeTurnBackground.setOutlineColor( sf::Color::Black );
@@ -32,9 +32,6 @@ EndTurnMenuState::EndTurnMenuState( States::ID id, StateStack& stack, Context co
     yesButton->setText( "YES" );
     yesButton->setCallback( [this] ( )
     {
-        mNewTurnPopTimer = sf::milliseconds( 5000 );
-        if( mWorld->mCurrentTurn == Category::Red ) mNewTurnPopUpText.setString( "Blue Team's\n\tTurn!" );
-        else mNewTurnPopUpText.setString( "Red Team's\n\tTurn!" );
         if( mWorld->mNetworkedWorld )
             mWorld->mNetworkNode->notifyGameAction( GameActions::ChangeTurn, sf::Vector2f( 0, 0 ) );
         else
@@ -52,33 +49,20 @@ EndTurnMenuState::EndTurnMenuState( States::ID id, StateStack& stack, Context co
     });
     mChangeTurnGUI.pack( yesButton );
     mChangeTurnGUI.pack( noButton );
-
-    mNewTurnPopUpText.setString( "ERROR" );
-    mNewTurnPopUpText.setFont( context.fonts->get( FontMap.at( "Default" ) ) );
-    mNewTurnPopUpText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
-    mNewTurnPopUpText.setOutlineThickness( 3 );
-    mNewTurnPopUpText.setOutlineColor( sf::Color::Black );
-    mNewTurnPopUpText.setCharacterSize( 70 );
-    centerOrigin( mNewTurnPopUpText );
-    mNewTurnPopUpText.setPosition( (WINDOW_WIDTH / 2), 150 );
 }
 
 void EndTurnMenuState::draw( )
 {
-    mWindow->draw( mChangeTurnBackground );
-    mWindow->draw( mChangeTurnText );
-    mWindow->draw( mChangeTurnGUI );
-
-    if( mNewTurnPopTimer > sf::Time::Zero )
-        mWindow->draw( mNewTurnPopUpText );
-
     sf::RenderTarget& window = *getContext( ).window;
     window.setView(window.getDefaultView( ) );
+
+    window.draw( mChangeTurnBackground );
+    window.draw( mChangeTurnText );
+    window.draw( mChangeTurnGUI );
 }
 
-bool EndTurnMenuState::update( sf::Time dt )
+bool EndTurnMenuState::update( sf::Time )
 {
-    if( mNewTurnPopTimer > sf::Time::Zero ) mNewTurnPopTimer -= dt;
     return false;
 }
 
@@ -90,9 +74,8 @@ bool EndTurnMenuState::handleEvent( const sf::Event& event )
         requestStackPop( );
     }
     else
-    {
         mChangeTurnGUI.handleEvent( event );
-    }
+
     return false;
 }
 
