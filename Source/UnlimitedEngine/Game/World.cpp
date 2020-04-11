@@ -443,7 +443,7 @@ void World::buildScene( std::string tileMapFilePath )
                      {
                          // set value of importance property to the tile found at the same location as this object
                          mMovementGrid->mData[object.y/TILE_SIZE * mMovementGrid->mGridWidth + object.x/TILE_SIZE].importance = std::atof( object.properties.at( "Importance" ).c_str( ) );
-                         //mMovementGrid->mData[object.y/TILE_SIZE * mMovementGrid->mGridWidth + object.x/TILE_SIZE].debugText->setString( object.properties.at( "Importance" ).c_str( ) )  ;
+                         mMovementGrid->mData[object.y/TILE_SIZE * mMovementGrid->mGridWidth + object.x/TILE_SIZE].debugText->setString( object.properties.at( "Importance" ).c_str( ) )  ;
                      }
                      else
                          std::cout << "Invalid object being loaded from tile map" << std::endl;

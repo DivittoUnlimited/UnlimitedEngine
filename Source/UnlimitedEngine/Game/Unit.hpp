@@ -30,7 +30,7 @@ public:
     Category::Type mCategory;
     sf::Vector2i mGridIndex;
 
-    unsigned int mStrength;
+    unsigned int mAttack;
     unsigned int mDexterity;
     int mConstitution;
     int mMaxConstitution;

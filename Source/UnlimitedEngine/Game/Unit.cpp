@@ -21,7 +21,7 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     // define unit based on data from lua
     this->mUnitType         = static_cast<unsigned int>( UnitTypeMap[data.type] );
     this->mCategory         = category;
-    this->mStrength         = static_cast<unsigned int>( data.strength );
+    this->mAttack           = static_cast<unsigned int>( data.attack );
     this->mDexterity        = static_cast<unsigned int>( data.dexterity );
     this->mConstitution     = static_cast<unsigned int>( data.constitution );
     this->mMaxConstitution  = static_cast<unsigned int>( data.constitution );

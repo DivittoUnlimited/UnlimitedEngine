@@ -8,7 +8,7 @@
 class Zone
 {
 public:
-    Zone( void );
+    Zone( Zone* parent, float x, float y, float width, float height, int depth = 0 );
 
     float offensiveInfluence( void );
     float defensiveInfluence( void );
@@ -23,15 +23,45 @@ public:
     /// \return
     float importance( void );
 
+    Category::Type ownedBy( void );
+
+    /// \brief addObj
+    /// Adds a obj to this node, or it's children if any and if they fit inside there boundries
+    ///  \param obj
+    bool addObj( Unit* obj );
+
+    /// \brief split
+    /// Splits the node into 4 new smaller nodes
+    /// Method gets called when the node is carrying to many objs
+    void split( void );
+
+    /// \brief clear
+    /// This method is meant to be called by the root node to clear the entire
+    /// tree it can of course also be called by any node to clear all objs and
+    /// childern before it.
+    void clear( void );
+
+    float heuristic( void );
+
     // Attributes
     unsigned int id;
-    Zone* parent;
+
     Zone* NE;
     Zone* NW;
     Zone* SE;
     Zone* SW;
-
-    std::vector<Square*> innerGrid;
+    Zone* parent;
+    /// \brief localObjs
+    /// list of objects that fit inside this zone
+    std::vector<Unit*> localObjs;
+    /// \brief innerGrid
+    /// list of squares on the grid that fit in this zone
+    std::vector<Square> innerGrid;
+    sf::Rect<float> rect;
+    float depth; // depth from the root of the stucture
+    bool hasKids; // flag to tell if the node has been split yet or not
+    const unsigned int mMaxDepth = 3; // the max depth a node can be before the tree ends
+    const unsigned int mMaxHeuristic = 24; // the max number of objs a node cn carry before it must be split.
 };
 
 ///
@@ -51,7 +81,7 @@ public:
     unsigned int getCategory( ) const { return mCategory; }
     bool isMarkedForRemoval( )  const { return false; }
     bool isDestroyed( )         const { return false; }
-    void initializeZones( void );
+    void initializeZones( Zone *rootZone );
     void findTargetZone( std::vector<unsigned int> excludedZones = std::vector<unsigned int>() );
 
     Category::Type mCategory;
@@ -59,7 +89,17 @@ public:
     //std::function<float(Square*, Square*)> mHeuristic;
     std::map<unsigned int, Unit*>* mUnits;
     std::vector<Building*>* mBuildings;
-    std::vector<Zone>       mZones;
+
+private:
+    Zone* mRootZone;
+
+
+    Zone* mCurrentZone;
+
+    ///
+    /// \brief mZones
+    /// A shortcut list of pointers to all the created children of mRootZone
+    std::vector<Zone*>       mZones;
 
     ///
     /// \brief mPathFinders

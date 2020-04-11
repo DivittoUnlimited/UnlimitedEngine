@@ -18,10 +18,10 @@ return {
 
     Fighter = {
         class           = "Fighter";
-        strength        = 8;
+        attack          = 8;
         dexterity       = 3;
         constitution    = 100;
-        defense         = 3;
+        defense         = 4;
         range           = { innerRange = 0; outerRange = 2; }; -- Can attack adjacent squares only.
         perception      = 3;
         texture         = "UnitSpriteSheet";
@@ -30,7 +30,7 @@ return {
 
     Templar = {
         class           = "Templar";
-        strength        = 8;
+        attack          = 8;
         dexterity       = 2;
         constitution    = 100;
         defense         = 8;
@@ -42,7 +42,7 @@ return {
 
     Archer = {
         class           = "Archer";
-        strength        = 8;
+        attack          = 8;
         dexterity       = 4;
         constitution    = 100;
         defense         = 2;
@@ -54,7 +54,7 @@ return {
 
     Medic = {
         class           = "Medic";
-        strength        = 8;
+        attack          = 8;
         dexterity       = 3;
         constitution    = 100;
         defense         = 3;
@@ -66,7 +66,7 @@ return {
 
     Wizard = {
         class           = "Wizard";
-        strength        = 8;
+        attack          = 8;
         dexterity       = 2;
         constitution    = 100;
         defense         = 3;
@@ -78,7 +78,7 @@ return {
 
     Rogue = {
         class           = "Rogue";
-        strength        = 8;
+        attack        = 8;
         dexterity       = 4;
         constitution    = 100;
         defense         = 3;
@@ -90,7 +90,7 @@ return {
 
     Scout = {
         class           = "Scout";
-        strength        = 8;
+        attack        = 8;
         dexterity       = 5;
         constitution    = 100;
         defense         = 3;
@@ -102,7 +102,7 @@ return {
 
     Bard = {
         class           = "Bard";
-        strength        = 8;
+        attack        = 8;
         dexterity       = 3;
         constitution    = 100;
         defense         = 3;

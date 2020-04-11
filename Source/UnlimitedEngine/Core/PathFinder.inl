@@ -19,12 +19,10 @@ sf::Vector2i PathFinder<T>::getNextMove( void )
 template<class T>
 std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<T> grid, T* start, T* goal, std::function<float(T*,T*)> heuristic )
 {   
-    //goal->gridIndex = sf::Vector2i( goal->gridIndex.y, goal->gridIndex.x );
     std::vector<sf::Vector2i> path;
     std::set<T*> openList;
     std::set<T*> closedList;
 
-    // auto calcT = [&openList, &closedList, this, goal]( T* current, T* node ) -> void {
     auto calcT = [&]( T* current, T* node ) -> void {
         if( isValid( node ) && !checkClosedList( node, closedList ) )
         {
@@ -99,6 +97,7 @@ std::vector<sf::Vector2i> PathFinder<T>::calculatePath( std::vector<T> grid, T* 
       std::vector<sf::Vector2i> final;
       while( path.size() > 0 )
       {
+          grid.at( path.back().y * mGridSize.x + path.back().x ).debugText->setString( "#" );
           final.push_back( path.back() );
           path.pop_back();
       }

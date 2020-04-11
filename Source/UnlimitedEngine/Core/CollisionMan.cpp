@@ -126,7 +126,8 @@ void CollisionMan::Node::clear( void ) {
 
 //## Constructor
 CollisionMan::QuadTree::QuadTree( float x, float y, float width, float height ) {
-    current = root = new Node( nullptr, x, y, width, height, 0 ); // 0 is the depth of the root node becuase it is at the top of the structure
+    // current = root = new Node( nullptr, x, y, width, height, 0 ); // 0 is the depth of the root node becuase it is at the top of the structure
+    root = new Node( nullptr, x, y, width, height, 0 ); // 0 is the depth of the root node becuase it is at the top of the structure
 }
 CollisionMan::QuadTree::~QuadTree( void ) {  }
 

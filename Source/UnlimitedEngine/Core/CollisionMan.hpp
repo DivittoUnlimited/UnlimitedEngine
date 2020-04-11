@@ -106,7 +106,7 @@ namespace CollisionMan {
         Node* root;
     private:
         //## Attributes
-        Node* current;
+        //Node* current;
     };
     static QuadTree QUAD_TREE( 0, 0, 0, 0 );
 

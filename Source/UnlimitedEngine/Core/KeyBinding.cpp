@@ -4,7 +4,7 @@
 #include <algorithm>
 
 
-KeyBinding::KeyBinding( int controlPreconfiguration )
+KeyBinding::KeyBinding( int ) // int controlPreconfiguration
 : mKeyMap( )
 {
     /*

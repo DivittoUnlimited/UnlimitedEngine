@@ -13,16 +13,15 @@ FEATURES:
             - Solution 1: Make each player "Blue" locally, run fog of war locally.
             - Solution 2: (better) Match unit color with world->clientColor when updating fog of war
         - Hide building color if under fog of war
-    - WifeBot
-        - Add Zones
-            - units should have importance
-            - importance should radiate from origin
-            - zones should be considered offensive or defensive goals with zone->importance - defensiveInfluence <= 0 as the best scenario
-            - zones should be able to switch if they are offensive or defensive goals
-            - zones with spawn points should always be considered highly important
-            - if moving a unit out of a zone towards a new goal would cause the current zone to be incomplete, dont.
-                - should add more units to the current zone before removing units to next objective
-            - zones closer to units should emmit more importance to stop units from B-lining to spawn points
+    - WifeBot        
+        - build best path from owned spawn points to all other spawn points
+            - Consider Offensive and defensive influence of the known world when building best path
+                - use zone data
+                - modify pathfinding heuristic to include influence
+
+            - Boost the Importance of all the squares on the paths
+
+
 
         - Add AI Attacking spawn points
         - Add AI Spawning units

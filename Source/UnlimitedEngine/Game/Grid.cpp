@@ -184,7 +184,7 @@ bool Grid::buildGrid(  Tiled::TileSet tileSet, Tiled::Layer layer )
             rect.get()->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 150 ) );
 
             ++counter;
-            std::unique_ptr<TextNode> debugText( new TextNode( mWorld->mFonts, "X" ) );
+            std::unique_ptr<TextNode> debugText( new TextNode( mWorld->mFonts, "" ) );
             debugText.get()->setPosition( rect.get()->getSprite()->getPosition().x + 25, rect.get()->getSprite()->getPosition().y + 25 );
             mData.back().debugText = debugText.get();
             mData.back().rect = rect.get();

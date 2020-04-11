@@ -100,7 +100,7 @@ struct ConversationData {
 
 struct UnitTypeData {
     Category::Type category;
-    int strength;
+    int attack;
     int dexterity;
     int constitution;
     int defense;
@@ -504,8 +504,8 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "type" << std::endl;
                     lua_pop( L, 1 );
 
-                    lua_getfield( L, -1, "strength" );
-                    if( lua_isnumber( L, -1 ) ) data[i->second].strength = static_cast<int>( lua_tonumber( L, -1 ) );
+                    lua_getfield( L, -1, "attack" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].attack = static_cast<int>( lua_tonumber( L, -1 ) );
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "strength" << std::endl;
                     lua_pop( L, 1 );
                     lua_getfield( L, -1, "dexterity" );
