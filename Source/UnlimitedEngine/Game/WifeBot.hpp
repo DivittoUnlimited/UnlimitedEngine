@@ -12,12 +12,12 @@ public:
 
     float offensiveInfluence( void );
     float defensiveInfluence( void );
-    ///
+
     /// \brief tacticalInfluence
     /// Designed to denote things like bards, and scouts that don't provide much in attack and defense but are still very important
     /// \return
     float tacticalInfluence( void );
-    ///
+
     /// \brief importance
     /// the total of all unit and location values returned as a single score
     /// \return
@@ -60,8 +60,8 @@ public:
     sf::Rect<float> rect;
     float depth; // depth from the root of the stucture
     bool hasKids; // flag to tell if the node has been split yet or not
-    const unsigned int mMaxDepth = 3; // the max depth a node can be before the tree ends
-    const unsigned int mMaxHeuristic = 24; // the max number of objs a node cn carry before it must be split.
+    const unsigned int mMaxDepth = 2; // the max depth a node can be before the tree ends
+    const unsigned int mMaxHeuristic = 25; // the max number of objs a node cn carry before it must be split.
 };
 
 ///
@@ -70,7 +70,7 @@ public:
 class WifeBot : public SceneNode
 {
 public:
-    WifeBot( Grid *grid, std::map<unsigned int, Unit*>* mUnits, std::vector<Building*> *mBuildings , Category::Type *currentTurn);
+    WifeBot(Grid *grid, std::map<unsigned int, Unit*>* mUnits, std::vector<Building*> *mBuildings , Category::Type *currentTurn);
     ~WifeBot( void );
 
     void updateCurrent( sf::Time dt, CommandQueue &queue );
@@ -91,26 +91,37 @@ public:
     std::vector<Building*>* mBuildings;
 
 private:
+    /// \brief mRootZone
+    /// A Quad tree structure used to divide up the map based on influences the troops impose on their surroundings
     Zone* mRootZone;
 
-
-    Zone* mCurrentZone;
-
-    ///
     /// \brief mZones
     /// A shortcut list of pointers to all the created children of mRootZone
-    std::vector<Zone*>       mZones;
+    std::vector<Zone*> mZones;
 
-    ///
+    /// \brief mTargetZone
+    /// The calculated most important zone to conquer in order to advance goals
+    unsigned int mTargetZone;
+
     /// \brief mPathFinders
     /// Key is the unitId that the pathfinder belongs to.
     std::map<unsigned int, PathFinder<Square>*> mUnitPathFinders;
-    bool mRecalculate;
-    sf::Time mAnimationTimer;
-    Category::Type* mCurrentTurn;
-    bool mAllUnitsMoved;
 
-    unsigned int mTargetZone;
+    /// \brief mRecalculate
+    /// Flag to signal whether or not to rerun logic for unit or to continue on current path
+    bool mRecalculate;
+
+    /// \brief mAnimationTimer
+    /// Allows the units enough time to move to their new squares
+    sf::Time mAnimationTimer;
+
+    /// \brief mCurrentTurn
+    /// Category enum to tell whose turn it is
+    Category::Type* mCurrentTurn;
+
+    /// \brief mAllUnitsMoved
+    /// flag to tell whether or not to end the turn
+    bool mAllUnitsMoved;
 };
 
 #endif // WIFEBOT_HPP

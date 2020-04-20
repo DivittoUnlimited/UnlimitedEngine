@@ -2,19 +2,16 @@
 
 Building::Building( unsigned int mId, Category::Type category, BuildingData data , const TextureManager &textures )
      : mID( mId )
+     , mIsVisible( true )
 {
     // define building based on data from lua
-    this->mType     = data.type;
-    this->mCategory     = category;
-    this->mGoldPerTurn     = static_cast<unsigned int>( data.goldPerTurn );
-    this->mTextureID    = data.textureID;
+    this->mType = data.type;
+    this->mCategory = category;
+    this->mGoldPerTurn = static_cast<unsigned int>( data.goldPerTurn );
+    this->mTextureID = data.textureID;
     this->mCapturePercentage = 0.0f;
-
     this->mSprite = sf::Sprite( textures.get( TextureMap.at( data.textureID ) ) );
-    if( mCategory & Category::Blue )
-        this->mSprite.setColor( sf::Color::Blue ); // blue
-    else if( mCategory & Category::Red )
-        this->mSprite.setColor( sf::Color::Red ); // red
+    this->mSprite.setColor( sf::Color::White );
 }
 
 unsigned int Building::getCategory( ) const
@@ -31,10 +28,16 @@ bool Building::isDestroyed( ) const
 }
 void Building::updateCurrent( sf::Time, CommandQueue& )
 {
-    if( mCategory & Category::Blue )
-        this->mSprite.setColor( sf::Color::Blue ); // blue
-    else if( mCategory & Category::Red )
-        this->mSprite.setColor( sf::Color::Red ); // red
+    if( mIsVisible )
+    {
+        if( mCategory & Category::Blue )
+            this->mSprite.setColor( sf::Color::Blue ); // blue
+        else if( mCategory & Category::Red )
+            this->mSprite.setColor( sf::Color::Red ); // red
+    }
+    else
+        this->mSprite.setColor( sf::Color::White );
+
 }
 void Building::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {

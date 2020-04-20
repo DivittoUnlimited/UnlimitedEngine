@@ -43,10 +43,10 @@ bool Grid::isDestroyed( ) const
 }
 void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
 {
-    //if( mUpdateFogOfWar )
+    if( mUpdateFogOfWar )
     {
-        //updateFogOfWar( );
-        //mUpdateFogOfWar = false;
+        updateFogOfWar( );
+        mUpdateFogOfWar = false;
     }
 
     // The onscreen debugging view of influence set to show offensive influence by default
@@ -101,16 +101,23 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                 else if( square->isOccupied && square->isPossibleAttackPosition && !( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mCategory &
                                                                mCurrentUnits.at( static_cast<unsigned int>(mData[mSelectedGridIndex.y * mGridWidth + mSelectedGridIndex.x].unitID) )->mCategory ) )
                 {
-                    ///
-                    // ENTER COMBAT ALGORITHM HERE!!!!!!!!!!!!
-                    ///
-                    mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->takeDamage( 75 );
-                    mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mHasSpentAction = true;
-                    mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mIsSelectedUnit = false;
-                    if( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mConstitution <= 0 )
+                    if( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mCategory & Category::Red )
                     {
-                        mCurrentUnits.erase( static_cast<unsigned int>(square->unitID) );
-                        removeUnit( sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
+                        if( mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mMorale > 25 )
+                        {
+                            ///
+                            // ENTER COMBAT ALGORITHM HERE!!!!!!!!!!!!
+                            ///
+                            mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->modHealth( -75 );
+
+                            mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mHasSpentAction = true;
+                            mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mIsSelectedUnit = false;
+                            if( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mConstitution <= 0 )
+                            {
+                                mCurrentUnits.erase( static_cast<unsigned int>(square->unitID) );
+                                removeUnit( sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
+                            }
+                        }
                     }
                     clearGrid();
                 }
@@ -353,10 +360,14 @@ void Grid::getTartgets( unsigned int i, unsigned int j )
         if( static_cast<unsigned int>( loc.y * mGridWidth + loc.x ) < mData.size() )
         {
             Square location =  mData[static_cast<unsigned int>( loc.y * mGridWidth + loc.x )];
-            if( (location.unitID > -1 && mCurrentUnits[location.unitID]->mCategory != mCurrentUnits[mWorld->getSelectedUnit()]->mCategory) || ( location.buildingID != -1 ) )
+            if( ( location.isOccupied && mCurrentUnits[location.unitID]->mCategory != mCurrentUnits[mWorld->getSelectedUnit()]->mCategory ) )
+                   // || ( location.buildingID > -1 && ( ( mCurrentBuildings.at( location.buildingID )->mCategory == Category::RedBuilding
+                   //                                   && mCurrentUnits[mWorld->getSelectedUnit()]->mCategory == Category::RedUnit ))
+                                                    //  || ( mCurrentBuildings.at( location.buildingID )->mCategory == Category::BlueBuilding
+                                                    //  && mCurrentUnits[mWorld->getSelectedUnit()]->mCategory == Category::BlueUnit ) ) ) )
             {
-                mData[static_cast<unsigned int>( loc.y * mGridWidth + loc.x )].isPossibleAttackPosition = true;
-                mData[static_cast<unsigned int>( loc.y * mGridWidth + loc.x )].rect->getSprite()->setFillColor( sf::Color( 255, 165, 0, 255 ) );
+                location.isPossibleAttackPosition = true;
+                location.rect->getSprite( )->setFillColor( sf::Color( 255, 165, 0, 255 ) );
                 flag = true;
             }
         }
@@ -400,8 +411,7 @@ void Grid::buildPossiblePositions( std::vector<sf::Vector2i>* mPossiblePositions
     if( distanceLeft >= 0 && static_cast<unsigned int>( startingPoint.y * mGridWidth + startingPoint.x ) < mData.size() )
     {
         Square* square = &mData[startingPoint.y * mGridWidth + startingPoint.x];
-        if(square->buildingID == -1 || !(mCurrentBuildings.at( square->buildingID )->mCategory & mWorld->mCurrentTurn) )
-            mPossiblePositions->push_back( startingPoint );
+        mPossiblePositions->push_back( startingPoint );
         distanceLeft -= getMoveCost( unitType, square->terrainType );
 
         buildPossiblePositions( mPossiblePositions, sf::Vector2i( startingPoint.x, startingPoint.y - 1 ), unitType, distanceLeft );
@@ -444,10 +454,24 @@ void Grid::updateFogOfWar( void )
 
         // update fog based on new data
         for( auto square : mData )
-            if( !square.isPossibleAttackPosition && !square.isPossibleNewLocation )
+            if( !square.isPossibleAttackPosition )
             {
-                if( square.isVisible ) square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
-                else square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 100 ) );
+                if( square.isVisible )
+                {
+                    square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+                    if( square.isOccupied ) mCurrentUnits.at( square.unitID )->mIsVisible = true;
+                    else if( square.buildingID > -1 ) mCurrentBuildings.at( square.buildingID )->mIsVisible = true;
+                }
+                else
+                {
+                    if( square.buildingID > -1 ) mCurrentBuildings.at( square.buildingID )->mIsVisible = false;
+                    square.rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 100 ) );
+                }
+            }
+            else
+            {
+                if( square.isOccupied ) mCurrentUnits.at( square.unitID )->mIsVisible = true;
+                else if( square.buildingID > -1 ) mCurrentBuildings.at( square.buildingID )->mIsVisible = true;
             }
     }
 }

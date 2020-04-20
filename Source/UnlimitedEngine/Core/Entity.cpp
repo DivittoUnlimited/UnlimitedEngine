@@ -36,25 +36,6 @@ void Entity::accelerate( float vx, float vy )
     mVelocity.y += vy;
 }
 
-int Entity::getHitpoints( ) const
-{
-    return mHitpoints;
-}
-
-void Entity::setHitpoints( int hp )
-{
-    if( hp > 0 )
-        this->mHitpoints = hp;
-    else {
-        this->mHitpoints = 0;
-    }
-}
-
-void Entity::damage( unsigned int points )
-{
-    mHitpoints -= points;
-}
-
 void Entity::destroy()
 {
     mHitpoints = 0;

@@ -9,7 +9,7 @@ return {
   tilewidth = 64,
   tileheight = 64,
   nextlayerid = 3,
-  nextobjectid = 10,
+  nextobjectid = 11,
   properties = {},
   tilesets = {
     {
@@ -260,7 +260,7 @@ return {
           type = "Fighter",
           shape = "rectangle",
           x = 384,
-          y = 1792,
+          y = 1856,
           width = 64,
           height = 64,
           rotation = 0,
@@ -275,8 +275,8 @@ return {
           name = "",
           type = "Fighter",
           shape = "rectangle",
-          x = 512,
-          y = 1792,
+          x = 192,
+          y = 384,
           width = 64,
           height = 64,
           rotation = 0,
@@ -307,14 +307,30 @@ return {
           name = "",
           type = "TacticalLocation",
           shape = "rectangle",
-          x = 704,
-          y = 576,
+          x = 320,
+          y = 1856,
           width = 64,
           height = 64,
           rotation = 0,
           visible = true,
           properties = {
             ["Importance"] = "10"
+          }
+        },
+        {
+          id = 10,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 1600,
+          y = 256,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
           }
         }
       }

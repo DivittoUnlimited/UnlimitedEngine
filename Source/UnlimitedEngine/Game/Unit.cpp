@@ -15,6 +15,7 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     , mPath( nullptr )
     , mDestination( -1.0f, -1.0f )
     , mIsVisible( true )
+    , mMorale( 100.0f )
     , mHealthBarBorder( nullptr )
     , mHealthBar( nullptr )
 {
@@ -30,7 +31,7 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     this->mRange            = data.range;
     this->mSprite = sf::Sprite( textures.get( TextureMap.at( data.textureID ) ) );
 
-    std::unique_ptr<RectangleShapeNode> hpBorder( new RectangleShapeNode( sf::IntRect( sf::Vector2i( 0,  68 ), sf::Vector2i( TILE_SIZE, 12.0f ) ) ) );
+    std::unique_ptr<RectangleShapeNode> hpBorder( new RectangleShapeNode( sf::IntRect( sf::Vector2i( 0,  68 ), sf::Vector2i( TILE_SIZE, 22.0f ) ) ) );
     this->mHealthBarBorder = hpBorder.get( );
     this->mHealthBarBorder->getSprite( )->setOutlineThickness( 2 );
     if( mCategory & Category::Blue )
@@ -44,6 +45,11 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     this->mHealthBar = hp.get( );
     this->mHealthBar->getSprite()->setFillColor( sf::Color::Green );
     this->attachChild( std::move( hp ) );
+
+    std::unique_ptr<RectangleShapeNode> morale( new RectangleShapeNode( sf::IntRect( sf::Vector2i( 2, 80 ), sf::Vector2i( TILE_SIZE-4, 8.0f ) ) ) );
+    this->mMoraleBar = morale.get( );
+    this->mMoraleBar->getSprite()->setFillColor( sf::Color( 255, 215, 0, 255 ) );
+    this->attachChild( std::move( morale ) );
 }
 
 Unit::~Unit( void )
@@ -101,6 +107,7 @@ void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
     if( mIsVisible )
     {
         this->mHealthBar->getSprite()->setFillColor( sf::Color::Green );
+        this->mMoraleBar->getSprite()->setFillColor( sf::Color( 255, 215, 0, 255 ) );
         if( mCategory & Category::Blue )
             this->mHealthBarBorder->getSprite()->setOutlineColor( sf::Color::Blue ); // blue
         else if( mCategory & Category::Red )
@@ -109,14 +116,15 @@ void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
     }
     else
     {
+        mMoraleBar->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
         mHealthBar->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
         mHealthBarBorder->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 0 ) );
     }
 }
 
-void Unit::takeDamage( int amount )
+void Unit::modHealth( int amount )
 {
-    this->mConstitution -= amount;
+    this->mConstitution += amount;
     if( mConstitution >= 1 )
     {
         // set health bar proportional to constitution value
@@ -127,5 +135,19 @@ void Unit::takeDamage( int amount )
     {
         this->mHealthBar->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
         // Death animation / sound effects?
+    }
+}
+void Unit::modMorale( int amount )
+{
+    this->mMorale += amount;
+    if( mMorale >= 1 )
+    {
+        // set morale bar proportional to mMoral value
+        this->mMoraleBar->getSprite()->setSize( sf::Vector2f( (static_cast<float>(mMorale) / 100) * (TILE_SIZE - 4), 8 ) );
+    }
+    else
+    {
+        this->mMoraleBar->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+        // sleep / strike animation  --  sound effects?
     }
 }

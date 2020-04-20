@@ -50,7 +50,7 @@ float Zone::defensiveInfluence( void )
 float Zone::tacticalInfluence( void )
 {
     float influence = 0.0f;
-    for( auto unit : localObjs )
+    //for( auto unit : localObjs )
     {
         //if( unit->mCategory & Category::Blue )
         //    influence += unit->mPerception + unit->mDexterity;
@@ -84,10 +84,10 @@ Category::Type Zone::ownedBy( void )
 bool Zone::addObj( Unit* obj )
 {
     // object should be added to this zone or one of it's children if any.
-    if( this->rect.contains( obj->getBoundingRect().left, obj->getBoundingRect().top ) &&
-            this->rect.contains( obj->getBoundingRect().left + obj->getBoundingRect().width, obj->getBoundingRect().top + obj->getBoundingRect().height ) )
+    if( this->rect.contains( obj->getWorldPosition().x, obj->getWorldPosition().y + obj->getBoundingRect().height ) )// &&
     {
-        if( this->depth < this->mMaxDepth )
+        //std::cout << "Unit " << obj->mID << " pos: " << obj->getWorldPosition().x << ", " << obj->getWorldPosition().y + obj->getBoundingRect().height << std::endl;
+        if( this->depth <= this->mMaxDepth )
         {
             // if node has kids try to push obj to them else add to this node
             if( this->hasKids )
@@ -99,6 +99,7 @@ bool Zone::addObj( Unit* obj )
             {   //  no kids add to node and attempt to split node if needed
                 this->localObjs.push_back( obj );
                 if( this->heuristic() > this->mMaxHeuristic ) this->split( );
+                //if( this->localObjs.size() > this->mMaxHeuristic ) this->split( );
             }
         }
         else
@@ -109,11 +110,12 @@ bool Zone::addObj( Unit* obj )
 }
 void Zone::split( void )
 {
+    std::cout << "============ SPLIT =============" << std::endl;
     // init kids of this zone
-    NW = new Zone( this, rect.left, rect.top, rect.width/2, rect.height/2, this->depth + 1 );
-    NE = new Zone( this, rect.left + rect.width/2, rect.top, rect.width/2, rect.height/2, this->depth + 1 );
-    SW = new Zone( this, rect.left, rect.top + rect.height/2, rect.width/2, rect.height/2, this->depth + 1 );
-    SE = new Zone( this, rect.left + rect.width/2, rect.top + rect.height/2, rect.width/2, rect.height/2, this->depth + 1 );
+    NW = new Zone( this, rect.left, rect.top, rect.width / 2, rect.height / 2, this->depth + 1 );
+    NE = new Zone( this, rect.left + rect.width / 2, rect.top, rect.width / 2, rect.height / 2, this->depth + 1 );
+    SW = new Zone( this, rect.left, rect.top + rect.height / 2, rect.width / 2, rect.height / 2, this->depth + 1 );
+    SE = new Zone( this, rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width / 2, rect.height / 2, this->depth + 1 );
     this->hasKids = true;
 
     // attempt to move objects from this zone to the new kids
@@ -153,11 +155,11 @@ WifeBot::WifeBot( Grid* grid, std::map<unsigned int, Unit*>* units,
     , mGrid( grid )
     , mUnits( units )
     , mBuildings( buildings )
+    , mTargetZone( 0 )
     , mRecalculate( true )
     , mAnimationTimer( sf::Time::Zero )
     , mCurrentTurn( currentTurn )
     , mAllUnitsMoved( false )
-    , mTargetZone( 0 )
 {
     for( auto unit : (*mUnits) )
         if( unit.second->mCategory & Category::RedUnit )
@@ -170,7 +172,6 @@ WifeBot::~WifeBot( void )
     mGrid = nullptr;
     mUnits = nullptr;
     mBuildings = nullptr;
-    mCurrentTurn = nullptr;
 }
 
 void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
@@ -203,9 +204,7 @@ void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
 
             // build best path from owned spawn points to all other spawn points
                 // Consider Offensive and defensive influence of the known world when building best path
-                // this path should be from zone to zone not square to square
                 // Boost the Importance of all the squares on the paths
-                // importance is seperate from tactical influence!!!!
 
             // Get the best zone(s) to focus on
             findTargetZone( );
@@ -218,8 +217,9 @@ void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
                 {
                     // only find target square for the unit if it isn't already in the best possible zone else run local zone logic on unit
                     // Check for collision between unit and target zone
-                    if( !( mZones.back( )->rect.contains( mZones[mTargetZone]->rect.left, mZones[mTargetZone]->rect.top ) &&
-                           mZones.back( )->rect.contains( mZones[mTargetZone]->rect.left + mZones[mTargetZone]->rect.width, mZones[mTargetZone]->rect.top + mZones[mTargetZone]->rect.height ) ) )
+                    bool flag = true;
+                    for( auto obj : mZones[mTargetZone]->localObjs ) if( obj->mID == unit.second->mID ) flag = false;
+                    if( flag )
                     {
                         // Change to the most important square in the grid that isnt already occupied by another unit
                         bool squareExists = false;
@@ -274,6 +274,7 @@ void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
 
 
         }
+
         if( mAnimationTimer <= sf::Time::Zero )
         {
             if( !mAllUnitsMoved )
@@ -391,17 +392,20 @@ void WifeBot::initializeZones( Zone* rootZone )
     else
     {
         rootZone->id = mZones.size();
-        mZones.push_back( rootZone );
+        //std::cout << "rootZone " << rootZone->id << " pos: " << rootZone->rect.left << ", " << rootZone->rect.top << " Size: " << rootZone->rect.width << ", " << rootZone->rect.height <<  std::endl;
+
         // Build list of squares that should be in this zone based on the zone's rect.
         for( unsigned int i = 0; i < mGrid->mData.size(); ++i )
         {
-            if( mZones.back( )->rect.contains( mGrid->mData[i].rect->getBoundingRect().left, mGrid->mData[i].rect->getBoundingRect().top ) &&
-                    mZones.back( )->rect.contains( mGrid->mData[i].rect->getBoundingRect().left + mGrid->mData[i].rect->getBoundingRect().width, mGrid->mData[i].rect->getBoundingRect().top + mGrid->mData[i].rect->getBoundingRect().height ) )
+            //std::cout << "Tile Pos: " << mGrid->mData[i].rect->getSprite()->getPosition().x << ",  " << mGrid->mData[i].rect->getSprite()->getPosition().y << std::endl;
+            if( rootZone->rect.contains( mGrid->mData[i].rect->getSprite()->getPosition( ) ) ) // &&
+                   // mZones.back( )->rect.contains( mGrid->mData[i].rect->getWorldPosition().x + mGrid->mData[i].rect->getBoundingRect().width, mGrid->mData[i].rect->getWorldPosition().y + mGrid->mData[i].rect->getBoundingRect().height ) )
             {
-                mZones.back( )->innerGrid.push_back( mGrid->mData[i] );
-                mZones.back( )->innerGrid.back().debugText->setString( std::to_string( rootZone->id ) + "-" + std::to_string( static_cast<int>( rootZone->heuristic() ) ) );
+                rootZone->innerGrid.push_back( mGrid->mData[i] );
+                rootZone->innerGrid.back().debugText->setString( std::to_string( rootZone->id ) );
             }
         }
+        mZones.push_back( rootZone );
     }
 }
 
@@ -425,7 +429,7 @@ void WifeBot::findTargetZone( std::vector<unsigned int> excludedZones )
             unsigned int targetZoneImportance = mZones[mTargetZone]->importance( );
 
             if( currentImportance > 0 ) std::cout << "Important zone Found! " << i << std::endl;
-            if( currentImportance > targetZoneImportance ) mTargetZone = i;
+            if( currentImportance >= targetZoneImportance ) mTargetZone = i;
 //            else if( currentImportance == targetZoneImportance )
 //            {
 //                if( mZones[i]->offensiveInfluence() > mZones[mTargetZone]->offensiveInfluence() )

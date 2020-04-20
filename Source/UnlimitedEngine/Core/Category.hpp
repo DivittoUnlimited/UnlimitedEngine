@@ -22,8 +22,10 @@ enum Type
     NeutralBuilding     = 1 << 13,
     Grid                = 1 << 14,
     WifeBot             = 1 << 15,
-    Red                 = RedUnit | RedBuilding | WifeBot,
-    Blue                = BlueUnit | BlueBuilding,
+    TeamRed             = 1 << 16,
+    TeamBlue            = 1 << 17,
+    Red                 = RedUnit | RedBuilding | WifeBot | TeamRed,
+    Blue                = BlueUnit | BlueBuilding | TeamBlue,
 };
 
 }

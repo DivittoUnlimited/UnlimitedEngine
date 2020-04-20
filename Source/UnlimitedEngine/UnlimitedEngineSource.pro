@@ -43,7 +43,8 @@ DISTFILES += \
     Media/Textures/Particle.png \
     Media/Textures/SpawnPoint.png \
     Media/Textures/UnitSpriteSheet.png \
-    Notes.txt
+    Notes.txt \
+    Story.txt
 
 HEADERS += \
     Core/Application.hpp \
@@ -82,6 +83,7 @@ HEADERS += \
     Game/Building.hpp \
     Game/DataTables.hpp \
     Game/Grid.hpp \
+    Game/TeamStats.hpp \
     Game/Unit.hpp \
     Game/WifeBot.hpp \
     Game/World.hpp \
@@ -102,6 +104,7 @@ HEADERS += \
     Gui/Label.hpp \
     Gui/MessageBoxNode.hpp \
     Gui/ResponseSelector.hpp \
+    States/ActionMenuState.hpp \
     States/BattleStatScreen.hpp \
     States/ConquestBattleSetupState.hpp \
     States/ConquestModeSetup.hpp \
@@ -173,6 +176,7 @@ SOURCES += \
     Game/Building.cpp \
     Game/DataTables.cpp \
     Game/Grid.cpp \
+    Game/TeamStats.cpp \
     Game/Unit.cpp \
     Game/WifeBot.cpp \
     Game/World.cpp \
@@ -192,6 +196,7 @@ SOURCES += \
     Gui/Label.cpp \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
+    States/ActionMenuState.cpp \
     States/BattleStatScreen.cpp \
     States/ConquestBattleSetupState.cpp \
     States/ConquestModeSetup.cpp \

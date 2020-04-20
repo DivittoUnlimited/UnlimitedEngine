@@ -9,7 +9,6 @@
 #include <cassert>
 #include <cmath>
 
-
 SceneNode::SceneNode( Category::Type category )
 : mChildren( )
 , mParent( nullptr )

@@ -4,9 +4,53 @@ BUGS and ISSUES:
         - Clicking while "ERROR could not connect" is shown causes crash.
         - Server often can't be started more than once per session
         - Project must be cleaned every time the server is run for it to work again.
-    - Slow down unit movement "animation" proccess clicking the unit, selecting a square to move to etc...
-
+        - Units can be spawned on  top of spawn points
+        - Attack Squares are not showing up anymore
 FEATURES:
+    - New Attack/Ability Patterns
+        - Replaces current system of using Grid::getTargets() -> Grid:::BuildPositions() etc...
+        - Each unit will get there own attack pattens loaded from lua for easy modding
+        - Create Child class of unit for each unit type.
+        - Add virtual interface method to unit class UseAbility( Stat stat, vector2f range )
+            - Enum of all possible unit stats that can be modified by abilities - health, defense, strength, dex etc..
+            - range of randomly generated number to signify effectiveness of ability. (i.e Attack roll d4 + 2 etc.. )
+        - Add ability tables to lua
+            - name
+            - Stat affected
+            - Range
+            - TargetSquare coordinates
+        - load ability tables per unit in DataTables.hpp
+        - Add action Menu when player clicks on a unit.
+            - See Below
+
+    - Action Menu
+        - pops whenever you click a unit
+        - pops for a unit after it has moved
+
+        - This will simplify Grid::handleLeftClick()
+            - Forced to break this up into seperate methods that the menu will be able to use.
+            - How does this affect the AI?
+                - Might have to write more commands for her to use this system...
+                    - Select unit
+                    - Get list of all possible actions unit has
+                        - Each possible square it can move to
+                        - Each square it can attack or use ability on
+                        - Wait commad, choose stance.
+                        - use these options to call apropriate methods in grid class. (same player menu will call)
+        - TO-DO
+            - Remove Current Attack system.
+            - Mod handleLeftClick to only select units and buildings and then pop apropriate menu
+            - Use menu to call methods such as attacks and moving from the grid.
+
+    - Optional Wait option bonus menu
+        - stance to take when you choose to wait?
+            - Defensive
+            - offensive
+            - Ambush
+            - Flee
+            - Ready attack etc...
+        - Boost morale when waiting
+
     - Fog of war
         - How will fog of war work in online games?
             - Fix server issues above first.
@@ -18,78 +62,15 @@ FEATURES:
             - Consider Offensive and defensive influence of the known world when building best path
                 - use zone data
                 - modify pathfinding heuristic to include influence
-
             - Boost the Importance of all the squares on the paths
-
-
-
         - Add AI Attacking spawn points
         - Add AI Spawning units
             - add currency first
-
-    - Game Currency
-        - Morale
-            - the in-game currency
-            - Units should be given a morale bar below their health if morale falls to low they will stop fighting.
-            - Player given points for total unit morale that can be used to spawn more units.
-        - Player Exp
-            - Level that goes up more when attacking then defending
-            - Gain exp per morale points earned
-            - Player can use exp points to unlock new units.
-
-Notes:
-    - WifeBot Overview:
-        - Levels of "Thought":
-            - Team Tactics: How the whole team should play.
-               - Combine world data to generate mathematical representation of world state
-               - Apply AI Bias towards goals
-                    - Some might be defensive others might go for buildings first etc...
-               - Use pathfinding on zone grid to build list of objectives to capture all bases.
-                    - an objective here is a zone along the best path to the next spawn point.
-                    - The heuristic for building this list of zones must include the zone's tactical
-                      importance as well as both teams offensive and defensive influence in the zone
-                    - Zone's overall tactical, offensive, and defensive scores should be affected by zones around them
-
-               - Unit tactics: How each should play to support team tactics.
-                    - based on goals build list of actions for units
-                        - Move To
-                        - Attack Square
-                        - Heal
-                        - Special Ability
-            - path finding: Moving around the grid.
-        - Needed Data structures:
-            - List of goals
-                - Capture Spawn points
-                - Defeat all enemy units
-                - Capture signifigant locations
-                - Capture zones
-                - Defend zone
-                - Defend square
-                - Spawn units
-                - Generate funds
-            - List of actions
-                - Move unit
-                    - list of possible new positions
-                - Attack Position ( unit/building )
-                - Heal unit
-                - Use unit ability
-                - Spawn unit
-            - Grid data
-        - Influence types:
-            - Offensive
-            - Defensive
-            - Tactical
-            - Building influence
-                - has spawn point or doesn't
-            - Importance
-    - Archers should get more range if they are on higher ground (i.e Standing on a wall)
-    - Archers should have a posibilty of hitting adjacent squares to their target.(MISS)
-    - Scouts should have invisibility mode even when exposed from fog of war.
-    - Add Level of exp multplier to units
-    - initiative per unit instead of turn based?
-        - needs a lot more research!
-    - Unit capture abillity
-        - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all
+    - Gold (Bonus points for Morale)
+        - Player given points for total unit morale at the end of every turn
+        - Player can use Gold to unlock new units. (think battlefront 2)
+            - This slows what units can be spawned until they are earned in a match.
+        - Used to purchase abilities for units after they level up enough to unlock them
 ART:
     - Needed Maps:
         - (tutorial) Small street/alley
@@ -106,4 +87,63 @@ ART:
         - Grass
         - Coblestone road
         - dirt road
-
+Notes:
+    - Art:
+        - Maps should be drawn like hand drawn maps in Dnd, GOT, LOTR, etc..
+            - Gives excuse for simple art that looks cool
+        - Low detail(tile art) large scale maps
+        - High detail(tile art) smaller maps like dungeons etc...
+    - Combat Algorith
+        - D20's?
+        - Risk?
+        - both?
+    - WifeBot Overview:
+        - Team Tactics: (How the whole team should play.)
+            - Combine world data to generate mathematical representation of world state
+            - Apply AI Bias towards goals
+                 - Some might be defensive others might go for buildings first etc...
+            - Use pathfinding on zone grid to build list of objectives to capture all bases.
+                 - an objective here is a zone along the best path to the next spawn point.
+                 - The heuristic for building this list of zones must include the zone's tactical
+                   importance as well as both teams offensive and defensive influence in the zone
+                 - Zone's overall tactical, offensive, and defensive scores should be affected by zones around them
+            - Unit tactics: How each should play to support team tactics.
+                 - based on goals build list of actions for units
+                     - Move To
+                     - Attack Square
+                     - Heal
+                     - Special Ability
+        - path finding: Moving around the grid.
+        - Needed Data structures:
+            - List of goals
+                - Capture Spawn points
+                - Defeat all enemy units
+                - Capture signifigant locations
+                - Capture zones
+                - Defend zone
+                - Spawn units
+                - Generate funds
+            - Grid data
+        - Influence types:
+            - Offensive
+            - Defensive
+            - Tactical
+            - Importance
+    - Archers should get more range if they are on higher ground (i.e Standing on a wall)
+    - Archers should have a posibilty of hitting adjacent squares to their target.(MISS)
+    - Scouts should have invisibility mode even when exposed from fog of war.
+    - Add Level of exp multplier to units
+    - Add skill tree for units to grow as they level up in battle.
+        - Have more skills then skill slots (make player choose what to add)
+        - limit ability use based on morale of the unit
+        - Multiple paths per Unit?
+            - Healing / Defense boost knights
+            - Rogues with backstab or potions
+            - Control bard / team buf bard
+            - AOE Wizard / Direct fire Wizard
+            - invisible scouts / fast scouts
+            - strength boost fighter / morale boost fighter
+    - initiative per unit instead of turn based?
+        - needs a lot more research!
+    - Unit capture abillity
+        - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all

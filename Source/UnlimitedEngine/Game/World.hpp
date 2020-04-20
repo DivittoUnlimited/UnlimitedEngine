@@ -32,6 +32,7 @@
 #include "Game/Grid.hpp"
 #include "Game/Unit.hpp"
 #include "Game/Building.hpp"
+#include "Game/TeamStats.hpp"
 
 enum Ships {
       TeamAShip1 = 0
@@ -148,6 +149,18 @@ public:
     /// \brief mChangeTurnTextTimer
     /// The length of time that the change turn text should be displayed over the game.
     sf::Time                            mChangeTurnTextTimer;
+    /// \brief mBlueTeamStats
+    ///  Container class for all the stats held by the team
+    /// as well as the source for the HUD data.
+    /// Child of SceneNode, This object must be attached to the SceneGraph
+    /// above all other layer to show up on the screen
+    TeamStats*                           mBlueTeamStats;
+    /// \brief mRedTeamStats
+    ///  Container class for all the stats held by the team
+    /// as well as the source for the HUD data
+    /// Child of SceneNode, This object must be attached to the SceneGraph
+    /// above all other layer to show up on the screen
+    TeamStats*                           mRedTeamStats;
 
 };
 

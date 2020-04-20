@@ -15,10 +15,6 @@ class Entity : public SceneNode
         void			accelerate( sf::Vector2f velocity );
         void			accelerate( float vx, float vy );
         sf::Vector2f	getVelocity( ) const;
-        int				getHitpoints( ) const;
-        void            setHitpoints( int hp );
-        void			repair( int points );
-        void			damage( unsigned int points );
         void			destroy( );
         virtual bool    isDestroyed( ) const;
 

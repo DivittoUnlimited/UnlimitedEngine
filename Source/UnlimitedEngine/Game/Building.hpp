@@ -20,6 +20,7 @@ public:
 
     // Attributes
     unsigned int mID;
+    bool mIsVisible;
     Category::Type mCategory;
     std::string mType;
     unsigned int mGoldPerTurn;

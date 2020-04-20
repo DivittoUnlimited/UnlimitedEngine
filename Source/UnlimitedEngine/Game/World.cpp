@@ -46,6 +46,8 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mClientTeamColor( Category::Blue )
     , mChangeTurnText( "Blue\nTeam's turn!" , mFonts.get( FontMap.at( "Default" ) ), 72 )
     , mChangeTurnTextTimer( sf::Time::Zero )
+    , mBlueTeamStats( nullptr )
+    , mRedTeamStats( nullptr )
 {
     if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     // mWorldView.zoom( 2.0 );
@@ -113,21 +115,29 @@ bool World::update( sf::Time dt )
     {
         mWorldView.move( 0.0f, -1 * mCameraPanSpeed );
         mDeltaMousePosition.y -= mCameraPanSpeed;
+        mBlueTeamStats->move( 0, -mCameraPanSpeed );
+        mRedTeamStats->move( 0, -mCameraPanSpeed );
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Down  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
     {
         mWorldView.move( 0.0f, mCameraPanSpeed );
         mDeltaMousePosition.y += mCameraPanSpeed;
+        mBlueTeamStats->move( 0, mCameraPanSpeed );
+        mRedTeamStats->move( 0, mCameraPanSpeed );
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Left  ) ) //  || sf::Mouse::getPosition().x < 100 )
     {
         mWorldView.move( -1 * mCameraPanSpeed, 0.0f );
         mDeltaMousePosition.x -= mCameraPanSpeed;
+        mBlueTeamStats->move( -mCameraPanSpeed, 0 );
+        mRedTeamStats->move( -mCameraPanSpeed, 0 );
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Right ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
     {
         mWorldView.move( mCameraPanSpeed, 0.0f );
         mDeltaMousePosition.x += mCameraPanSpeed;
+        mBlueTeamStats->move( mCameraPanSpeed, 0 );
+        mRedTeamStats->move( mCameraPanSpeed, 0 );
     }
 
     return true;
@@ -153,9 +163,10 @@ bool World::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Cat
 
 void World::handleEvent( const sf::Event& event )
 {
-    if( event.type == sf::Event::KeyReleased &&
-            ( event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
-        mStateStack->pushState( States::EndTurnMenuState );
+    if( ( !this->mLocalMultiplayerWorld && mCurrentTurn & Category::Blue ) || this->mLocalMultiplayerWorld )
+        if( event.type == sf::Event::KeyReleased &&
+                ( event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
+            mStateStack->pushState( States::EndTurnMenuState );
 }
 
 void World::changeTurn( void )
@@ -164,6 +175,8 @@ void World::changeTurn( void )
     {
         mCurrentTurn = Category::Blue;
         mChangeTurnText.setString( "\t  BLUE\nPLAYER GO!" );
+        mBlueTeamStats->mDisplay = true;
+        mRedTeamStats->mDisplay = false;
         // solve any end-of-turn buffs etc for red team here
         // solve any start-of-turn bufs etc for blue team here
     }
@@ -172,6 +185,8 @@ void World::changeTurn( void )
     {
         mCurrentTurn = Category::Red;
         mChangeTurnText.setString( "\t   RED\nPLAYER GO!" );
+        mBlueTeamStats->mDisplay = false;
+        mRedTeamStats->mDisplay = true;
     }
     mChangeTurnTextTimer = sf::milliseconds( 2000 );
 
@@ -185,6 +200,7 @@ void World::changeTurn( void )
             unit.second->mHasSpentAction = false;
         }
     }
+
     if( !mNetworkedWorld && !mLocalMultiplayerWorld && (mCurrentTurn & Category::Red) ) // Game is Player vs AI bot is always red
     {
         // Must tell Wifebot to update at the beggining of her turn
@@ -193,6 +209,7 @@ void World::changeTurn( void )
         com.action = derivedAction<WifeBot>( [] ( WifeBot& bot, sf::Time ){ bot.recalculate( true ); } );
         mCommandQueue.push( com );
     }
+
 }
 
 void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
@@ -204,8 +221,8 @@ void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
     else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
     std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( unitType ), mTextures ) );
-    sf::Rect<float> object = mMovementGrid->mData[gridIndex.y * (WINDOW_WIDTH / TILE_SIZE) + gridIndex.x].mBounds;
-    unit->setPosition( object.left, object.top );
+    //sf::Rect<float> object = mMovementGrid->mData[gridIndex.y * (WINDOW_WIDTH / TILE_SIZE) + gridIndex.x].mBounds;
+    unit->setPosition( gridIndex.x * TILE_SIZE, gridIndex.y * TILE_SIZE );
     unit->mSprite.setTextureRect( UnitDataTable.at( unitType ).textureRect );
     mMovementGrid->addUnit( unit.get( ) );
 
@@ -467,7 +484,7 @@ void World::buildScene( std::string tileMapFilePath )
                 mSceneLayers[i]->attachChild( std::move( backgroundImage ) );
             }
         }
-        /*
+/*
          *
          *   Particle effects for extra credit!!!!
          *
@@ -500,18 +517,27 @@ void World::buildScene( std::string tileMapFilePath )
             lua_pop( L, 1 ); // Particles table
         }
         lua_close( L );
-    */
+*/
+        // Add HUD
+        std::unique_ptr<TeamStats> mBlueTeam( new TeamStats( Category::TeamBlue, mFonts ) );
+        mBlueTeamStats = mBlueTeam.get();
+        mSceneGraph.attachChild( std::move( mBlueTeam ) );
+        std::unique_ptr<TeamStats> mRedTeam( new TeamStats( Category::TeamRed, mFonts ) );
+        mRedTeamStats = mRedTeam.get();
+        mSceneGraph.attachChild( std::move( mRedTeam ) );
+        mRedTeamStats->mDisplay = false;
+        mBlueTeamStats->mDisplay = true;
 
-    // Add network node, if necessary
-    if( mNetworkedWorld )
-    {
-        std::unique_ptr<NetworkNode> networkNode( new NetworkNode( ) );
-        mNetworkNode = networkNode.get( );
-        mSceneGraph.attachChild( std::move( networkNode ) );
-        std::cout << "BuildScene Complete on a networked world!!" << std::endl;
-    }
-    else
-        std::cout << "BuildScene Complete!!" << std::endl;
+        // Add network node, if necessary
+        if( mNetworkedWorld )
+        {
+            std::unique_ptr<NetworkNode> networkNode( new NetworkNode( ) );
+            mNetworkNode = networkNode.get( );
+            mSceneGraph.attachChild( std::move( networkNode ) );
+            std::cout << "BuildScene Complete on a networked world!!" << std::endl;
+        }
+        else
+            std::cout << "BuildScene Complete!!" << std::endl;
 }
 
 void World::loadSaveFile( std::string )
