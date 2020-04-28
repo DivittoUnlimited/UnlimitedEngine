@@ -5,6 +5,9 @@
 #include "Gui/Button.hpp"
 #include "States/EndTurnMenuState.hpp"
 #include "States/SpawnPointMenuState.hpp"
+#include "States/ActionMenuState.hpp"
+#include "States/AbilitySelectMenuState.hpp"
+#include "States/RotationSelectMenuState.hpp"
 #include "Core/GameServer.hpp"
 #include "Game/WifeBot.hpp"
 #include "Graphics/TextNode.hpp"
@@ -549,4 +552,7 @@ void World::registerStates( )
 {
     mStateStack->registerState<EndTurnMenuState>( States::EndTurnMenuState, this );
     mStateStack->registerState<SpawnPointMenuState>( States::SpawnPointMenuState, this );
+    mStateStack->registerState<ActionMenuState>( States::ActionMenuState, this );
+    mStateStack->registerState<AbilitySelectMenuState>( States::AbilitySelectMenuState, this );
+    mStateStack->registerState<RotationSelectMenuState>( States::RotationSelectMenuState, this );
 }

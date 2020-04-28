@@ -5,6 +5,7 @@
 #include "Core/ResourceIdentifiers.hpp"
 #include "Core/DialogNode.hpp"
 #include "Core/Category.hpp"
+#include "Game/Dice.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -98,19 +99,41 @@ struct ConversationData {
     std::vector<sf::Vector2f> portraitPosition; // index will line up with other two vectors
 };
 
-struct UnitTypeData {
-    Category::Type category;
-    int attack;
-    int dexterity;
-    int constitution;
-    int defense;
-    std::string type;
-    sf::Vector2i range;
-    unsigned int perception;
-    std::string textureID;
-    sf::Rect<int> textureRect;
+struct StatModifier
+{
+    std::string stat;
+    Dice power;
+    unsigned int duration;
 };
 
+struct AbilityData
+{
+    unsigned int coolDown;
+    unsigned int range;
+    bool hasRotation;
+    std::vector<std::vector<sf::Vector2i>> AOE;
+    std::vector<StatModifier> targetMods;
+    std::vector<StatModifier> userMods;
+};
+
+struct UnitTypeData {
+    Category::Type category;
+    std::string type;
+    int attack;
+    int armour;
+    int speed;
+    unsigned int perception;
+    int health;
+    int morale;
+    int stamina;
+    std::string textureID;
+    sf::Rect<int> textureRect;
+    std::vector<std::string> abilities;
+};
+
+/// \brief The BuildingData struct
+/// Probably obsolete since the only "building" type in the game is the spawn points
+/// anymore :P
 struct BuildingData {
     Category::Type category;
     std::string type;
@@ -125,11 +148,6 @@ static std::map<std::string, unsigned int> MusicMap;
 static std::map<std::string, unsigned int> LayerMap;
 static std::map<std::string, unsigned int> ObjectMap;
 static std::map<std::string, unsigned int> LevelMap;
-
-
-//// READ ME
-// Add levels here once everything is working and finally remove Game.lua in place of World1_1.lua
-// Which will have everything Game.lua has plus a optional tiledMap path that will be loaded in the World class
 
 static bool loadAssetsLuaFile = []() -> bool {
         lua_State* L = luaL_newstate();
@@ -295,6 +313,7 @@ static std::map<std::string, unsigned int> WarpMap              = buildResourceM
 // Tactics tribe Maps
 static std::map<std::string, unsigned int> TerrainTypeMap       = buildResourceMap( "Game/Lua/TerrainTypes.lua" );
 static std::map<std::string, unsigned int> UnitTypeMap          = buildResourceMap( "Game/Lua/UnitTypes.lua" );
+static std::map<std::string, unsigned int> AbilityMap           = buildResourceMap( "Game/Lua/Abilities.lua" );
 static std::map<std::string, unsigned int> BuildingTypeMap      = buildResourceMap( "Game/Lua/Buildings.lua" );
 
 static std::vector<WarpData> initializeWarpData = []() -> std::vector<WarpData> {
@@ -479,6 +498,247 @@ static std::vector<ConversationData> initializeConversationData = []( ) -> std::
         lua_close( L );
         return data;
 }( ); // initializeConversationData
+static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<AbilityData> {
+        std::vector<AbilityData> data( AbilityMap.size( ) );
+        lua_State* L = luaL_newstate();
+        luaL_openlibs(L);
+        lua_getglobal( L, "debug" );
+        lua_getfield( L, -1, "traceback" );
+        lua_replace( L, -2 );
+        luaL_loadfile( L, "Game/Lua/Abilities.lua" );
+        if ( lua_pcall( L, 0, LUA_MULTRET, -2 ) ) {
+            luaL_traceback( L, L, lua_tostring( L, -1 ), 1 );
+            std::cout << "ERROR: " << lua_tostring( L, -1 ) << std::endl;
+            throw( lua_tostring( L, -1 ) );
+        }
+        if( lua_istable( L, -1 ) ) // Anon table
+        {
+            for( auto i = AbilityMap.begin(); i != AbilityMap.end(); ++i )
+            {
+                lua_getfield( L, -1, i->first.c_str( ) );
+                if( lua_istable( L, -1 ) ) // Ability Definition
+                {
+                    lua_getfield( L, -1, "coolDown" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].coolDown = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading Abilities " << i->first.c_str() << "coolDown" << std::endl;
+                    lua_pop( L, 1 ); // CoolDown
+                    lua_getfield( L, -1, "range" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].range = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading Abilities " << i->first.c_str() << "range" << std::endl;
+                    lua_pop( L, 1 ); // range
+                    lua_getfield( L, -1, "hasRotation" );
+                    if( lua_isboolean( L, -1 ) ) data[i->second].hasRotation = lua_toboolean( L, -1 );
+                    else std::cout << "Error loading Abilities " << i->first.c_str() << "hasRotation" << std::endl;
+                    lua_pop( L, 1 ); // hasRotation
+
+                    if( !data[i->second].hasRotation )
+                    {
+                        // MOD THIS TO BE AOE IF APPLICABLE
+                        lua_getfield( L, -1, "AOE" );
+                        if( lua_istable( L, -1 ) )
+                        {
+                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            // build int pairs vector
+                            lua_pushnil( L );
+                            while( lua_next( L, -2 ) != 0 )
+                            {
+                                if( lua_istable( L, -1 ) )
+                                {
+                                    int x = 0;
+                                    int y = 0;
+                                    lua_getfield( L, -1, "x" );
+                                    if( lua_isnumber( L, -1 ) ) x = static_cast<int>( lua_tonumber( L, -1 ) );
+                                    else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                    lua_pop( L, 1 );
+                                    lua_getfield( L, -1, "y" );
+                                    if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
+                                    else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                    lua_pop( L, 1 );
+                                    data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                }
+                                lua_pop( L, 1 );
+                            }
+                        }
+                        else std::cout << "Error Reading Ability AOE" << std::endl;
+                        lua_pop( L, 1 ); // AOE
+                    }
+                    else
+                    {
+                        // MOD THIS TO BE AOE IF APPLICABLE
+                        lua_getfield( L, -1, "AOE" );
+                        if( lua_istable( L, -1 ) )
+                        {
+                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            lua_getfield( L, -1, "north" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                // build int pairs vector
+                                lua_pushnil( L );
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    if( lua_istable( L, -1 ) )
+                                    {
+                                        int x = 0;
+                                        int y = 0;
+                                        lua_getfield( L, -1, "x" );
+                                        if( lua_isnumber( L, -1 ) ) x = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        lua_getfield( L, -1, "y" );
+                                        if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                    }
+                                    lua_pop( L, 1 );
+                                }
+                            }
+                            lua_pop( L, 1 ); // north
+                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            lua_getfield( L, -1, "east" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                // build int pairs vector
+                                lua_pushnil( L );
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    if( lua_istable( L, -1 ) )
+                                    {
+                                        int x = 0;
+                                        int y = 0;
+                                        lua_getfield( L, -1, "x" );
+                                        if( lua_isnumber( L, -1 ) ) x = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        lua_getfield( L, -1, "y" );
+                                        if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                    }
+                                    lua_pop( L, 1 );
+                                }
+                            }
+                            lua_pop( L, 1 ); // east
+                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            lua_getfield( L, -1, "south" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                // build int pairs vector
+                                lua_pushnil( L );
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    if( lua_istable( L, -1 ) )
+                                    {
+                                        int x = 0;
+                                        int y = 0;
+                                        lua_getfield( L, -1, "x" );
+                                        if( lua_isnumber( L, -1 ) ) x = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        lua_getfield( L, -1, "y" );
+                                        if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                    }
+                                    lua_pop( L, 1 );
+                                }
+                            }
+                            lua_pop( L, 1 ); // south
+                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            lua_getfield( L, -1, "west" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                // build int pairs vector
+                                lua_pushnil( L );
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    if( lua_istable( L, -1 ) )
+                                    {
+                                        int x = 0;
+                                        int y = 0;
+                                        lua_getfield( L, -1, "x" );
+                                        if( lua_isnumber( L, -1 ) ) x = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        lua_getfield( L, -1, "y" );
+                                        if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                    }
+                                    lua_pop( L, 1 );
+                                }
+                            }
+                            lua_pop( L, 1 ); // west
+
+                        }
+                        else std::cout << "Error Reading Ability AOE" << std::endl;
+                        lua_pop( L, 1 ); // AOE
+                    }
+
+                    lua_getfield( L, -1, "targetMods" );
+                    if( lua_istable( L, -1 ) )
+                    {
+                        lua_pushnil( L );
+                        while( lua_next( L, -2 ) != 0 )
+                        {
+                            if( lua_istable( L, -1 ) )
+                            {
+                                data[i->second].targetMods.push_back( StatModifier( ) );
+                                lua_getfield( L, -1, "stat" );
+                                if( lua_isstring( L, -1 ) ) data[i->second].targetMods.back().stat = lua_tostring( L, -1 );
+                                else std::cout << "Error loading Ability TargetMods" <<  std::endl;
+                                lua_pop( L, 1 );
+                                lua_getfield( L, -1, "power" );
+                                if( lua_isstring( L, -1 ) ) data[i->second].targetMods.back().power = Dice( lua_tostring( L, -1 ) );
+                                else std::cout << "Error loading Ability TargetMods" <<  std::endl;
+                                lua_pop( L, 1 );
+                                lua_getfield( L, -1, "duration" );
+                                if( lua_isnumber( L, -1 ) ) data[i->second].targetMods.back().duration = static_cast<int>( lua_tonumber( L, -1 ) );
+                                else std::cout << "Error loading Ability TargetMods" <<  std::endl;
+                                lua_pop( L, 1 );
+                            }
+                            lua_pop( L, 1 );
+                        }
+                    }else std::cout << "Error reading TargetMods of ability." << std::endl;
+                    lua_pop( L, 1 ); // // TargetMods
+
+                    lua_getfield( L, -1, "userMods" );
+                    if( lua_istable( L, -1 ) )
+                    {
+                        lua_pushnil( L );
+                        while( lua_next( L, -2 ) != 0 )
+                        {
+                            if( lua_istable( L, -1 ) )
+                            {
+                                data[i->second].userMods.push_back( StatModifier( ) );
+                                lua_getfield( L, -1, "stat" );
+                                if( lua_isstring( L, -1 ) ) data[i->second].userMods.back().stat = lua_tostring( L, -1 );
+                                else std::cout << "Error loading Ability UserMods" <<  std::endl;
+                                lua_pop( L, 1 );
+                                lua_getfield( L, -1, "power" );
+                                if( lua_isstring( L, -1 ) ) data[i->second].userMods.back().power = Dice( lua_tostring( L, -1 ) );
+                                else std::cout << "Error loading Ability UserMods" <<  std::endl;
+                                lua_pop( L, 1 );
+                                lua_getfield( L, -1, "duration" );
+                                if( lua_isnumber( L, -1 ) ) data[i->second].userMods.back().duration = static_cast<int>( lua_tonumber( L, -1 ) );
+                                else std::cout << "Error loading Ability UserMods" <<  std::endl;
+                                lua_pop( L, 1 );
+                            }
+                            lua_pop( L, 1 );
+                        }
+                    }else std::cout << "Error reading UserMods of ability." << std::endl;
+                    lua_pop( L, 1 ); // // UserMods
+                }else std::cout << "ERROR Reading Ability" << std::endl;
+                lua_pop( L, 1 ); // Ability Definition
+            }
+        }else std::cout << "Error reading Abilities.lua" << std::endl;
+        lua_pop( L, 1 ); // anon table
+        lua_close( L );
+        return data;
+}(  ); // initializeAbilityData
 static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<UnitTypeData> {
         std::vector<UnitTypeData> data( UnitTypeMap.size( ) );
         lua_State* L = luaL_newstate();
@@ -508,44 +768,34 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
                     if( lua_isnumber( L, -1 ) ) data[i->second].attack = static_cast<int>( lua_tonumber( L, -1 ) );
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "strength" << std::endl;
                     lua_pop( L, 1 );
-                    lua_getfield( L, -1, "dexterity" );
-                    if( lua_isnumber( L, -1 ) ) data[i->second].dexterity = static_cast<int>( lua_tonumber( L, -1 ) );
-                    else std::cout << "Error loading UnitType " << i->first.c_str() << "dexterity" << std::endl;
+                    lua_getfield( L, -1, "speed" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].speed = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "speed" << std::endl;
                     lua_pop( L, 1 );
-                    lua_getfield( L, -1, "constitution" );
-                    if( lua_isnumber( L, -1 ) ) data[i->second].constitution = static_cast<int>( lua_tonumber( L, -1 ) );
-                    else std::cout << "Error loading UnitType " << i->first.c_str() << "constition" << std::endl;
+                    lua_getfield( L, -1, "health" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].health = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "Health" << std::endl;
                     lua_pop( L, 1 );
-                    lua_getfield( L, -1, "defense" );
-                    if( lua_isnumber( L, -1 ) ) data[i->second].defense = static_cast<int>( lua_tonumber( L, -1 ) );
-                    else std::cout << "Error loading UnitType " << i->first.c_str() << "defense" << std::endl;
+                    lua_getfield( L, -1, "armour" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].armour = static_cast<int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "armour" << std::endl;
                     lua_pop( L, 1 );
-
-                    lua_getfield( L, -1, "range" );
-                    if( lua_istable( L, -1 ) )
-                    {
-                        lua_getfield( L, -1, "innerRange" );
-                        if( lua_isnumber( L, -1 ) ) data[i->second].range.x = static_cast<int>( lua_tonumber( L, -1 ) );
-                        else std::cout << "Error loading UnitType " << i->first.c_str() << "innerRange" << std::endl;
-                        lua_pop( L, 1 );
-                        lua_getfield( L, -1, "outerRange" );
-                        if( lua_isnumber( L, -1 ) ) data[i->second].range.y = static_cast<int>( lua_tonumber( L, -1 ) );
-                        else std::cout << "Error loading UnitType " << i->first.c_str() << "outerRange" << std::endl;
-                        lua_pop( L, 1 );
-                    }
-                    else std::cout << "Error loading UnitType " << i->first.c_str() << "range" << std::endl;
-                    lua_pop( L, 1 );
-
                     lua_getfield( L, -1, "perception" );
                     if( lua_isnumber( L, -1 ) ) data[i->second].perception = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "perception" << std::endl;
                     lua_pop( L, 1 );
-
+                    lua_getfield( L, -1, "morale" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].morale = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "morale" << std::endl;
+                    lua_pop( L, 1 );
+                    lua_getfield( L, -1, "stamina" );
+                    if( lua_isnumber( L, -1 ) ) data[i->second].stamina = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
+                    else std::cout << "Error loading UnitType " << i->first.c_str() << "stamina" << std::endl;
+                    lua_pop( L, 1 );
                     lua_getfield( L, -1, "texture" );
                     if( lua_isstring( L, -1 ) ) data[i->second].textureID = lua_tostring( L, -1 );
                     else std::cout << "Error loading UnitType " << i->first.c_str() << "texture" << std::endl;
                     lua_pop( L, 1 );
-
                     lua_getfield( L, -1, "textureRect" );
                     if( lua_istable( L, -1 ) )
                     {
@@ -569,6 +819,19 @@ static std::vector<UnitTypeData> initializeUnitTypeData = []( ) -> std::vector<U
                     // Commented out because not all units have texRects. Not having one indicates that they use the entire texture.
                     //else std::cout << "Error loading UnitType " << i->first.c_str() << " range" << std::endl;
                     lua_pop( L, 1 );
+                    lua_getfield(  L, -1, "Abilities" );
+                    if( lua_istable( L ,-1 ) )
+                    {
+                        lua_pushnil( L );
+                        while( lua_next( L, -2 ) != 0 )
+                        {
+                            if( lua_isstring( L, -1 ) ) data[i->second].abilities.push_back( lua_tostring( L, -1 ) );
+                            else std::cout << "Error loading UnitType " << i->first.c_str() << "Ability" << std::endl;
+                            lua_pop( L, 1 ); // anon string value
+                        }
+                        lua_pop( L, 1 );
+                    }
+                    lua_pop( L, 1 ); // Abilities table
                 }
                 lua_pop( L, 1 ); // defintion table
             }

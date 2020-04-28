@@ -78,93 +78,96 @@ void Grid::handleLeftClick( sf::Vector2i pos )
             Square* square = &mData[j * mGridWidth + i];
             if( square->mBounds.contains( pos.x, pos.y ) ) // pos refers to the mouse pos when it was clicked.
             {
-                if( !mUnitAwaitingOrders && square->isOccupied )
-                    selectUnit( i, j );
-                else if( !mUnitAwaitingOrders && mWorld->getSelectedBuilding( ) > -1 ) //this is dumb....
+                flag = true; // break out loop, the square has been found
+                if( square->isVisible )
                 {
-                    // building selected but not unit!!!
-                    if( square->isPossibleNewLocation )
+                    if( square->isOccupied && !this->mUnitAwaitingOrders )
                     {
-                        mWorld->spawnUnit( static_cast<unsigned int>(mWorld->getSelectedUnit()), sf::Vector2i( static_cast<int>(i), static_cast<int>(j) ) );
-                        if( mWorld->mNetworkedWorld )
-                            mWorld->mNetworkNode->notifyGameAction( GameActions::Type::SpawnUnit, sf::Vector2f( i, j ) );
-                        mCurrentUnits.at( mCurrentUnits.size() - 1 )->mHasMoved = true;
+                        if( mCurrentUnits.at( square->unitID )->mCategory & mWorld->mCurrentTurn )
+                        {   // Friendly unit
+                            clearGrid( );
+                            this->mSelectedGridIndex = sf::Vector2i( i, j );
+                            mWorld->mStateStack->pushState( States::ActionMenuState );
+                        }
+                        else
+                        {   // Enemy unit show move/attack range and stats or something
+
+                        }
+                    }
+                    else if( square->isPossibleNewLocation )
+                    {
+                        if( mUnitAwaitingOrders )
+                            moveUnit( mCurrentUnits.at( mWorld->getSelectedUnit() )->mGridIndex, square->gridIndex  );
+                        else
+                        {
+                            mWorld->spawnUnit( static_cast<unsigned int>(mWorld->getSelectedUnit()), sf::Vector2i( static_cast<int>(i), static_cast<int>(j) ) );
+                            if( mWorld->mNetworkedWorld )
+                                mWorld->mNetworkNode->notifyGameAction( GameActions::Type::SpawnUnit, sf::Vector2f( i, j ) );
+                            mCurrentUnits.at( mCurrentUnits.size() - 1 )->mHasMoved = true;
+                            clearGrid( );
+                        }
+                    }
+                    else if( square->isPossibleAttackPosition  )
+                    {
+                        // An Ability is being used and this square has been selected as target
+                        Unit* unit = mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit( ) )];
+                        if( unit->mAbilities.at( unit->mSelectedAbility ).range > 0 ) // if attack originates from user
+                        {
+                            if( unit->mAbilities.at( unit->mSelectedAbility ).hasRotation ) // if attack must be rotated
+                            {
+                                // Get rotation from player
+
+                                // pop menu
+
+                                // use ability on every unit inside AOE.at( playerSelectedRotation )
+                            }
+                            else // list of affected squares has already been decided
+                            {
+                                // use ability on all units inside possibleAttackLocations
+                            }
+                        }
+                        else // attack originates from a target square chosen by the player.
+                        {
+                            if( unit->mAbilities.at( unit->mSelectedAbility ).hasRotation ) // if attack must be rotated
+                            {
+                                // Get rotation from player
+
+                                // pop menu
+                            }
+                            else
+                            {
+                                // use ability on all units inside the abilities AOE[0]
+                            }
+                        }
+
+
+                        // Call useAbility on every unit inside the affected square list
+                        unit->useAbility( unit->mSelectedAbility, mCurrentUnits.at( square->unitID ) );
+
+                        unit->mSelectedAbility = "NONE";
+                        unit->mHasSpentAction = true;
+                        unit->mIsSelectedUnit = false;
+                        clearGrid();
+                    }
+
+
+
+
+
+                    else if( square->buildingID > -1 && mCurrentBuildings.at( square->buildingID )->mCategory & mWorld->mCurrentTurn )
+                    {   // square has a spawn point on it.
                         clearGrid( );
-                    }
-                }
-                // Units previously selected
-                else if( square->isPossibleNewLocation )
-                {
-                    if( square->isOccupied || square->buildingID != -1 ) clearGrid( );
-                    else moveUnit( mSelectedGridIndex, sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
-                }
-                else if( square->isOccupied && square->isPossibleAttackPosition && !( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mCategory &
-                                                               mCurrentUnits.at( static_cast<unsigned int>(mData[mSelectedGridIndex.y * mGridWidth + mSelectedGridIndex.x].unitID) )->mCategory ) )
-                {
-                    if( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mCategory & Category::Red )
-                    {
-                        if( mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mMorale > 25 )
+                        mWorld->setSelectedBuilding(square->buildingID );
+                        mWorld->mStateStack->pushState( States::SpawnPointMenuState );
+                        // where to spawn the unit??
+                        std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( static_cast<unsigned int>(mWorld->getSelectedBuilding()) )->mGridIndex, static_cast<unsigned int>(mWorld->getSelectedUnit()), 1 );
+                        for( auto loc : possibleLocations )
                         {
-                            ///
-                            // ENTER COMBAT ALGORITHM HERE!!!!!!!!!!!!
-                            ///
-                            mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->modHealth( -75 );
-
-                            mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mHasSpentAction = true;
-                            mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit())]->mIsSelectedUnit = false;
-                            if( mCurrentUnits.at( static_cast<unsigned int>(square->unitID) )->mConstitution <= 0 )
-                            {
-                                mCurrentUnits.erase( static_cast<unsigned int>(square->unitID) );
-                                removeUnit( sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ) );
-                            }
+                            mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
+                            mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
                         }
                     }
-                    clearGrid();
                 }
-                else if( square->buildingID != -1 )
-                {
-                    if( mCurrentBuildings.at( static_cast<unsigned int>(square->buildingID) )->mType == "SpawnPoint" )
-                    {
-                        if( (mCurrentBuildings.at( static_cast<unsigned int>(square->buildingID) )->mCategory & mWorld->mCurrentTurn)
-                                && ( !mWorld->mNetworkedWorld || mWorld->mCurrentTurn & mWorld->mClientTeamColor ) )
-                        {
-                            clearGrid( );
-                            mWorld->setSelectedBuilding(square->buildingID );
-                            mWorld->mStateStack->pushState( States::SpawnPointMenuState );
-
-                            // where to spawn the unit??
-                            std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( static_cast<unsigned int>(mWorld->getSelectedBuilding()) )->mGridIndex, static_cast<unsigned int>(mWorld->getSelectedUnit()), 1 );
-
-                            for( auto loc : possibleLocations )
-                            {
-                                mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
-                                mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
-                            }
-                        }
-                        else if( !(mCurrentBuildings.at( static_cast<unsigned int>(square->buildingID) )->mCategory & mWorld->mCurrentTurn)
-                                 && ( !mWorld->mNetworkedWorld || !(mWorld->mCurrentTurn & mWorld->mClientTeamColor) ) )
-
-                        {
-                            auto building = mCurrentBuildings.at( static_cast<unsigned int>(square->buildingID) );
-                            building->mCapturePercentage += 0.5f;
-                            if( building->mCapturePercentage >= 1.0f )
-                            {
-                                if( building->mCategory & Category::Red )
-                                    building->mCategory = Category::BlueBuilding;
-                                else if( building->mCategory & Category::Blue )
-                                    building->mCategory = Category::RedBuilding;
-                                building->mCapturePercentage = 0.0f;
-                            }
-                            clearGrid( );
-                        }
-                    }
-                    else
-                        clearGrid(); // untill i add more buildings
-                }
-                else clearGrid( );
-
-                flag = true;
-                break;
             }
         }
         if( flag ) break;
@@ -285,7 +288,7 @@ void Grid::selectUnit( unsigned int i, unsigned int j )
         {
             std::vector<sf::Vector2i> possibleLocations = getPossiblePositions(
                                                         sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ),
-                                                        unit->mUnitType, static_cast<unsigned int>( unit->mDexterity ) );
+                                                        unit->mUnitType, static_cast<unsigned int>( unit->mSpeed ) );
             for( auto loc : possibleLocations )
             {
                 mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
@@ -341,43 +344,33 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
             mData[i].isPossibleNewLocation = false;
             mData[i].rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
         }
-        getTartgets( newPos.x, newPos.y );
+        mUnitAwaitingOrders = false;
         mUpdateFogOfWar = true;
     }
     return true;
 }
 
-void Grid::getTartgets( unsigned int i, unsigned int j )
+void Grid::getTartgets( std::vector<sf::Vector2i> possibleAttackLocations )
 {
-    // Show potential targets if any if none clear data for next click
-    std::vector<sf::Vector2i> possibleAttackLocations = getPossibleAttackPositions(
-                                                    sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ),
-                                                    static_cast<unsigned int>( mCurrentUnits[mWorld->getSelectedUnit()]->mRange.x ),
-                                                    static_cast<unsigned int>( mCurrentUnits[mWorld->getSelectedUnit()]->mRange.y ) );
+    std::cout << "Get Targets was called." << std::endl;
     bool flag = false;
     for( auto loc : possibleAttackLocations )
-    {
         if( static_cast<unsigned int>( loc.y * mGridWidth + loc.x ) < mData.size() )
         {
-            Square location =  mData[static_cast<unsigned int>( loc.y * mGridWidth + loc.x )];
-            if( ( location.isOccupied && mCurrentUnits[location.unitID]->mCategory != mCurrentUnits[mWorld->getSelectedUnit()]->mCategory ) )
+            Square* location =  &mData[static_cast<unsigned int>( loc.y * mGridWidth + loc.x )];
+            // if( ( location->isOccupied && mCurrentUnits[location->unitID]->mCategory != mCurrentUnits[mWorld->getSelectedUnit()]->mCategory ) )
                    // || ( location.buildingID > -1 && ( ( mCurrentBuildings.at( location.buildingID )->mCategory == Category::RedBuilding
                    //                                   && mCurrentUnits[mWorld->getSelectedUnit()]->mCategory == Category::RedUnit ))
                                                     //  || ( mCurrentBuildings.at( location.buildingID )->mCategory == Category::BlueBuilding
                                                     //  && mCurrentUnits[mWorld->getSelectedUnit()]->mCategory == Category::BlueUnit ) ) ) )
             {
-                location.isPossibleAttackPosition = true;
-                location.rect->getSprite( )->setFillColor( sf::Color( 255, 165, 0, 255 ) );
+                location->isPossibleAttackPosition = true;
+                location->rect->getSprite( )->setFillColor( sf::Color( 255, 165, 0, 255 ) );
                 flag = true;
             }
         }
-    }
-    if( flag )
-    {
-        mSelectedGridIndex = sf::Vector2i( i, j );
-        mWorld->setSelectedUnit( mData[j * mGridWidth + i].unitID );
-        mUnitAwaitingOrders = true;
-    }
+
+    if( flag ) mUnitAwaitingOrders = true;
     else // no targets
         clearGrid( );
 }

@@ -134,7 +134,7 @@ public:
     void removeUnit( sf::Vector2i position );
     void selectUnit( unsigned int i, unsigned int j );
     bool moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos );
-    void getTartgets(unsigned int i , unsigned int j);
+    void getTartgets( std::vector<sf::Vector2i> possibleAttackLocations );
     void clearGrid( void );
 
     bool handleEvent(sf::Event event);

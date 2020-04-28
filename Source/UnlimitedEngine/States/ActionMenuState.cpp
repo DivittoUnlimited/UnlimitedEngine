@@ -15,43 +15,44 @@
 ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
 {
-    mBackground = sf::RectangleShape( sf::Vector2f( WINDOW_WIDTH - 100, WINDOW_HEIGHT / 3) );
-    mBackground.setPosition( 50, (WINDOW_HEIGHT / 2) + 100 );
-    mBackground.setFillColor( sf::Color( 181, 182, 228, 200 ) );
-    mBackground.setOutlineThickness( 3 );
-    mBackground.setOutlineColor( sf::Color::Black );
+    sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
+    pos -= world->mDeltaMousePosition;
 
     auto Move = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    Move->setPosition( mBackground.getPosition().x + 50, mBackground.getPosition().y + 50 );
+    Move->setPosition( pos.x - 64, pos.y - 96 );
     Move->setText( "Move" );
     Move->setCallback( [this, world] ( )
     {
-        // Call Grid::moveSelectedUnit
+        world->mMovementGrid->selectUnit( world->mMovementGrid->mSelectedGridIndex.x, world->mMovementGrid->mSelectedGridIndex.y );
         this->requestStackPop( );
     });
 
     auto Actions = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    Actions->setPosition( mBackground.getPosition().x + mBackground.getSize().x - 50, mBackground.getPosition().y + 50 );
+    Actions->setPosition( pos.x + 72, pos.y );
     Actions->setText( "Actions" );
     Actions->setCallback( [this, world] ( )
     {
-        // Call Actions menu
         this->requestStackPop( );
+        Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
+        if( !unit->mHasSpentAction )
+            this->requestStackPush( States::AbilitySelectMenuState );
     });
 
     auto Wait = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    Wait->setPosition( mBackground.getPosition().x + 50, mBackground.getPosition().y + mBackground.getSize().y - 50 );
+    Wait->setPosition( pos.x - 214, pos.y );
     Wait->setText( "Wait" );
     Wait->setCallback( [this, world] ( )
     {
-        // Set unit hasMoved, and hasSpentAction to true
+        Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
+        unit->mHasMoved = true;
+        unit->mHasSpentAction = true;
         // OPTIONAL Call wait menu
             // Set stance see notes
         this->requestStackPop( );
     });
 
     auto none = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    none->setPosition( mBackground.getPosition().x + 50, mBackground.getPosition().y + mBackground.getSize().y - 50 );
+    none->setPosition( pos.x - 64, pos.y + 72 );
     none->setText( "Exit" );
     none->setCallback( [this] ( )
     {
@@ -68,9 +69,6 @@ void ActionMenuState::draw( )
 {
     sf::RenderTarget& window = *getContext( ).window;
     window.setView(window.getDefaultView( ) );
-
-    mWindow->draw( mBackground );
-    mWindow->draw( mText );
     window.draw( mGUIContainer );
 }
 

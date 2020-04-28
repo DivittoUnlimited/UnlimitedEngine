@@ -40,7 +40,7 @@ float Zone::defensiveInfluence( void )
     for( auto unit : localObjs )
     {
         if( unit->mCategory & Category::BlueUnit )
-            influence += unit->mDefense;
+            influence += unit->mArmour;
         //else if( unit->mCategory & Category::Red )
         //    influence -= unit->mDefense;
     }
@@ -288,13 +288,13 @@ void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
                         {
                             if( mUnitPathFinders.at( unit.second->mID ) && mUnitPathFinders.at( unit.second->mID )->size() )
                             {
-                                std::vector<sf::Vector2i> posMoves = mGrid->getPossiblePositions( unit.second->mGridIndex, unit.second->mUnitType, unit.second->mDexterity );
+                                std::vector<sf::Vector2i> posMoves = mGrid->getPossiblePositions( unit.second->mGridIndex, unit.second->mUnitType, unit.second->mSpeed );
                                 auto path = mUnitPathFinders.at( unit.second->mID );
                                 sf::Vector2i bestMove;
 
                                 // look ahead in pathfinder to units dex distance or last element in path and find match in pos Moves
-                                if( path->size() > unit.second->mDexterity )
-                                    for( unsigned int i = 0; i < unit.second->mDexterity-1; ++i ) path->getNextMove( );
+                                if( path->size() > unit.second->mSpeed )
+                                    for( unsigned int i = 0; i < unit.second->mSpeed-1; ++i ) path->getNextMove( );
                                 // path less then the distance the unit can move look at last element in path list.
                                 else while( path->mPath.size() > 1 ) path->getNextMove();
                                 sf::Vector2i farthestPos = path->getNextMove( );

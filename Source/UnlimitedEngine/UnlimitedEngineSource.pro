@@ -11,6 +11,7 @@ DISTFILES += \
     Core/ip.txt \
     Game/Application.lua \
     Game/Game.lua \
+    Game/Lua/Abilities.lua \
     Game/Lua/Application.lua \
     Game/Lua/Buildings.lua \
     Game/Lua/Game.lua \
@@ -82,6 +83,7 @@ HEADERS += \
     Core/Utility.inl \
     Game/Building.hpp \
     Game/DataTables.hpp \
+    Game/Dice.hpp \
     Game/Grid.hpp \
     Game/TeamStats.hpp \
     Game/Unit.hpp \
@@ -104,6 +106,7 @@ HEADERS += \
     Gui/Label.hpp \
     Gui/MessageBoxNode.hpp \
     Gui/ResponseSelector.hpp \
+    States/AbilitySelectMenuState.hpp \
     States/ActionMenuState.hpp \
     States/BattleStatScreen.hpp \
     States/ConquestBattleSetupState.hpp \
@@ -119,6 +122,7 @@ HEADERS += \
     States/MultiplayerGameState.hpp \
     States/PauseState.hpp \
     States/QuickBattleSetupState.hpp \
+    States/RotationSelectMenuState.hpp \
     States/SettingsState.hpp \
     States/ShopState.hpp \
     States/SinglePlayerBattle.hpp \
@@ -175,6 +179,7 @@ SOURCES += \
     Core/Utility.cpp \
     Game/Building.cpp \
     Game/DataTables.cpp \
+    Game/Dice.cpp \
     Game/Grid.cpp \
     Game/TeamStats.cpp \
     Game/Unit.cpp \
@@ -196,6 +201,7 @@ SOURCES += \
     Gui/Label.cpp \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
+    States/AbilitySelectMenuState.cpp \
     States/ActionMenuState.cpp \
     States/BattleStatScreen.cpp \
     States/ConquestBattleSetupState.cpp \
@@ -210,6 +216,7 @@ SOURCES += \
     States/MultiplayerGameState.cpp \
     States/PauseState.cpp \
     States/QuickBattleSetupState.cpp \
+    States/RotationSelectMenuState.cpp \
     States/SettingsState.cpp \
     States/ShopState.cpp \
     States/SinglePlayerBattle.cpp \

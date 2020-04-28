@@ -19,7 +19,5 @@ public:
 
 private:
     GUI::Container      mGUIContainer;
-    sf::Text            mText;
-    sf::RectangleShape  mBackground;
 };
 #endif // ACTIONMENUSTATE_HPP

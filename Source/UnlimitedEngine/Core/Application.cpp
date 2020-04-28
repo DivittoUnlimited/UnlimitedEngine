@@ -33,7 +33,7 @@
 const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 
 // Defined in Globals.hpp
-sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "UNLIMITED ENGINE", sf::Style::Default );
+sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "Wizard's Request", sf::Style::Default );
 GameModes::ID GAME_MODE = GameModes::NONE;
 States::ID CURRENT_LEVEL = States::SinglePlayerLevel1;
 Category::Type CURRENT_TURN = Category::Blue;
