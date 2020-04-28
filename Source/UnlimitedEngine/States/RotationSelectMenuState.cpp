@@ -15,20 +15,33 @@
 RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
 {
+    555
+    ///
+    /// NEED TO MOD THIS MENU TO USE TARGET ORIGIN NOT unit->mGrindIndex
+    ///
+
+
     sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
     pos -= world->mDeltaMousePosition;
 
-    // Get current units abilities to name buttons
-    std::vector<std::string> buttonNames;
-
     Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
-    AbilityData ability = unit->mAbilities.at( unit->mSelectedAbility );
+    AbilityData* ability = &unit->mAbilities.at( unit->mSelectedAbility );
 
     auto button1 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     button1->setPosition( pos.x - 64, pos.y - 96 );
     button1->setText( "NORTH" );
     button1->setCallback( [=] ( )
     {
+        for( auto t : ability->AOE.at( "north" ) ) // use abililty on all units inside the ability AOE[0]
+        {
+            // get all units inside AOE from grid
+            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+        }
+        unit->mSelectedAbility = "NONE";
+        unit->mHasSpentAction = true;
+        unit->mIsSelectedUnit = false;
+        world->mMovementGrid->clearGrid();
         requestStackPop( );
     });
 
@@ -37,6 +50,16 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
     button2->setText( "EAST" );
     button2->setCallback( [=] ( )
     {
+        for( auto t : ability->AOE.at( "east" ) ) // use abililty on all units inside the ability AOE[0]
+        {
+            // get all units inside AOE from grid
+            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+        }
+        unit->mSelectedAbility = "NONE";
+        unit->mHasSpentAction = true;
+        unit->mIsSelectedUnit = false;
+        world->mMovementGrid->clearGrid();
         requestStackPop( );
     });
 
@@ -45,6 +68,16 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
     button3->setText( "SOUTH" );
     button3->setCallback( [=] ( )
     {
+        for( auto t : ability->AOE.at( "south" ) ) // use abililty on all units inside the ability AOE[0]
+        {
+            // get all units inside AOE from grid
+            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+        }
+        unit->mSelectedAbility = "NONE";
+        unit->mHasSpentAction = true;
+        unit->mIsSelectedUnit = false;
+        world->mMovementGrid->clearGrid();
         requestStackPop( );
     });
 
@@ -53,6 +86,16 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
     button4->setText( "WEST" );
     button4->setCallback( [=] ( )
     {
+        for( auto t : ability->AOE.at( "west" ) ) // use abililty on all units inside the ability AOE[0]
+        {
+            // get all units inside AOE from grid
+            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+        }
+        unit->mSelectedAbility = "NONE";
+        unit->mHasSpentAction = true;
+        unit->mIsSelectedUnit = false;
+        world->mMovementGrid->clearGrid( );
         requestStackPop( );
     });
 

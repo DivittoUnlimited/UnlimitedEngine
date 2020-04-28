@@ -110,50 +110,16 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                     else if( square->isPossibleAttackPosition  )
                     {
                         // An Ability is being used and this square has been selected as target
-                        Unit* unit = mCurrentUnits[static_cast<unsigned int>(mWorld->getSelectedUnit( ) )];
-                        if( unit->mAbilities.at( unit->mSelectedAbility ).range > 0 ) // if attack originates from user
-                        {
-                            if( unit->mAbilities.at( unit->mSelectedAbility ).hasRotation ) // if attack must be rotated
-                            {
-                                // Get rotation from player
+                        Unit* unit = mCurrentUnits[static_cast<unsigned int>( mWorld->mSelectedUnit )];
 
-                                // pop menu
-
-                                // use ability on every unit inside AOE.at( playerSelectedRotation )
-                            }
-                            else // list of affected squares has already been decided
-                            {
-                                // use ability on all units inside possibleAttackLocations
-                            }
-                        }
-                        else // attack originates from a target square chosen by the player.
-                        {
-                            if( unit->mAbilities.at( unit->mSelectedAbility ).hasRotation ) // if attack must be rotated
-                            {
-                                // Get rotation from player
-
-                                // pop menu
-                            }
-                            else
-                            {
-                                // use ability on all units inside the abilities AOE[0]
-                            }
-                        }
-
-
-                        // Call useAbility on every unit inside the affected square list
-                        unit->useAbility( unit->mSelectedAbility, mCurrentUnits.at( square->unitID ) );
-
-                        unit->mSelectedAbility = "NONE";
-                        unit->mHasSpentAction = true;
-                        unit->mIsSelectedUnit = false;
-                        clearGrid();
+                        555
+                        ///
+                        ///
+                        /// THIS NEEDS TO CALL ROTATION MENU WITH NEW TARTGT ORIGIN!!
+                        if( unit->mAbilities.at( unit->mSelectedAbility ).hasRotation ) // if attack must be rotated
+                            // Get rotation from player call attack from there
+                            this->mWorld->mStateStack->pushState( States::RotationSelectMenuState );
                     }
-
-
-
-
-
                     else if( square->buildingID > -1 && mCurrentBuildings.at( square->buildingID )->mCategory & mWorld->mCurrentTurn )
                     {   // square has a spawn point on it.
                         clearGrid( );

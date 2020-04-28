@@ -111,7 +111,7 @@ struct AbilityData
     unsigned int coolDown;
     unsigned int range;
     bool hasRotation;
-    std::vector<std::vector<sf::Vector2i>> AOE;
+    std::map<std::string, std::vector<sf::Vector2i>> AOE;
     std::vector<StatModifier> targetMods;
     std::vector<StatModifier> userMods;
 };
@@ -537,7 +537,7 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                         lua_getfield( L, -1, "AOE" );
                         if( lua_istable( L, -1 ) )
                         {
-                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            data[i->second].AOE.insert( std::pair<std::string, std::vector<sf::Vector2i>>( "only", std::vector<sf::Vector2i>() ) );
                             // build int pairs vector
                             lua_pushnil( L );
                             while( lua_next( L, -2 ) != 0 )
@@ -554,7 +554,7 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                                     if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
                                     else std::cout << "Error loading Ability AOE" <<  std::endl;
                                     lua_pop( L, 1 );
-                                    data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                    data[i->second].AOE.at( "only" ).push_back( sf::Vector2i( x, y ) );
                                 }
                                 lua_pop( L, 1 );
                             }
@@ -568,7 +568,7 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                         lua_getfield( L, -1, "AOE" );
                         if( lua_istable( L, -1 ) )
                         {
-                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            data[i->second].AOE.insert( std::pair<std::string, std::vector<sf::Vector2i>>( "north", std::vector<sf::Vector2i>() ) );
                             lua_getfield( L, -1, "north" );
                             if( lua_istable( L, -1 ) )
                             {
@@ -588,13 +588,13 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                                         if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
                                         else std::cout << "Error loading Ability AOE" <<  std::endl;
                                         lua_pop( L, 1 );
-                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                        data[i->second].AOE.at( "north" ).push_back( sf::Vector2i( x, y ) );
                                     }
                                     lua_pop( L, 1 );
                                 }
                             }
                             lua_pop( L, 1 ); // north
-                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            data[i->second].AOE.insert( std::pair<std::string, std::vector<sf::Vector2i>>( "east", std::vector<sf::Vector2i>() ) );
                             lua_getfield( L, -1, "east" );
                             if( lua_istable( L, -1 ) )
                             {
@@ -614,13 +614,13 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                                         if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
                                         else std::cout << "Error loading Ability AOE" <<  std::endl;
                                         lua_pop( L, 1 );
-                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                        data[i->second].AOE.at( "east" ).push_back( sf::Vector2i( x, y ) );
                                     }
                                     lua_pop( L, 1 );
                                 }
                             }
                             lua_pop( L, 1 ); // east
-                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            data[i->second].AOE.insert( std::pair<std::string, std::vector<sf::Vector2i>>( "south", std::vector<sf::Vector2i>() ) );
                             lua_getfield( L, -1, "south" );
                             if( lua_istable( L, -1 ) )
                             {
@@ -640,13 +640,13 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                                         if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
                                         else std::cout << "Error loading Ability AOE" <<  std::endl;
                                         lua_pop( L, 1 );
-                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                        data[i->second].AOE.at( "south" ).push_back( sf::Vector2i( x, y ) );
                                     }
                                     lua_pop( L, 1 );
                                 }
                             }
                             lua_pop( L, 1 ); // south
-                            data[i->second].AOE.push_back( std::vector<sf::Vector2i>( ) );
+                            data[i->second].AOE.insert( std::pair<std::string, std::vector<sf::Vector2i>>( "west", std::vector<sf::Vector2i>() ) );
                             lua_getfield( L, -1, "west" );
                             if( lua_istable( L, -1 ) )
                             {
@@ -666,7 +666,7 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                                         if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
                                         else std::cout << "Error loading Ability AOE" <<  std::endl;
                                         lua_pop( L, 1 );
-                                        data[i->second].AOE.back().push_back( sf::Vector2i( x, y ) );
+                                        data[i->second].AOE.at( "west" ).push_back( sf::Vector2i( x, y ) );
                                     }
                                     lua_pop( L, 1 );
                                 }

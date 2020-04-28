@@ -32,7 +32,7 @@ return {
         coolDown    = 2; -- in turns
         range       = 2; -- in squares
         hasRotation = false;
-        AOE = { { 0, 0 } };
+        AOE = { only = { 0, 0 } };
         targetMods =
         {
             { stat = "health"; power = "36-52"; duration = 1; },
@@ -49,7 +49,7 @@ return {
         coolDown    = 2; -- in turns
         range       = 1;
         hasRotation = false;
-        AOE = { { 0, 0 } };
+        AOE = { only = { 0, 0 } };
         targetMods  =
         {
             { stat = "health"; power = "4-16"; duration = 1; },

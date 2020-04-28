@@ -32,7 +32,6 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
         world->setSelectedUnit( unit->mID );
         unit->mSelectedAbility = buttonNames[0];
         AbilityData* ability = &unit->mAbilities.at( buttonNames[0] );
-        unsigned int rotationIndex = 0;
         std::vector<sf::Vector2i> targets;
 
         if( ability->range > 0 )
@@ -54,7 +53,7 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
                 this->requestStackPush( States::RotationSelectMenuState );
             }
             else
-                for( auto t : ability->AOE.at( rotationIndex ) ) // use abililty on all units inside the ability AOE[0]
+                for( auto t : ability->AOE.at( "only" ) ) // use abililty on all units inside the ability AOE[0]
                 {
                     // get all units inside AOE from grid
                     int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
@@ -72,7 +71,6 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
         world->setSelectedUnit( unit->mID );
         unit->mSelectedAbility = buttonNames[1];
         AbilityData* ability = &unit->mAbilities.at( buttonNames[1] );
-        unsigned int rotationIndex = 0;
         std::vector<sf::Vector2i> targets;
 
         if( ability->range > 0 )
@@ -94,7 +92,7 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
                 this->requestStackPush( States::RotationSelectMenuState );
             }
             else
-                for( auto t : ability->AOE.at( rotationIndex ) ) // use abililty on all units inside the ability AOE[0]
+                for( auto t : ability->AOE.at( "only" ) ) // use abililty on all units inside the ability AOE[0]
                 {
                     // get all units inside AOE from grid
                     int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
@@ -112,19 +110,20 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
         world->setSelectedUnit( unit->mID );
         unit->mSelectedAbility = buttonNames[2];
         AbilityData* ability = &unit->mAbilities.at( buttonNames[2] );
-        unsigned int rotationIndex = 0;
         std::vector<sf::Vector2i> targets;
 
         if( ability->range > 0 )
+        {
             // build list of all squares within range around player (relative)
             for( int x = -1 * (ability->range-1); x < static_cast<int>( ability->range ); ++x )
                 for( int y = -1 * (ability->range-1); y < static_cast<int>( ability->range ); ++y )
                 {
                     targets.push_back( sf::Vector2i( x, y ) );
                     targets.back() += unit->mGridIndex;
-                    world->mMovementGrid->getTartgets( targets );
-                    this->requestStackPop( );
                 }
+            world->mMovementGrid->getTartgets( targets );
+            this->requestStackPop( );
+        }
         else if( ability->range == 0 ) // attack originates from user
         {
             if( ability->hasRotation )
@@ -134,12 +133,18 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
                 this->requestStackPush( States::RotationSelectMenuState );
             }
             else
-                for( auto t : ability->AOE.at( rotationIndex ) ) // use abililty on all units inside the ability AOE[0]
+            {
+                for( auto t : ability->AOE.at( "only" ) ) // use abililty on all units inside the ability AOE[0]
                 {
                     // get all units inside AOE from grid
                     int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
                     if( id > 0 ) unit->useAbility( buttonNames[2], world->mMovementGrid->mCurrentUnits.at( id ) );
                 }
+                unit->mSelectedAbility = "NONE";
+                unit->mHasSpentAction = true;
+                unit->mIsSelectedUnit = false;
+                world->mMovementGrid->clearGrid();
+            }
         }
     });
 
