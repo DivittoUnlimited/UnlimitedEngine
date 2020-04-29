@@ -9,7 +9,7 @@ return {
   tilewidth = 64,
   tileheight = 64,
   nextlayerid = 3,
-  nextobjectid = 11,
+  nextobjectid = 12,
   properties = {},
   tilesets = {
     {
@@ -207,22 +207,6 @@ return {
           }
         },
         {
-          id = 3,
-          name = "",
-          type = "Fighter",
-          shape = "rectangle",
-          x = 192,
-          y = 192,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 50,
-          visible = true,
-          properties = {
-            ["Team"] = "Red"
-          }
-        },
-        {
           id = 4,
           name = "",
           type = "Fighter",
@@ -331,6 +315,22 @@ return {
           visible = true,
           properties = {
             ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 11,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 192,
+          y = 192,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Red"
           }
         }
       }

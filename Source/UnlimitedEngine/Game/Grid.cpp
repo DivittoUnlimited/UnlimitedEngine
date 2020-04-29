@@ -109,16 +109,26 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                     }
                     else if( square->isPossibleAttackPosition  )
                     {
-                        // An Ability is being used and this square has been selected as target
+                        // An Ability is being used and this square has been selected as the origin
                         Unit* unit = mCurrentUnits[static_cast<unsigned int>( mWorld->mSelectedUnit )];
-
-                        555
-                        ///
-                        ///
-                        /// THIS NEEDS TO CALL ROTATION MENU WITH NEW TARTGT ORIGIN!!
+                        unit->mAbilities.at( unit->mSelectedAbility ).origin = square->gridIndex;
                         if( unit->mAbilities.at( unit->mSelectedAbility ).hasRotation ) // if attack must be rotated
                             // Get rotation from player call attack from there
                             this->mWorld->mStateStack->pushState( States::RotationSelectMenuState );
+                        else
+                        {
+                            unit->mAbilities.at( unit->mSelectedAbility ).origin = square->gridIndex;
+                            for( auto t : unit->mAbilities.at( unit->mSelectedAbility ).AOE.at( "only" ) ) // use abililty on all units inside the ability AOE[0]
+                            {
+                                // get all units inside AOE from grid
+                                int id = this->mData.at( (t.y+square->gridIndex.y) * (this->mGridWidth) + (t.x+square->gridIndex.x) ).unitID;
+                                if( id > 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( unit->mSelectedAbility, this->mCurrentUnits.at( id ) );
+                            }
+                            unit->mSelectedAbility = "NONE";
+                            unit->mHasSpentAction = true;
+                            unit->mIsSelectedUnit = false;
+                            this->clearGrid();
+                        }
                     }
                     else if( square->buildingID > -1 && mCurrentBuildings.at( square->buildingID )->mCategory & mWorld->mCurrentTurn )
                     {   // square has a spawn point on it.
@@ -318,7 +328,7 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
 
 void Grid::getTartgets( std::vector<sf::Vector2i> possibleAttackLocations )
 {
-    std::cout << "Get Targets was called." << std::endl;
+    // std::cout << "Get Targets was called." << std::endl;
     bool flag = false;
     for( auto loc : possibleAttackLocations )
         if( static_cast<unsigned int>( loc.y * mGridWidth + loc.x ) < mData.size() )

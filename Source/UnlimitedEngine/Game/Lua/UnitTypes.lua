@@ -31,9 +31,9 @@ return {
         textureRect     = { top = 0; left = 0; width = 64; height  = 64; };
         Abilities       =
         {
-            "Stab",
+            "SpinSlash",
             "Slash",
-            "Parry"
+            "FireBlast"
         };
     };
 

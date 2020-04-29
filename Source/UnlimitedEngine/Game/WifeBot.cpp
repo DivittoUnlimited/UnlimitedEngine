@@ -110,7 +110,6 @@ bool Zone::addObj( Unit* obj )
 }
 void Zone::split( void )
 {
-    std::cout << "============ SPLIT =============" << std::endl;
     // init kids of this zone
     NW = new Zone( this, rect.left, rect.top, rect.width / 2, rect.height / 2, this->depth + 1 );
     NE = new Zone( this, rect.left + rect.width / 2, rect.top, rect.width / 2, rect.height / 2, this->depth + 1 );
@@ -208,7 +207,7 @@ void WifeBot::updateCurrent( sf::Time dt, CommandQueue& commands )
 
             // Get the best zone(s) to focus on
             findTargetZone( );
-            std::cout << "WifeBot::update(): mTargetZone = " << mTargetZone << std::endl;
+            // std::cout << "WifeBot::update(): mTargetZone = " << mTargetZone << std::endl;
 
             // update each unit controlled by wifeBot based on high level results
             for( auto unit : (*mUnits) )
@@ -428,7 +427,7 @@ void WifeBot::findTargetZone( std::vector<unsigned int> excludedZones )
             unsigned int currentImportance = mZones[i]->importance( );
             unsigned int targetZoneImportance = mZones[mTargetZone]->importance( );
 
-            if( currentImportance > 0 ) std::cout << "Important zone Found! " << i << std::endl;
+            // if( currentImportance > 0 ) std::cout << "Important zone Found! " << i << std::endl;
             if( currentImportance >= targetZoneImportance ) mTargetZone = i;
 //            else if( currentImportance == targetZoneImportance )
 //            {

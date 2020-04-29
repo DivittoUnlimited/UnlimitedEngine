@@ -34,7 +34,7 @@ int Dice::roll( void )
 {
     int score = randomInt( mMaxResult ) + mMinResult;
     if( score > mMaxResult ) score = mMaxResult;
-    std::cout << "Dice Roll: Min: " << mMinResult << " Max: " << mMaxResult << " Result: " << score << std::endl;
+    // std::cout << "Dice Roll: Min: " << mMinResult << " Max: " << mMaxResult << " Result: " << score << std::endl;
     if( mPositiveValue ) return score;
     return -1 * score;
 }

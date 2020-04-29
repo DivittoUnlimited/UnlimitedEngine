@@ -6,42 +6,39 @@ BUGS and ISSUES:
         - Project must be cleaned every time the server is run for it to work again.
         - Units can be spawned on  top of spawn points
         - Attack Squares are not showing up anymore
+    - Dead units crash game when turn ends
+    - That one unit is immortal....
 FEATURES:
-    - Unit Abilities
-        - Use unit->mBeginingOfTurn to enact statMod effects in update method
-        - create Abilities with longer duration statMods to test.
-
-
-        - Add AOE squares to abilities table in lua
-        - Add More abilities with better names
-        - Adjust values to make game fun
-        - Optional Wait option bonus menu
-            - stance to take when you choose to wait?
-                - Defensive
-                - offensive
-                - Ambush
-                - Flee
-                - Ready attack etc...
-            - Boost morale when waiting
-
-    - Gold (Bonus points for Morale)
-        - Player given points for total unit morale at the end of every turn
-        - Player can use Gold to unlock/spawn new units. (think battlefront 2)
-            - This slows what units can be spawned until they are earned in a match.
-
     - initiative system
         - first round init rolls based on speed
         - unit initiative will vary from there based on if it attacks or defends from attack, waits etc...
         - Units should display there turn order near their avatar
             - Small circle with number in it
 
+    - Unit Abilities and menus
+        - Use unit->mBeginingOfTurn to enact statMod effects in update method
+            - create Abilities with longer duration statMods to test.
+            - Must finish initiative system first
+        - Optional Wait option bonus menu
+            - stance to take when you choose to wait?
+                - Defensive
+                - offensive
+                - Flee
+            - Boost morale when waiting
 
-    - Fog of war
-        - How will fog of war work in online games?
-            - Fix server issues above first.
-            - Solution 1: Make each player "Blue" locally, run fog of war locally.
-            - Solution 2: (better) Match unit color with world->clientColor when updating fog of war
-        - Hide building color if under fog of war
+    - Gold (Bonus points for Morale)
+        - Player given points for total unit morale at the end of every turn
+        - Player can use Gold to unlock/spawn new units. (think battlefront 2)
+            - This slows what units can be spawned until they are earned in a match.
+        - must finish initiative system first to have correct "End of Turn"
+
+    - Spawn Points
+        - Hide color under fog of war unless owned by player
+        - How are they captured?
+            - Unit capture abillity
+                - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all
+        - How much gold should be awarded per spawn point per turn?
+
     - WifeBot        
         - build best path from owned spawn points to all other spawn points
             - Consider Offensive and defensive influence of the known world when building best path
@@ -57,6 +54,12 @@ FEATURES:
                 - Each square it can attack or use ability on
                 - Wait commad, choose stance.
                 - use these options to call apropriate methods in grid class. (same player menu will call)
+
+        - Fog of war
+                - How will fog of war work in online games?
+                    - Fix server issues above first.
+                    - Solution 1: Make each player "Blue" locally, run fog of war locally.
+                    - Solution 2: (better) Match unit color with world->clientColor when updating fog of war
 
 ART:
     - Needed Maps:
@@ -80,10 +83,7 @@ Notes:
             - Gives excuse for simple art that looks cool
         - Low detail(tile art) large scale maps
         - High detail(tile art) smaller maps like dungeons etc...
-    - Combat Algorith
-        - D20's?
-        - Risk?
-        - both?
+
 
     - WifeBot Overview:
         - Team Tactics: (How the whole team should play.)
@@ -121,19 +121,4 @@ Notes:
     - Archers should have a posibilty of hitting adjacent squares to their target.(MISS)
     - Scouts should have invisibility mode even when exposed from fog of war.
     - Add Level of exp multplier to units
-    - Add skill tree for units to grow as they level up in battle.
-        - Have more skills then skill slots (make player choose what to add)
-        - limit ability use based on morale of the unit
-        - Multiple paths per Unit?
-            - Healing / Defense boost knights
-            - Rogues with backstab or potions
-            - Control bard / team buf bard
-            - AOE Wizard / Direct fire Wizard
-            - invisible scouts / fast scouts
-            - strength boost fighter / morale boost fighter
-    - initiative per unit instead of turn based?
-        - localized initiative?
-            - initiative sets per zone so that each fight is "seperate"?
-        - needs a lot more research!
-    - Unit capture abillity
-        - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all
+

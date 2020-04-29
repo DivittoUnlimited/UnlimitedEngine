@@ -111,6 +111,7 @@ struct AbilityData
     unsigned int coolDown;
     unsigned int range;
     bool hasRotation;
+    sf::Vector2i origin; // "Ground-Zero for AOE patterns, must be decided at runtime"
     std::map<std::string, std::vector<sf::Vector2i>> AOE;
     std::vector<StatModifier> targetMods;
     std::vector<StatModifier> userMods;
@@ -538,26 +539,31 @@ static std::vector<AbilityData> initializeAbilityData = []( ) -> std::vector<Abi
                         if( lua_istable( L, -1 ) )
                         {
                             data[i->second].AOE.insert( std::pair<std::string, std::vector<sf::Vector2i>>( "only", std::vector<sf::Vector2i>() ) );
-                            // build int pairs vector
-                            lua_pushnil( L );
-                            while( lua_next( L, -2 ) != 0 )
+                            lua_getfield( L, -1, "only" );
+                            if( lua_istable( L, -1 ) )
                             {
-                                if( lua_istable( L, -1 ) )
+                                // build int pairs vector
+                                lua_pushnil( L );
+                                while( lua_next( L, -2 ) != 0 )
                                 {
-                                    int x = 0;
-                                    int y = 0;
-                                    lua_getfield( L, -1, "x" );
-                                    if( lua_isnumber( L, -1 ) ) x = static_cast<int>( lua_tonumber( L, -1 ) );
-                                    else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                    if( lua_istable( L, -1 ) )
+                                    {
+                                        int x = 0;
+                                        int y = 0;
+                                        lua_getfield( L, -1, "x" );
+                                        if( lua_isnumber( L, -1 ) ) x = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        lua_getfield( L, -1, "y" );
+                                        if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
+                                        else std::cout << "Error loading Ability AOE" <<  std::endl;
+                                        lua_pop( L, 1 );
+                                        data[i->second].AOE.at( "only" ).push_back( sf::Vector2i( x, y ) );
+                                    }
                                     lua_pop( L, 1 );
-                                    lua_getfield( L, -1, "y" );
-                                    if( lua_isnumber( L, -1 ) ) y = static_cast<int>( lua_tonumber( L, -1 ) );
-                                    else std::cout << "Error loading Ability AOE" <<  std::endl;
-                                    lua_pop( L, 1 );
-                                    data[i->second].AOE.at( "only" ).push_back( sf::Vector2i( x, y ) );
                                 }
-                                lua_pop( L, 1 );
                             }
+                            lua_pop( L, 1 ); // only
                         }
                         else std::cout << "Error Reading Ability AOE" << std::endl;
                         lua_pop( L, 1 ); // AOE
