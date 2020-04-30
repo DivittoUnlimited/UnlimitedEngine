@@ -72,7 +72,8 @@ namespace States
         SpawnPointMenuState,
         ActionMenuState,
         AbilitySelectMenuState,
-        RotationSelectMenuState
+        RotationSelectMenuState,
+        WaitMenuState
 	};
 }
 

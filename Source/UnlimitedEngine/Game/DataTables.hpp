@@ -101,6 +101,11 @@ struct ConversationData {
 
 struct StatModifier
 {
+    StatModifier( ) { }
+    StatModifier( std::string stat, std::string power, unsigned int duration )
+        : stat( stat )
+        , power( power )
+        , duration( duration ) { }
     std::string stat;
     Dice power;
     unsigned int duration;

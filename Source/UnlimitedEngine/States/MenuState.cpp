@@ -39,7 +39,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     mDevNotes.setOutlineThickness( 1 );
     mDevNotes.setOutlineColor( sf::Color( 0, 255, 0, 255 ) );
 
-    mTitleText = sf::Text( "Tactics Tribes\nMENU", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
+    mTitleText = sf::Text( "Wizard's Request", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
     mTitleText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     centerOrigin( mTitleText );
     mTitleText.setPosition( WINDOW_WIDTH / 2, 200 );
@@ -105,13 +105,12 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStateClear( );
 	});
 
-
+    mGUIContainer.pack( testMap );
     mGUIContainer.pack( playButton );
     mGUIContainer.pack( playLocalButton );
     mGUIContainer.pack( playMultiplayerButton );
     mGUIContainer.pack( settingsButton );
     mGUIContainer.pack( exitButton );
-    mGUIContainer.pack( testMap );
 }
 
 MenuState::~MenuState()

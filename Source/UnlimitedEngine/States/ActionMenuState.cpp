@@ -41,14 +41,10 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     auto Wait = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     Wait->setPosition( pos.x - 214, pos.y );
     Wait->setText( "Wait" );
-    Wait->setCallback( [this, world] ( )
+    Wait->setCallback( [this] ( )
     {
-        Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
-        unit->mHasMoved = true;
-        unit->mHasSpentAction = true;
-        // OPTIONAL Call wait menu
-            // Set stance see notes
         this->requestStackPop( );
+        this->requestStackPush( States::WaitMenuState );
     });
 
     auto none = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

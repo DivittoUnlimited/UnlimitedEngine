@@ -8,6 +8,7 @@
 #include "States/ActionMenuState.hpp"
 #include "States/AbilitySelectMenuState.hpp"
 #include "States/RotationSelectMenuState.hpp"
+#include "States/WaitMenu.hpp"
 #include "Core/GameServer.hpp"
 #include "Game/WifeBot.hpp"
 #include "Graphics/TextNode.hpp"
@@ -555,4 +556,5 @@ void World::registerStates( )
     mStateStack->registerState<ActionMenuState>( States::ActionMenuState, this );
     mStateStack->registerState<AbilitySelectMenuState>( States::AbilitySelectMenuState, this );
     mStateStack->registerState<RotationSelectMenuState>( States::RotationSelectMenuState, this );
+    mStateStack->registerState<WaitMenu>( States::WaitMenuState, this );
 }

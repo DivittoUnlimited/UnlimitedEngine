@@ -131,6 +131,7 @@ HEADERS += \
     States/SplashScreen.hpp \
     States/StoryModeSetupState.hpp \
     States/TitleState.hpp \
+    States/WaitMenu.hpp \
     States/cutSceneState.hpp.autosave \
     Tiled/TiledManager.hpp \
     lua/lapi.h \
@@ -225,6 +226,7 @@ SOURCES += \
     States/SplashScreen.cpp \
     States/StoryModeSetupState.cpp \
     States/TitleState.cpp \
+    States/WaitMenu.cpp \
     lua/lapi.c \
     lua/lauxlib.c \
     lua/lbaselib.c \

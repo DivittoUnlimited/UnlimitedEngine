@@ -4,8 +4,7 @@ BUGS and ISSUES:
         - Clicking while "ERROR could not connect" is shown causes crash.
         - Server often can't be started more than once per session
         - Project must be cleaned every time the server is run for it to work again.
-        - Units can be spawned on  top of spawn points
-        - Attack Squares are not showing up anymore
+    - Units can be spawned on  top of spawn points
     - Dead units crash game when turn ends
     - That one unit is immortal....
 FEATURES:
@@ -19,12 +18,17 @@ FEATURES:
         - Use unit->mBeginingOfTurn to enact statMod effects in update method
             - create Abilities with longer duration statMods to test.
             - Must finish initiative system first
-        - Optional Wait option bonus menu
-            - stance to take when you choose to wait?
-                - Defensive
-                - offensive
-                - Flee
-            - Boost morale when waiting
+        - What happens when you use a waitMenu ability
+            - Take Gaurd
+                - boost morale and stamina
+                - if unit should be attacked before next turn they will gain an oppertunity attack
+                - Apply symbol to mark unit as taking guard on the map
+            - Recover
+                - Boost morale and stamina more than other wait menu Abilities
+                - Show stat mod effects as they happed
+            - Evade
+                - If the unit gets attacked they have an opertunity to escape without being punished.
+                - Apply symbol to indicate they are ready to run.
 
     - Gold (Bonus points for Morale)
         - Player given points for total unit morale at the end of every turn
@@ -38,6 +42,10 @@ FEATURES:
             - Unit capture abillity
                 - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all
         - How much gold should be awarded per spawn point per turn?
+        - Fix Unit can be spawned on top of spawn point bug.
+
+    - Add "Attack roll" vs Armour to see if attacks actually hit target.
+        - Currently Armour does nothing becauase units just automaticly take damage (StatModifiers)
 
     - WifeBot        
         - build best path from owned spawn points to all other spawn points
@@ -54,29 +62,26 @@ FEATURES:
                 - Each square it can attack or use ability on
                 - Wait commad, choose stance.
                 - use these options to call apropriate methods in grid class. (same player menu will call)
-
-        - Fog of war
-                - How will fog of war work in online games?
-                    - Fix server issues above first.
-                    - Solution 1: Make each player "Blue" locally, run fog of war locally.
-                    - Solution 2: (better) Match unit color with world->clientColor when updating fog of war
-
+    - Fog of war
+        - How will fog of war work in online games?
+        - Fix server issues above first.
+        - Solution 1: Make each player "Blue" locally, run fog of war locally.
+        - Solution 2: (better) Match unit color with world->clientColor when updating fog of war
 ART:
     - Needed Maps:
-        - (tutorial) Small street/alley
-        - (Level1/Final level?) Main castle Gates Large map with tall walls, a gate to defend, and the
-            - inner courtyard where most of the battle will take place.
-        - (Level2) Grass plains outside of main castle. Mostly flat grass with some mud traps and sporatic mountains.
-            - Their is a large trade road running through it.
+
     - Needed Sprites:
-        - King portrait
+        - Wizard Portrait
         - SpawnPoint
-    - Needed Tiles:
-        - Castle walls
-        - Castle floors
-        - Grass
-        - Coblestone road
-        - dirt road
+        - Attack damage animations
+            - Slash for getting attacked
+            - Particles for bleeding effects
+            - Icons for other effects? broken sheild for less armour etc...
+            - Icon for targted squares
+            - Icons for each ability
+            - Icons for Wait menu
+                - for each button and to mark unit on map with added status
+
 Notes:
     - Art:
         - Maps should be drawn like hand drawn maps in Dnd, GOT, LOTR, etc..
