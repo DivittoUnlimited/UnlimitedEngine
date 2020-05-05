@@ -49,9 +49,10 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
 
     auto none = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     none->setPosition( pos.x - 64, pos.y + 72 );
-    none->setText( "Exit" );
-    none->setCallback( [this] ( )
+    none->setText( "End Turn" );
+    none->setCallback( [this, world] ( )
     {
+        world->mMovementGrid->endTurn();
         requestStackPop( );
     });
 

@@ -13,7 +13,6 @@ namespace
 
 Grid::Grid( World* world, unsigned int gridWidth, unsigned int gridHeight )
     : mWorld( world )
-    , mUnitAwaitingOrders( false )
     , mGridWidth( gridWidth )
     , mGridHeight( gridHeight )
     , mUpdateFogOfWar( true )
@@ -81,6 +80,7 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                 flag = true; // break out loop, the square has been found
                 if( square->isVisible )
                 {
+                    /* OLD WAY REMOVE ONCE INITATIVE SYSTEM COMPLETE
                     if( square->isOccupied && !this->mUnitAwaitingOrders )
                     {
                         if( mCurrentUnits.at( square->unitID )->mCategory & mWorld->mCurrentTurn )
@@ -94,11 +94,9 @@ void Grid::handleLeftClick( sf::Vector2i pos )
 
                         }
                     }
-                    else if( square->isPossibleNewLocation )
+                    else */ if( square->isPossibleNewLocation )
                     {
-                        if( mUnitAwaitingOrders )
-                            moveUnit( mCurrentUnits.at( mWorld->getSelectedUnit() )->mGridIndex, square->gridIndex  );
-                        else
+                        if( mWorld->getSelectedBuilding() > -1 )  // a spawn was selected before so the player wants to drop a new unit this could be done better
                         {
                             mWorld->spawnUnit( static_cast<unsigned int>(mWorld->getSelectedUnit()), sf::Vector2i( static_cast<int>(i), static_cast<int>(j) ) );
                             if( mWorld->mNetworkedWorld )
@@ -106,6 +104,7 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                             mCurrentUnits.at( mCurrentUnits.size() - 1 )->mHasMoved = true;
                             clearGrid( );
                         }
+                        else moveUnit( mCurrentUnits.at( mWorld->getSelectedUnit() )->mGridIndex, square->gridIndex  );
                     }
                     else if( square->isPossibleAttackPosition  )
                     {
@@ -233,6 +232,7 @@ void Grid::addUnit( Unit* unit )
             break;
         }
     }
+    updateTurnOrderIndicators( );
 }
 
 void Grid::addBuilding( Building* building )
@@ -256,30 +256,27 @@ void Grid::removeUnit( sf::Vector2i position )
     mData[position.y * mGridWidth + position.x].unitID = -1;
     mData[position.y * mGridWidth + position.x].isOccupied = false;
     mUpdateFogOfWar = true;
+    updateTurnOrderIndicators( );
 }
 
 void Grid::selectUnit( unsigned int i, unsigned int j )
 {
     Unit* unit = mCurrentUnits[mData[j * mGridWidth + i].unitID];
-    if( unit && (unit->mCategory & mWorld->mCurrentTurn) ) // is it this unit's turn?
+    if( unit ) // units can only move once per turn
     {
-        if( !unit->mHasMoved ) // units can only move once per turn
+        std::vector<sf::Vector2i> possibleLocations = getPossiblePositions(
+                                                    sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ),
+                                                    unit->mUnitType, static_cast<unsigned int>( unit->mSpeed ) );
+        for( auto loc : possibleLocations )
         {
-            std::vector<sf::Vector2i> possibleLocations = getPossiblePositions(
-                                                        sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ),
-                                                        unit->mUnitType, static_cast<unsigned int>( unit->mSpeed ) );
-            for( auto loc : possibleLocations )
-            {
-                mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
-                if( unit->mIsVisible && (( !mWorld->mNetworkedWorld && !mWorld->mLocalMultiplayerWorld && mWorld->mCurrentTurn & Category::Blue ) ||
-                        mWorld->mNetworkedWorld || mWorld->mLocalMultiplayerWorld ) )
-                    mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
-            }
-            mSelectedGridIndex = sf::Vector2i( i, j );
-            mWorld->setSelectedUnit( unit->mID );
-            unit->mIsSelectedUnit = true;
-            mUnitAwaitingOrders = true;
+            mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
+            if( unit->mIsVisible && (( !mWorld->mNetworkedWorld && !mWorld->mLocalMultiplayerWorld && mWorld->mCurrentTurn & Category::Blue ) ||
+                    mWorld->mNetworkedWorld || mWorld->mLocalMultiplayerWorld ) )
+                mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
         }
+        mSelectedGridIndex = sf::Vector2i( i, j );
+        mWorld->setSelectedUnit( unit->mID );
+        unit->mIsSelectedUnit = true;
     }
 }
 
@@ -323,8 +320,8 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
             mData[i].isPossibleNewLocation = false;
             mData[i].rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
         }
-        mUnitAwaitingOrders = false;
         mUpdateFogOfWar = true;
+        updateTurnOrderIndicators( );
     }
     return true;
 }
@@ -332,7 +329,6 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
 void Grid::getTartgets( std::vector<sf::Vector2i> possibleAttackLocations )
 {
     // std::cout << "Get Targets was called." << std::endl;
-    bool flag = false;
     for( auto loc : possibleAttackLocations )
         if( static_cast<unsigned int>( loc.y * mGridWidth + loc.x ) < mData.size() )
         {
@@ -345,13 +341,8 @@ void Grid::getTartgets( std::vector<sf::Vector2i> possibleAttackLocations )
             {
                 location->isPossibleAttackPosition = true;
                 location->rect->getSprite( )->setFillColor( sf::Color( 255, 165, 0, 255 ) );
-                flag = true;
             }
         }
-
-    if( flag ) mUnitAwaitingOrders = true;
-    else // no targets
-        clearGrid( );
 }
 
 void Grid::clearGrid( void )
@@ -366,11 +357,21 @@ void Grid::clearGrid( void )
         mData[i].defensiveInfluence = 0.0f;
         mData[i].tacticalInfluence = 0.0f;
     }
-    mWorld->setSelectedUnit( -1 );
-    mWorld->setSelectedBuilding( -1 );
-    mSelectedGridIndex = sf::Vector2i( 0, 0 );
-    mUnitAwaitingOrders = false;
     mUpdateFogOfWar = true;
+}
+
+void Grid::endTurn( void )
+{
+    int next = getNextUnit( );
+    if( next > -1 )
+    {
+        mSelectedGridIndex = sf::Vector2i( mCurrentUnits.at( next )->mGridIndex.x, mCurrentUnits.at( next )->mGridIndex.y );
+        //mWorld->setSelectedUnit( mCurrentUnits.at( next )->mID );
+        //mCurrentUnits.at( next )->mIsSelectedUnit = true;
+        mWorld->mStateStack->pushState( States::ActionMenuState );
+    }
+    // selectUnit( mCurrentUnits.at( next )->mGridIndex.x, mCurrentUnits.at( next )->mGridIndex.y );
+    updateTurnOrderIndicators( );
 }
 
 bool Grid::handleEvent( sf::Event )
@@ -404,6 +405,7 @@ unsigned int Grid::getMoveCost( int unitType, unsigned int terrainType )
 
 void Grid::updateFogOfWar( void )
 {
+    /*
     if( mUpdateFogOfWar && !mWorld->mLocalMultiplayerWorld )
     {
         // Fill fog completly
@@ -446,6 +448,7 @@ void Grid::updateFogOfWar( void )
                 else if( square.buildingID > -1 ) mCurrentBuildings.at( square.buildingID )->mIsVisible = true;
             }
     }
+    */
 }
 
 int Grid::getNextUnit( void )
@@ -454,9 +457,12 @@ int Grid::getNextUnit( void )
     do
     {
         for( auto unit : mCurrentUnits )
-            if( unit.second->mInitiative > 99 && unit.second->mInitiative > mCurrentUnits.at( id )->mInitiative ) id = unit.second->mID;
+        {
+            if( id == -1 ) id = unit.second->mID;
+            else if( unit.second->mInitiative > 99 && unit.second->mInitiative > mCurrentUnits.at( id )->mInitiative ) id = unit.second->mID;
+        }
         if( id == -1 )
-            for( auto unit : mCurrentUnits ) unit.second->mInitiative += randomInt( unit.second->mSpeed * .5 ) + (unit.second->mSpeed * .5);
+            for( auto unit : mCurrentUnits ) unit.second->mInitiative += randomInt( unit.second->mSpeed * 10 ) + unit.second->mSpeed * 2;
     }while( id == -1 );
     return id;
 }

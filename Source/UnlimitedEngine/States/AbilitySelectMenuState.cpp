@@ -169,7 +169,7 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
 
     auto exit = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     exit->setPosition( pos.x - 64, pos.y + 72 );
-    exit->setText( "Exit" );
+    exit->setText( "Back" );
     exit->setCallback( [this] ( )
     {
         requestStackPop( );

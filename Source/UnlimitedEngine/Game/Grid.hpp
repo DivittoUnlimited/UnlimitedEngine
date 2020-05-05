@@ -136,6 +136,7 @@ public:
     bool moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos );
     void getTartgets( std::vector<sf::Vector2i> possibleAttackLocations );
     void clearGrid( void );
+    void endTurn( void );
 
     bool handleEvent(sf::Event event);
     unsigned int getMoveCost( int unitType, unsigned int terrainType );
@@ -158,10 +159,6 @@ public:
     /// \brief mCurrentBuildings
     /// List of all the buildings currently on the field.
     std::vector<Building*>              mCurrentBuildings;
-    ///
-    /// \brief mUnitAwaitingOrders
-    /// flag for whether or not a unit has been selected by the player
-    bool                                mUnitAwaitingOrders;
     ///
     /// \brief mSelectedGridIndex
     /// The index of the grid square that was previously selected, if any.
