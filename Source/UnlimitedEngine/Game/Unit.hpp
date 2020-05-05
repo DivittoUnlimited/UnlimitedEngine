@@ -1,19 +1,21 @@
 #ifndef UNIT_HPP
 #define UNIT_HPP
 
+#include "queue"
 #include "Graphics/SceneNode.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "Graphics/RectangleShapeNode.hpp"
-
+#include "Core/Utility.hpp"
 #include "Core/PathFinder.hpp"
 #include "Game/DataTables.hpp"
+#include "Game/StatModHUD.hpp"
 
 class Square;
 
 class Unit : public SceneNode
 {
 public:
-    Unit(unsigned int mId, Category::Type category, UnitTypeData data , const TextureManager &textures );
+    Unit(unsigned int mId, Category::Type category, UnitTypeData data , const TextureManager &textures , const FontManager &fonts);
     ~Unit( void );
     virtual unsigned int	getCategory( ) const;
     virtual bool			isMarkedForRemoval( ) const;
@@ -104,6 +106,17 @@ public:
     /// \brief mMoraleBar
     /// The best indication of the units morale
     RectangleShapeNode* mMoraleBar;
+    /// \brief mFonts
+    /// reference to the fontManager used throughout the game to create the StatModHUD objs when an ability is used on this obj.
+    const FontManager& mFonts;
+    /// \brief mCurrentStatModHUD
+    /// Pointer to the text that floats above the unit when something changes one of it's stats
+    StatModHUD* mCurrentStatModHUD;
+    /// \brief mInitiativeHUD
+    /// Heads up display of this units current turn order
+    sf::Text mInitiativeHUD;
+    sf::CircleShape mInitiativeHUDBackground;
+
 };
 
 #endif // UNIT_HPP

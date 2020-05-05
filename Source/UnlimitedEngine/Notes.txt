@@ -8,11 +8,18 @@ BUGS and ISSUES:
     - Dead units crash game when turn ends
     - That one unit is immortal....
 FEATURES:
-    - initiative system
-        - first round init rolls based on speed
-        - unit initiative will vary from there based on if it attacks or defends from attack, waits etc...
-        - Units should display there turn order near their avatar
-            - Small circle with number in it
+    - Update Turn logic
+        - Must Go from unit to unit not from team to team.
+        - Call Grid::GetNextUnit() after a player ends a units turn and at the beggining of the match
+        - Call Grid::updateTurnOrderIndicators every time a player or unit does anything.
+        - The value returned by getNext unit must be set to World->mSelectedUnit()
+        - fix World->getSelectedUnit() to return proper value
+        - End turn menu no longer needed
+            - Ending turn will be done from the action menu
+        - Handle Left click will not have to "Select Unit" It will already be selected
+        - Unit ability menu will pop automaticly
+        - Must change Wife bot logic to handle one unit at a time and be able to end the unit's turn.
+        - All stat mods that a unit has aquired take place at the beggining of it's turn.
 
     - Unit Abilities and menus
         - Use unit->mBeginingOfTurn to enact statMod effects in update method
@@ -43,9 +50,6 @@ FEATURES:
                 - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all
         - How much gold should be awarded per spawn point per turn?
         - Fix Unit can be spawned on top of spawn point bug.
-
-    - Add "Attack roll" vs Armour to see if attacks actually hit target.
-        - Currently Armour does nothing becauase units just automaticly take damage (StatModifiers)
 
     - WifeBot        
         - build best path from owned spawn points to all other spawn points

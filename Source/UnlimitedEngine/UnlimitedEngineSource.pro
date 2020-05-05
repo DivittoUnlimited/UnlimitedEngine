@@ -85,6 +85,7 @@ HEADERS += \
     Game/DataTables.hpp \
     Game/Dice.hpp \
     Game/Grid.hpp \
+    Game/StatModHUD.hpp \
     Game/TeamStats.hpp \
     Game/Unit.hpp \
     Game/WifeBot.hpp \
@@ -182,6 +183,7 @@ SOURCES += \
     Game/DataTables.cpp \
     Game/Dice.cpp \
     Game/Grid.cpp \
+    Game/StatModHUD.cpp \
     Game/TeamStats.cpp \
     Game/Unit.cpp \
     Game/WifeBot.cpp \

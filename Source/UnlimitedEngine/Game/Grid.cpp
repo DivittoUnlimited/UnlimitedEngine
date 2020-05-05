@@ -122,7 +122,10 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                             {
                                 // get all units inside AOE from grid
                                 int id = this->mData.at( (t.y+square->gridIndex.y) * (this->mGridWidth) + (t.x+square->gridIndex.x) ).unitID;
-                                if( id > 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( unit->mSelectedAbility, this->mCurrentUnits.at( id ) );
+                                if( id > 0 && id != static_cast<int>( unit->mID ) )
+                                {
+                                    unit->useAbility( unit->mSelectedAbility, this->mCurrentUnits.at( id ) );
+                                }
                             }
                             unit->mSelectedAbility = "NONE";
                             unit->mHasSpentAction = true;
@@ -445,6 +448,43 @@ void Grid::updateFogOfWar( void )
     }
 }
 
+int Grid::getNextUnit( void )
+{
+    int id = -1;
+    do
+    {
+        for( auto unit : mCurrentUnits )
+            if( unit.second->mInitiative > 99 && unit.second->mInitiative > mCurrentUnits.at( id )->mInitiative ) id = unit.second->mID;
+        if( id == -1 )
+            for( auto unit : mCurrentUnits ) unit.second->mInitiative += randomInt( unit.second->mSpeed * .5 ) + (unit.second->mSpeed * .5);
+    }while( id == -1 );
+    return id;
+}
+
+void Grid::updateTurnOrderIndicators( void )
+{
+    std::vector<unsigned int> unitIDs;
+    for( auto unit : mCurrentUnits )
+    {
+        bool flag = false;
+        for( unsigned int i = 0; i < unitIDs.size(); ++i )
+        {
+            flag = unit.second->mInitiative < unitIDs[i];
+            if( flag )
+            {
+                unitIDs.insert( unitIDs.begin() + i, unit.second->mID );
+                break;
+            }
+        }
+        if( !flag ) unitIDs.push_back( unit.second->mID );
+    }
+    int counter = 0;
+    while( unitIDs.size( ) )
+    {
+        mCurrentUnits.at( unitIDs.back() )->mInitiativeHUD.setString( std::to_string( ++counter ) );
+        unitIDs.pop_back( );
+    }
+}
 
 void Grid::updateInfluenceMap( InfluenceType type)
 {

@@ -10,7 +10,7 @@ namespace
     const std::vector<AbilityData> Abilities = initializeAbilityData;
 }
 
-Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const TextureManager& textures )
+Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const TextureManager& textures, const FontManager& fonts )
     : mID( mId )
     , mGridIndex( sf::Vector2i( 0, 0 ) )
     , mInitiative( 0 )
@@ -25,6 +25,8 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     , mAbilities( )
     , mHealthBarBorder( nullptr )
     , mHealthBar( nullptr )
+    , mFonts( fonts )
+    , mCurrentStatModHUD( nullptr )
 {
     // define unit based on data from lua
     this->mUnitType      = static_cast<unsigned int>( UnitTypeMap[data.type] );
@@ -60,6 +62,20 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     this->mMoraleBar = morale.get( );
     this->mMoraleBar->getSprite()->setFillColor( sf::Color( 255, 215, 0, 255 ) );
     this->attachChild( std::move( morale ) );
+
+    std::unique_ptr<StatModHUD> statHud( new StatModHUD( mFonts, "", sf::Vector2i( this->mSprite.getPosition().x + 64, this->mSprite.getPosition().y ) ) );
+    this->mCurrentStatModHUD = statHud.get( );
+    this->mCurrentStatModHUD->mText.setFillColor( sf::Color::White );
+    this->attachChild( std::move( statHud ) );
+
+    // initiative turn order
+    mInitiativeHUD = sf::Text( "0", mFonts.get( FontMap.at( "Default" ) ), 14  );
+    mInitiativeHUD.setFillColor( sf::Color::White );
+    mInitiativeHUD.setPosition( getPosition( ) );
+
+    mInitiativeHUDBackground = sf::CircleShape( 11 );
+    mInitiativeHUDBackground.setFillColor( sf::Color::Black );
+    mInitiativeHUDBackground.setPosition( getPosition( ) );
 }
 
 Unit::~Unit( void )
@@ -89,19 +105,46 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
         std::vector<StatModifier> newMods;
         while( mCurrentModifiers.size( ) )
         {
-            mod = mCurrentModifiers.back();
-            mCurrentModifiers.pop_back();
-            if( mod.stat == "health" )              modHealth( mod.power.roll( ) ); // Dif because they must also update the graphics bars representign them to the player
-            else if( mod.stat == "morale" )         modMorale( mod.power.roll( ) );
-            else if( mod.stat == "armour" )         this->mArmour += mod.power.roll();
-            else if( mod.stat == "stamina" )        this->mStamina += mod.power.roll();
-            else if( mod.stat == "initiative" )     this->mInitiative += mod.power.roll();
-            else if( mod.stat == "perception" )     this->mPerception += mod.power.roll();
+            mod = mCurrentModifiers.back( );
+            mCurrentModifiers.pop_back( );
+            int power = mod.power.roll();
+            if( mod.stat == "health" )
+            {
+                modHealth( power ); // Dif because they must also update the graphics bars representign them to the player
+                mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nHealth " + std::to_string( power ) );
+            }
+            else if( mod.stat == "morale" )
+            {
+                modMorale( mod.power.roll( ) );
+                mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nMorale " + std::to_string( power ) );
+            }
+            else if( mod.stat == "armour" )
+            {
+                this->mArmour += mod.power.roll( );
+                mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nArmour " + std::to_string( power ) );
+            }
+            else if( mod.stat == "stamina" )
+            {
+                this->mStamina += mod.power.roll( );
+                mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nStamina " + std::to_string( power ) );
+            }
+            else if( mod.stat == "initiative" )
+            {
+                this->mInitiative += mod.power.roll( );
+                mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nInitiative " + std::to_string( power ) );
+            }
+            else if( mod.stat == "perception" )
+            {
+                this->mPerception += mod.power.roll( );
+                mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nPerception " + std::to_string( power ) );
+            }
             else
             {
                 std::cout << "Attempting to modifiy a unit stat that does not exist!" << std::endl;
                 assert( mod.stat == "health" );
             }
+            mCurrentStatModHUD->mTimer += sf::milliseconds( 2000 );
+
             mod.duration--;
             if( mod.duration > 0 )
             {
@@ -140,6 +183,10 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
             else mDestination = sf::Vector2f( -1.0f, -1.0f );
         }
     }
+
+    // update HUD
+    mInitiativeHUD.setPosition( getPosition( ).x, getPosition().y + 47 );
+    mInitiativeHUDBackground.setPosition( getPosition( ).x - 5, getPosition().y + 45 );
 }
 void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
@@ -152,6 +199,8 @@ void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
         else if( mCategory & Category::Red )
             this->mHealthBarBorder->getSprite()->setOutlineColor( sf::Color::Red ); // red
         target.draw( mSprite, states );
+        target.draw( mInitiativeHUDBackground );
+        target.draw( mInitiativeHUD );
     }
     else
     {
@@ -165,8 +214,15 @@ void Unit::useAbility( std::string abilityID, Unit* target )
 {
     if( mAbilities.find( abilityID ) != mAbilities.end() )
     {
-        for( auto t : mAbilities.at( abilityID ).targetMods )
-            target->addModifier( t );
+        if( (this->mAttack + randomInt( 20 ) > target->mArmour + randomInt( 20 ) ) )  // or the ability type is not an attack
+        {
+            std::cout << "The Attack was a hit!" << std::endl;
+            for( auto t : mAbilities.at( abilityID ).targetMods )
+                target->addModifier( t );
+        }
+        else
+            std::cout << "The Attack was a miss!" << std::endl;
+
         for( auto t : mAbilities.at( abilityID ).userMods )
             this->addModifier( t );
     }
@@ -174,17 +230,43 @@ void Unit::useAbility( std::string abilityID, Unit* target )
 
 void Unit::addModifier( StatModifier mod )
 {
-    if( mod.stat == "health" )              modHealth( mod.power.roll( ) ); // Dif because they must also update the graphics bars representign them to the player
-    else if( mod.stat == "morale" )         modMorale( mod.power.roll( ) );
-    else if( mod.stat == "armour" )         this->mArmour += mod.power.roll();
-    else if( mod.stat == "stamina" )        this->mStamina += mod.power.roll();
-    else if( mod.stat == "initiative" )     this->mInitiative += mod.power.roll();
-    else if( mod.stat == "perception" )     this->mPerception += mod.power.roll();
+    int power = mod.power.roll();
+    if( mod.stat == "health" )
+    {
+        modHealth( power ); // Dif because they must also update the graphics bars representign them to the player
+        mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nHealth " + std::to_string( power ) );
+    }
+    else if( mod.stat == "morale" )
+    {
+        modMorale( mod.power.roll( ) );
+        mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nMorale " + std::to_string( power ) );
+    }
+    else if( mod.stat == "armour" )
+    {
+        this->mArmour += mod.power.roll( );
+        mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nArmour " + std::to_string( power ) );
+    }
+    else if( mod.stat == "stamina" )
+    {
+        this->mStamina += mod.power.roll( );
+        mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nStamina " + std::to_string( power ) );
+    }
+    else if( mod.stat == "initiative" )
+    {
+        this->mInitiative += mod.power.roll( );
+        mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nInitiative " + std::to_string( power ) );           
+    }
+    else if( mod.stat == "perception" )
+    {
+        this->mPerception += mod.power.roll( );
+        mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nPerception " + std::to_string( power ) );
+    }
     else
     {
         std::cout << "Attempting to modifiy a unit stat that does not exist!" << std::endl;
         assert( mod.stat == "health" );
     }
+    mCurrentStatModHUD->mTimer += sf::milliseconds( 2000 );
     mod.duration--;
     if( mod.duration > 0 )
         mCurrentModifiers.push_back( mod );

@@ -140,6 +140,8 @@ public:
     bool handleEvent(sf::Event event);
     unsigned int getMoveCost( int unitType, unsigned int terrainType );
     void updateFogOfWar( void );
+    int getNextUnit( void );
+    void updateTurnOrderIndicators( void );
 
     // Attributes
     World* mWorld;

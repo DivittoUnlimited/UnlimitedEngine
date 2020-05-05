@@ -12,6 +12,7 @@ Building::Building( unsigned int mId, Category::Type category, BuildingData data
     this->mCapturePercentage = 0.0f;
     this->mSprite = sf::Sprite( textures.get( TextureMap.at( data.textureID ) ) );
     this->mSprite.setColor( sf::Color::White );
+    this->mSprite.setOrigin( this->mSprite.getLocalBounds().width / 2, this->mSprite.getLocalBounds().height / 2 );
 }
 
 unsigned int Building::getCategory( ) const
@@ -37,6 +38,7 @@ void Building::updateCurrent( sf::Time, CommandQueue& )
     }
     else
         this->mSprite.setColor( sf::Color::White );
+    this->mSprite.rotate( -.5 );
 
 }
 void Building::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const

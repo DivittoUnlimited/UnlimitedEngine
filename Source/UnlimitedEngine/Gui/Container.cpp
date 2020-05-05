@@ -44,10 +44,10 @@ void Container::handleEvent( const sf::Event& event )
             if( c->contains( sf::Mouse::getPosition(*mWindow).x, sf::Mouse::getPosition(*mWindow).y ) )
             {
                 this->mSelectedChild = static_cast<int>( c->getIndex( ) );
-                c->select();
+                c->select( );
             }
             else
-                c->deselect();
+                c->deselect( );
         }
     }
     // Keyboard input
