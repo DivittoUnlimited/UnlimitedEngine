@@ -8,8 +8,8 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#include "Core/SceneNode.hpp"
-#include "Core/DataTables.hpp"
+#include "Graphics/SceneNode.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/DialogNode.hpp"
 
 #include "Container.hpp"
@@ -25,6 +25,8 @@ public:
     void setConversation( std::string conversationName );
     void transitionDialog( int link );
     bool complete( void ) { return mComplete; }
+    int getPortrait( void ) ;
+    sf::Vector2f getPortraitPosition( void );
 
 private:
     sf::Text                                 mMessage;
@@ -35,6 +37,8 @@ private:
     std::vector<std::pair<std::string, int>> mAnswers;
     FontManager*                             mFonts;
     bool                                     mComplete;
+    int                                      mCurrentPortrait;
+    int                                      mCurrentDialog;
 };
 
 #endif // MESSAGEBOXNODE_HPP

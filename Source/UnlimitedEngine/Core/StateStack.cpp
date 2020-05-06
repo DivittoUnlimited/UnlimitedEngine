@@ -13,7 +13,7 @@ StateStack::StateStack( State::Context context )
 void StateStack::update( sf::Time dt )
 {
 	// Iterate from top to bottom, stop as soon as update() returns false
-    for( auto itr = mStack.rbegin(); itr != mStack.rend(); ++itr )
+    for( auto itr = mStack.rbegin( ); itr != mStack.rend( ); ++itr )
 	{
         if( !(*itr)->update( dt ) )
 			break;
@@ -28,7 +28,7 @@ void StateStack::draw( )
         state->draw( );
 }
 
-void StateStack::handleEvent(const sf::Event& event)
+void StateStack::handleEvent( const sf::Event& event )
 {
 	// Iterate from top to bottom, stop as soon as handleEvent() returns false
     for( auto itr = mStack.rbegin( ); itr != mStack.rend( ); ++itr )
@@ -54,7 +54,7 @@ void StateStack::clearStates( )
     mPendingList.push_back( PendingChange( Clear ) );
 }
 
-bool StateStack::isEmpty() const
+bool StateStack::isEmpty( ) const
 {
     return mStack.empty( );
 }
@@ -89,8 +89,8 @@ void StateStack::applyPendingChanges( )
 }
 
 StateStack::PendingChange::PendingChange( Action action, States::ID stateID )
-: action( action )
-, stateID( stateID )
+    : action( action )
+    , stateID( stateID )
 {
 
 }

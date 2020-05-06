@@ -2,7 +2,7 @@
 
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

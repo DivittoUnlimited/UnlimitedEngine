@@ -1,0 +1,108 @@
+
+Dev notes:
+Story timeline: (High level)
+
+
+
+=====================================================================
+=====================================================================
+World backstory:
+The land of Abigale was once a noble kingdom respected and loved by all. The King ruled with out malice or greed but with a just hand and a cool head.
+Unfortunatly, it is said, while on a hunting expedition the great king perished. No explaination was given, and with his passing, no heir to the thrown.
+The law stated it was up to the people to choose the next king between the late kings two brothers. Unable to decide, the people said the brothers would share
+the thrown. Neither brother aproved of this decision and both had strong allies in the many guilds throughout the kingdom. And so, they rose against one another.
+They started what has come to be known as the great cival war. Millions of lives were lost and a winner was never declared. The two brothers met on the
+field of battle and it is said they fought for days on end. The result is the same. They died from the injuries inflicted on one another, leaving no heir to the
+Kingdom of Abigale. The war ended as quick as it started, a seemingly endless waste of life and resources. The once proud land of Abigale left in ruin.
+
+
+
+=====================================================================
+Places:
+- Abigale
+A Large Kingdom built up of 9 smaller districts. Also the name of the capital city. A once vibrant and prosperous land. Like it's people,
+it has now fallen to ruin from generations of neglect.
+
+
+=================================
+
+=====================================================================
+Characters:
+Name: Princess Audreyn Mudborne
+Age: 17
+Race: Human
+Stats:
+    str:
+    con:
+    dex:
+    def:
+    perc:
+    range:
+Bio:
+
+
+================================
+Name: Princess' mom
+Age:
+Race:
+Stats:
+    str:
+    con:
+    dex:
+    def:
+    perc:
+    range:
+Bio:
+
+================================
+Name: Crazed King
+Age:
+Race:
+Stats:
+    str:
+    con:
+    dex:
+    def:
+    perc:
+    range:
+Bio:
+
+================================
+
+====================================================================
+Important Items:
+
+====================================================================
+Lore:
+
+
+Script:
+Intro: (speech plays before menu w/ option to skip)
+    Scene:
+        Camera pans over large drawn map of abigale, slowly being destroyed by war. Epic theme music plays in the background
+    Dialog:
+    Older Female voice:
+        "Few remember it now, but there was a time when the land of Abigale was at peace. A time before this terrible war.
+        A time when her citizens lived happily and with great prosperity. Those times are gone now. Gone with the last traces of the royal family.
+        It is said, no one knows what happened to the royal family, but not all things said are true. For I know what truely happened.
+        I know the treachery of how the Crazed King came to power."
+
+        - Map burns away revealing a speaker in front of a large crowd. She continues her story to rally the crowd.
+
+        "I remember the times before we fell into chaos, and now i beg you is the time we go back! Now is the time we stand against cruelity!
+        Now is the time we fight! Join our cause, and help put in end to the crazed king's tyranny, help restore Abigale to her former glory,
+        help bring you and your families to saftey. Or stand idle, while everything you love falls to ruin. I ask only that you look inside youself for
+        the courage to do what is right when your kingdom and your people need you the most."
+
+CutScene 1:
+        - Later that night following the rally.
+        Dialog:
+        Female speaker:
+            "I think the rally went well today at least a few more people are willing to stand up to the Crazed King.
+            It seems people are ready for change. They have grown tired of this terrible reign."
+
+        Young girl:
+            "I'm glad it went well mother. Hopefully soon we can restore Abigale to it's former glory."
+
+    - A loud crash occurs and the room were the conversation was happening is now flooded with solders. The woman and girl are knocked out and thrown into prison.
+

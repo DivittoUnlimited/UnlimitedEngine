@@ -2,7 +2,7 @@
 #define PARALLELTASK_HPP
 
 #include "State.hpp"
-#include "DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "ResourceIdentifiers.hpp"
 #include "Core/SoundPlayer.hpp"
 

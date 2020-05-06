@@ -2,7 +2,8 @@
 
 #include "ResponseSelector.hpp"
 #include "Core/Utility.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
+#include "Gui/MessageBoxNode.hpp"
 
 
 #include <SFML/Window/Event.hpp>
@@ -13,7 +14,7 @@
 namespace GUI
 {
 
-ResponseSelector::ResponseSelector( std::string text, const FontManager& fonts )
+ResponseSelector::ResponseSelector( std::string text, const FontManager& fonts, MessageBoxNode* owner )
 : mCallback( )
 , mNormal(   sf::Color(   0,   0,   0,   0 ) )
 , mSelected( sf::Color( 204, 204, 255, 180 ) )
@@ -21,6 +22,7 @@ ResponseSelector::ResponseSelector( std::string text, const FontManager& fonts )
 , mText( text, fonts.get( FontMap.at( "Default" ) ), 16 )
 , mIsToggle( true )
 , mSprite( sf::Vector2f( 550, 20 ) )
+, mOwner( owner )
 {
     mText.setFillColor( sf::Color::Black );
 
@@ -93,6 +95,14 @@ void ResponseSelector::deactivate( )
 void ResponseSelector::handleEvent( const sf::Event& )
 {
 }
+
+bool ResponseSelector::contains( float x, float y )
+{
+    //position is relative to message box need to add its pos somehow
+    //std::cout << "MesBoxSel Pos: " << this->getPosition().x << ", " << this->getPosition().y << std::endl;
+    return sf::FloatRect( this->getPosition() + this->mOwner->getWorldPosition(), sf::Vector2f( mSprite.getSize().x, mSprite.getSize().y ) ).contains( x, y );
+}
+
 
 void ResponseSelector::draw( sf::RenderTarget& target, sf::RenderStates states ) const
 {

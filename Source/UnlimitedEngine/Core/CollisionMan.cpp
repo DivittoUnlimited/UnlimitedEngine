@@ -16,7 +16,12 @@ CollisionMan::Node::Node( Node* parent, float x, float y, float width, float hei
     debugRect.setFillColor( sf::Color( 0,0,0,0 ) );
     debugRect.setOutlineColor( sf::Color( 0, 0, 255, 255 ) );
 }
-CollisionMan::Node::~Node( void ) {  }
+CollisionMan::Node::~Node( void ) {
+    delete NW;
+    delete NE;
+    delete SW;
+    delete SE;
+}
 //## Interface
 
 /// \brief addObj
@@ -121,7 +126,8 @@ void CollisionMan::Node::clear( void ) {
 
 //## Constructor
 CollisionMan::QuadTree::QuadTree( float x, float y, float width, float height ) {
-    current = root = new Node( nullptr, x, y, width, height, 0 ); // 0 is the depth of the root node becuase it is at the top of the structure
+    // current = root = new Node( nullptr, x, y, width, height, 0 ); // 0 is the depth of the root node becuase it is at the top of the structure
+    root = new Node( nullptr, x, y, width, height, 0 ); // 0 is the depth of the root node becuase it is at the top of the structure
 }
 CollisionMan::QuadTree::~QuadTree( void ) {  }
 

@@ -28,6 +28,7 @@ public:
     void	 setCallback( Callback callback );
     void	 setText( const std::string& text );
     void	 setToggle( bool flag );
+    virtual bool     contains( float x , float y);
 
     virtual bool isSelectable( void ) const;
     virtual void select( void );

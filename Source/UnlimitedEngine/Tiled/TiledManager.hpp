@@ -40,14 +40,15 @@ struct TileSet
     unsigned int  gridHeight;
     std::map<std::string, std::string> properties;
     unsigned int tileCount;
+    std::map<unsigned int, std::map<std::string, std::string>> tiles;
 };
 
 struct Object
 {
-    unsigned int id;
     std::string name;
     std::string type;
     std::string shape;
+    unsigned int id;
     unsigned int x;
     unsigned int y;
     unsigned int width;
@@ -55,6 +56,7 @@ struct Object
     unsigned int rotation;
     unsigned int gid;
     bool visible;
+    std::map<std::string, std::string> properties;
 };
 
 struct Layer
@@ -179,7 +181,6 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                 if( lua_isnumber( L, -1 ) ) currentTileSet.firstGid = (unsigned int)lua_tonumber( L, -1 );
                 else throw( "Error: TileSet firstGid invalid" );
                 lua_pop( L, 1 ); // firstGid value
-
                 lua_getfield( L, -1, "tilewidth" );
                 if( lua_isnumber( L, -1 ) ) currentTileSet.tileWidth = (unsigned int)lua_tonumber( L, -1 );
                 else throw( "Error: TileSet tileWidth invalid" );
@@ -211,12 +212,12 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                 lua_pop( L, 1 ); // name value
 
                 lua_getfield( L, -1, "imagewidth" );
-                if( lua_isnumber( L, -1 ) ) currentTileSet.imageWidth = (unsigned int)lua_tonumber( L, -1 );
+                if( lua_isnumber( L, -1 ) ) currentTileSet.imageWidth = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                 else throw( "Error: TileSet imageWidth invalid" );
                 lua_pop( L, 1 ); // imageWidth value
 
                 lua_getfield( L, -1, "imageheight" );
-                if( lua_isnumber( L, -1 ) ) currentTileSet.imageHeight = (unsigned int)lua_tonumber( L, -1 );
+                if( lua_isnumber( L, -1 ) ) currentTileSet.imageHeight = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                 else throw( "Error: TileSet imageHeigt invalid" );
                 lua_pop( L, 1 ); // imageHeight value
 
@@ -224,12 +225,12 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                 if(  lua_istable( L, -1 ) )
                 {
                     lua_getfield( L, -1, "x" );
-                    if( lua_isnumber( L, -1 ) ) currentTileSet.offsetX = (unsigned int)lua_tonumber( L, -1 );
+                    if( lua_isnumber( L, -1 ) ) currentTileSet.offsetX = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                     else throw( "Error: TileSet tileOffsetX invalid" );
                     lua_pop( L, 1 ); // tileOffset.x value
 
                     lua_getfield( L, -1, "y" );
-                    if( lua_isnumber( L, -1 ) ) currentTileSet.offsetY = (unsigned int)lua_tonumber( L, -1 );
+                    if( lua_isnumber( L, -1 ) ) currentTileSet.offsetY = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                     else throw( "Error: TileSet tileOffsetY invalid" );
                     lua_pop( L, 1 ); // tileOffset.y value
                 }
@@ -246,30 +247,69 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                     lua_pop( L, 1 ); // Orientaion value
 
                     lua_getfield( L, -1, "width" );
-                    if( lua_isnumber( L, -1 ) ) currentTileSet.gridWidth = (unsigned int)lua_tonumber( L, -1 );
+                    if( lua_isnumber( L, -1 ) ) currentTileSet.gridWidth = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                     else throw( "Error: TileSet grid.width invalid" );
                     lua_pop( L, 1 ); // grid.width value
 
                     lua_getfield( L, -1, "height" );
-                    if( lua_isnumber( L, -1 ) ) currentTileSet.gridHeight = (unsigned int)lua_tonumber( L, -1 );
+                    if( lua_isnumber( L, -1 ) ) currentTileSet.gridHeight = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                     else throw( "Error: TileSet grid.height invalid" );
                     lua_pop( L, 1 ); // grid.height value
                 }
                 else
-                    std::cout << "Error reading tileoffset table: " << filePath << std::endl;
+                    std::cout << "Error reading Grid data: " << filePath << std::endl;
                 lua_pop( L, 1 ); // grid
 
-                // properties table
+                // properties table - refering to the properties of the entire tileset
 
-                // terrains??? youtube it!!!!!!!!!!!
+                // terrains table
 
                 // tileCount
                 lua_getfield( L, -1, "tilecount" );
-                if( lua_isnumber( L, -1 ) ) currentTileSet.tileCount = (unsigned int)lua_tonumber( L, -1 );
+                if( lua_isnumber( L, -1 ) ) currentTileSet.tileCount = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                 else throw( "Error: TileSet tileCount invalid" );
                 lua_pop( L, 1 ); // tileCount value
 
-                // tiles table
+                // tiles table - handles properties of individual tiles
+                lua_getfield( L, -1, "tiles" );
+                if( lua_istable( L, -1 ) )
+                {
+                    lua_pushnil( L );  // first key
+                    while( lua_next( L, -2 ) != 0 )
+                    {
+                        if( lua_istable( L, -1 ) )
+                        {
+                            lua_getfield( L, -1, "id" );
+                            if( lua_isnumber( L, -1 ) )
+                                currentTileSet.tiles.insert(
+                                        std::pair<unsigned int, std::map<std::string, std::string>>(
+                                        static_cast<unsigned int>( lua_tonumber( L, -1 ) ),
+                                        std::map<std::string, std::string>( ) ) );
+
+                            else throw( "Error TileSet tiles table invalid." );
+                            unsigned int id = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
+                            lua_pop( L, 1 ); // id
+
+                            // properties table
+                            lua_getfield( L, -1, "properties" );
+                            if( lua_istable( L, -1 ) )
+                            {
+                                lua_pushnil( L ); // first key
+                                while( lua_next( L, -2 ) != 0 )
+                                {
+                                    currentTileSet.tiles.at( id ).insert( std::pair<std::string, std::string>(
+                                                                              lua_tostring( L, -2 ), lua_tostring( L, -1 ) ) );
+                                    lua_pop( L, 1); // removes 'value'; keeps 'key' for next iteration
+                                }
+                            }
+                            lua_pop( L, 1 ); // properties
+                            lua_pop( L, 1 ); // prep stack for next iteration
+                        }
+                    }
+                }
+                else
+                    std::cout << "There was an error reading individual tile properties." << filePath << std::endl;
+                lua_pop( L, 1 ); // tiles
 
                 currentTileMap.tileSets.push_back( currentTileSet );
                 lua_pop( L, 1); // removes anon tileset table; keeps 'key' for next iteration
@@ -302,7 +342,7 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                         currentLayer.type = type;
 
                         lua_getfield( L, -1, "id" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.id = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.id = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: Layer id invalid" );
                         lua_pop( L, 1 ); // id value
 
@@ -312,22 +352,22 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                         lua_pop( L, 1 ); // name value
 
                         lua_getfield( L, -1, "x" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.x = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.x = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: Layer x invalid" );
                         lua_pop( L, 1 ); // x value
 
                         lua_getfield( L, -1, "y" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.y = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.y = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: y invalid" );
                         lua_pop( L, 1 ); // y value
 
                         lua_getfield( L, -1, "width" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.width = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.width = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: Layer width invalid" );
                         lua_pop( L, 1 ); // x value
 
                         lua_getfield( L, -1, "height" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.height = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.height = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: height invalid" );
                         lua_pop( L, 1 ); // height value
 
@@ -337,17 +377,17 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                         lua_pop( L, 1 ); // visible value
 
                         lua_getfield( L, -1, "opacity" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.opacity = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.opacity = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: Layer Opacity invalid" );
                         lua_pop( L, 1 ); // Opacity value
 
                         lua_getfield( L, -1, "offsetx" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetX = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetX = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: Layer offsetx invalid" );
                         lua_pop( L, 1 ); // offsetx value
 
                         lua_getfield( L, -1, "offsety" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetY = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetY = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: offsety invalid" );
                         lua_pop( L, 1 ); // offsety value
 
@@ -361,7 +401,7 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                                 for( unsigned int j = 0; j < currentLayer.width; ++j )
                                 {
                                     lua_next( L, -2 );
-                                    currentLayer.data.push_back( (unsigned int)lua_tonumber( L , -1 ) );
+                                    currentLayer.data.push_back(  static_cast<unsigned int>( lua_tonumber( L, -1 ) ) );
                                     lua_pop( L, 1 );
                                 }
                             }
@@ -379,7 +419,7 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
 
                         // Add object layer specific data here
                         lua_getfield( L, -1, "id" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.id = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.id = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: ObjectLayer id invalid" );
                         lua_pop( L, 1 ); // id value
 
@@ -394,17 +434,17 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                         lua_pop( L, 1 ); // visible value
 
                         lua_getfield( L, -1, "opacity" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.opacity = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.opacity = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: ObjectLayer Opacity invalid" );
                         lua_pop( L, 1 ); // Opacity value
 
                         lua_getfield( L, -1, "offsetx" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetX = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetX = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: ObjectLayer offsetx invalid" );
                         lua_pop( L, 1 ); // offsetx value
 
                         lua_getfield( L, -1, "offsety" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetY = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetY = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: ObjectLayer offsety invalid" );
                         lua_pop( L, 1 ); // offsety value
 
@@ -432,7 +472,7 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                                     lua_pop( L, 1 ); // Object type value
 
                                     lua_getfield( L, -1, "id" );
-                                    if( lua_isnumber( L, -1 ) ) currentObj.id = (unsigned int)lua_tonumber( L, -1 );
+                                    if( lua_isnumber( L, -1 ) ) currentObj.id = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                                     else throw( "Error: Object id invalid" );
                                     lua_pop( L, 1 ); // id value
 
@@ -447,32 +487,32 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                                     lua_pop( L, 1 ); // shape value
 
                                     lua_getfield( L, -1, "x" );
-                                    if( lua_isnumber( L, -1 ) ) currentObj.x = (unsigned int)lua_tonumber( L, -1 );
+                                    if( lua_isnumber( L, -1 ) ) currentObj.x = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                                     else throw( "Error: Object x invalid" );
                                     lua_pop( L, 1 ); // x value
 
                                     lua_getfield( L, -1, "y" );
-                                    if( lua_isnumber( L, -1 ) ) currentObj.y = (unsigned int)lua_tonumber( L, -1 );
+                                    if( lua_isnumber( L, -1 ) ) currentObj.y = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                                     else throw( "Error: Object y invalid" );
                                     lua_pop( L, 1 ); // y value
 
                                     lua_getfield( L, -1, "width" );
-                                    if( lua_isnumber( L, -1 ) ) currentObj.width = (unsigned int)lua_tonumber( L, -1 );
+                                    if( lua_isnumber( L, -1 ) ) currentObj.width = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                                     else throw( "Error: Object width invalid" );
                                     lua_pop( L, 1 ); // x value
 
                                     lua_getfield( L, -1, "height" );
-                                    if( lua_isnumber( L, -1 ) ) currentObj.height = (unsigned int)lua_tonumber( L, -1 );
+                                    if( lua_isnumber( L, -1 ) ) currentObj.height = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                                     else throw( "Error: Object height invalid" );
                                     lua_pop( L, 1 ); // height value
 
                                     lua_getfield( L, -1, "gid" );
-                                    if( lua_isnumber( L, -1 ) ) currentObj.gid = (unsigned int)lua_tonumber( L, -1 );
+                                    if( lua_isnumber( L, -1 ) ) currentObj.gid = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                                     else currentObj.gid = 0;
                                     lua_pop( L, 1 ); // gid value POSSIBLE TO NOT HAVE ONE THEREFOR NO THROW!
 
                                     lua_getfield( L, -1, "rotation" );
-                                    if( lua_isnumber( L, -1 ) ) currentObj.rotation = (unsigned int)lua_tonumber( L, -1 );
+                                    if( lua_isnumber( L, -1 ) ) currentObj.rotation = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                                     else throw( "Error: Object rotation invalid" );
                                     lua_pop( L, 1 ); // rotation value
 
@@ -480,15 +520,21 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                                     if( lua_isboolean( L, -1 ) ) currentObj.visible = lua_toboolean( L, -1 );
                                     else throw( "Error: Object visible invalid" );
                                     lua_pop( L, 1 ); // visible value
-    /*
+
                                     lua_getfield( L, -1, "properties" );
                                     if( lua_istable( L, -1 ) )
                                     {
-
+                                        lua_pushnil( L ); // first key
+                                        while( lua_next( L, -2 ) != 0 )
+                                        {
+                                            currentObj.properties.insert( std::pair<std::string, std::string>(
+                                                                                      lua_tostring( L, -2 ), lua_tostring( L, -1 ) ) );
+                                            lua_pop( L, 1); // removes 'value'; keeps 'key' for next iteration
+                                        }
                                     }
                                     else throw( "Error: Object Properties invalid" );
                                     lua_pop( L, 1 ); // Properties table
-    */
+
                                     currentLayer.objects.push_back( currentObj );
                                 }
                                 else
@@ -518,7 +564,7 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                         lua_pop( L, 1 ); // Object type value
 
                         lua_getfield( L, -1, "id" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.id = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.id = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: imageLayer id invalid" );
                         lua_pop( L, 1 ); // id value
 
@@ -533,17 +579,17 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                         lua_pop( L, 1 ); // visible value
 
                         lua_getfield( L, -1, "opacity" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.opacity = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.opacity = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: imageLayer Opacity invalid" );
                         lua_pop( L, 1 ); // Opacity value
 
                         lua_getfield( L, -1, "offsetx" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetX = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetX = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: imageLayer offsetx invalid" );
                         lua_pop( L, 1 ); // offsetx value
 
                         lua_getfield( L, -1, "offsety" );
-                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetY = (unsigned int)lua_tonumber( L, -1 );
+                        if( lua_isnumber( L, -1 ) ) currentLayer.offsetY = static_cast<unsigned int>( lua_tonumber( L, -1 ) );
                         else throw( "Error: imageLayer offsety invalid" );
                         lua_pop( L, 1 ); // offsety value
 
@@ -572,9 +618,6 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
     std::cout << "TiledManager loadFromFile complete!" << std::endl;
     return currentTileMap;
 };
-
-
-
 }
 
 #endif // TILEDMANAGER_HPP

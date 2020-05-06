@@ -1,7 +1,7 @@
 #include "MusicPlayer.hpp"
 #include "ResourceIdentifiers.hpp"
 #include "ResourceManager.hpp"
-#include "DataTables.hpp"
+#include "Game/DataTables.hpp"
 
 MusicPlayer::MusicPlayer( )
 : mMusic( )

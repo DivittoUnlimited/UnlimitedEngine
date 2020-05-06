@@ -4,8 +4,10 @@
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
-
+#include <SFML/Graphics/Sprite.hpp>
 #include <memory>
+
+
 
 namespace sf
 {
@@ -23,6 +25,9 @@ public:
     Component();
     virtual	~Component();
 
+    void setIndex( unsigned int index ) { this->mIndex = index; }
+    unsigned int getIndex( void ) { return this->mIndex; }
+
     virtual bool isSelectable() const = 0;
     bool         isSelected() const;
     virtual void select();
@@ -32,9 +37,11 @@ public:
     virtual void activate();
     virtual void deactivate();
     virtual void handleEvent(const sf::Event& event) = 0;
+    virtual bool contains( float x, float y ) = 0;
 private:
     bool mIsSelected;
     bool mIsActive;
+    unsigned int mIndex;
 };
 
 }

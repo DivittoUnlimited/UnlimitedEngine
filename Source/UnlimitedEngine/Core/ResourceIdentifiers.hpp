@@ -44,6 +44,7 @@ class ResourceManager;
 typedef ResourceManager<sf::Texture>        TextureManager;
 typedef ResourceManager<sf::Font>           FontManager;
 typedef ResourceManager<sf::SoundBuffer>    SoundManager;
+typedef ResourceManager<sf::Music>          MusicManager;
 typedef ResourceManager<sf::Shader>         ShaderManager;
 
 

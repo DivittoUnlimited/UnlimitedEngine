@@ -1,9 +1,133 @@
+BUGS and ISSUES:
+    - ConquestMode start battle crashes game.
+    - Errors when attempting to connect to the server happen to often.
+        - Clicking while "ERROR could not connect" is shown causes crash.
+        - Server often can't be started more than once per session
+        - Project must be cleaned every time the server is run for it to work again.
+    - Units can be spawned on  top of spawn points
+    - Dead units crash game when turn ends
+    - That one unit is immortal....
+FEATURES:
+    - Update Turn logic
+        - Must Go from unit to unit not from team to team.
+        - Call Grid::GetNextUnit() after a player ends a units turn and at the beggining of the match
+        - Call Grid::updateTurnOrderIndicators every time a player or unit does anything.
+        - The value returned by getNext unit must be set to World->mSelectedUnit()
+        - fix World->getSelectedUnit() to return proper value
+        - End turn menu no longer needed
+            - Ending turn will be done from the action menu
+        - Handle Left click will not have to "Select Unit" It will already be selected
+        - Unit ability menu will pop automaticly
+        - Must change Wife bot logic to handle one unit at a time and be able to end the unit's turn.
+        - All stat mods that a unit has aquired take place at the beggining of it's turn.
 
-FURTHER TESTING NEEDED:
-MUSIC
-SOUND_EFFECTS
+    - Unit Abilities and menus
+        - Use unit->mBeginingOfTurn to enact statMod effects in update method
+            - create Abilities with longer duration statMods to test.
+            - Must finish initiative system first
+        - What happens when you use a waitMenu ability
+            - Take Gaurd
+                - boost morale and stamina
+                - if unit should be attacked before next turn they will gain an oppertunity attack
+                - Apply symbol to mark unit as taking guard on the map
+            - Recover
+                - Boost morale and stamina more than other wait menu Abilities
+                - Show stat mod effects as they happed
+            - Evade
+                - If the unit gets attacked they have an opertunity to escape without being punished.
+                - Apply symbol to indicate they are ready to run.
 
-MINOR ENGINE COMPONENTS HAVE NOT BEEN ENABLED
-PARTICLES
-ANIMATIONS
+    - Gold (Bonus points for Morale)
+        - Player given points for total unit morale at the end of every turn
+        - Player can use Gold to unlock/spawn new units. (think battlefront 2)
+            - This slows what units can be spawned until they are earned in a match.
+        - must finish initiative system first to have correct "End of Turn"
+
+    - Spawn Points
+        - Hide color under fog of war unless owned by player
+        - How are they captured?
+            - Unit capture abillity
+                - Solution one: (Advanced wars) Units capture abillity based on HP some units can't capture at all
+        - How much gold should be awarded per spawn point per turn?
+        - Fix Unit can be spawned on top of spawn point bug.
+
+    - WifeBot        
+        - build best path from owned spawn points to all other spawn points
+            - Consider Offensive and defensive influence of the known world when building best path
+                - use zone data
+                - modify pathfinding heuristic to include influence
+            - Boost the Importance of all the squares on the paths
+        - Add AI Attacking spawn points
+        - Add AI Spawning units
+            - add currency first
+        - Unit Tactics
+            - Get list of all possible actions unit has
+                - Each possible square it can move to
+                - Each square it can attack or use ability on
+                - Wait commad, choose stance.
+                - use these options to call apropriate methods in grid class. (same player menu will call)
+    - Fog of war
+        - How will fog of war work in online games?
+        - Fix server issues above first.
+        - Solution 1: Make each player "Blue" locally, run fog of war locally.
+        - Solution 2: (better) Match unit color with world->clientColor when updating fog of war
+ART:
+    - Needed Maps:
+
+    - Needed Sprites:
+        - Wizard Portrait
+        - SpawnPoint
+        - Attack damage animations
+            - Slash for getting attacked
+            - Particles for bleeding effects
+            - Icons for other effects? broken sheild for less armour etc...
+            - Icon for targted squares
+            - Icons for each ability
+            - Icons for Wait menu
+                - for each button and to mark unit on map with added status
+
+Notes:
+    - Art:
+        - Maps should be drawn like hand drawn maps in Dnd, GOT, LOTR, etc..
+            - Gives excuse for simple art that looks cool
+        - Low detail(tile art) large scale maps
+        - High detail(tile art) smaller maps like dungeons etc...
+
+
+    - WifeBot Overview:
+        - Team Tactics: (How the whole team should play.)
+            - Combine world data to generate mathematical representation of world state
+            - Apply AI Bias towards goals
+                 - Some might be defensive others might go for buildings first etc...
+            - Use pathfinding on zone grid to build list of objectives to capture all bases.
+                 - an objective here is a zone along the best path to the next spawn point.
+                 - The heuristic for building this list of zones must include the zone's tactical
+                   importance as well as both teams offensive and defensive influence in the zone
+                 - Zone's overall tactical, offensive, and defensive scores should be affected by zones around them
+            - Unit tactics: How each should play to support team tactics.
+                 - based on goals build list of actions for units
+                     - Move To
+                     - Attack Square
+                     - Heal
+                     - Special Ability
+        - path finding: Moving around the grid.
+        - Needed Data structures:
+            - List of goals
+                - Capture Spawn points
+                - Defeat all enemy units
+                - Capture signifigant locations
+                - Capture zones
+                - Defend zone
+                - Spawn units
+                - Generate funds
+            - Grid data
+        - Influence types:
+            - Offensive
+            - Defensive
+            - Tactical
+            - Importance
+    - Archers should get more range if they are on higher ground (i.e Standing on a wall)
+    - Archers should have a posibilty of hitting adjacent squares to their target.(MISS)
+    - Scouts should have invisibility mode even when exposed from fog of war.
+    - Add Level of exp multplier to units
 

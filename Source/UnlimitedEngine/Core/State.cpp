@@ -11,13 +11,13 @@ State::State( States::ID stateID, StateStack& stack, Context context )
 {
 }
 
-State::~State()
+State::~State( )
 {
 }
 
-void State::requestStackPush(States::ID stateID)
+void State::requestStackPush( States::ID stateID )
 {
-	mStack->pushState(stateID);
+    mStack->pushState( stateID );
 }
 
 void State::requestStackPop()

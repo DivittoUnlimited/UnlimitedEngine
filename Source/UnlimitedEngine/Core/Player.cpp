@@ -1,170 +1,196 @@
 #include "Player.hpp"
 #include "CommandQueue.hpp"
 
+#include "NetworkProtocol.hpp"
+#include "Game/Grid.hpp"
+#include "Core/Globals.hpp"
+
+#include <SFML/Network/Packet.hpp>
 #include <map>
 #include <string>
 #include <algorithm>
-#include "Objects/Actor.hpp"
+#include <math.h>
 
-///
-/// \brief The ActorMover struct
-/// Functor to move the player based on velocity and the delta time for this frame.
-struct ActorMover
-{
-    ActorMover( float vx, float vy )
-    : velocity( vx, vy )
+
+Player::Player( sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding )
+    : mKeyBinding( binding )
+    , mSocket( socket )
+    , mIdentifier( identifier )
     {
+        // Set initial action bindings
+        initializeActions( );
+
+        // Assign all categories to player's aircraft
+        if( mIdentifier == Category::Player )
+            for( auto& pair : mActionBinding )
+                pair.second.category = Category::Player;
+        else if( mIdentifier == Category::Player2 ) {
+            for( auto& pair : mActionBinding )
+                pair.second.category = Category::Player2;
+        }
+
     }
-    void operator( )( Actor& actor, sf::Time ) const
-    {
-        actor.accelerate( velocity * actor.speed( ) );
-    }
-    sf::Vector2f velocity;
-};
-
-Player::Player( void )
-{
-    // Set initial key bindings
-    mKeyBinding[sf::Keyboard::Left]     = MoveLeft;
-    mKeyBinding[sf::Keyboard::Right]    = MoveRight;
-    mKeyBinding[sf::Keyboard::Up]       = MoveUp;
-    mKeyBinding[sf::Keyboard::Down]     = MoveDown;
-    //mKeyBinding[sf::Keyboard::Space]    = Fire;
-
-    // Set initial action bindings
-    initializeActions( );
-
-    // Assign all categories to player's aircraft
-
-    for( auto& pair : mActionBinding )
-        pair.second.category = Category::Player;
-}
 
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 {
-    if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position > 0 )
-        commands.push( mActionBinding[MoveDown] );
-    else if( event.joystickMove.axis == sf::Joystick::Y && event.joystickMove.position < 0 )
-        commands.push( mActionBinding[MoveUp] );
-    if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position > 0 )
-        commands.push( mActionBinding[MoveRight] );
-    else if( event.joystickMove.axis == sf::Joystick::X && event.joystickMove.position < 0 )
-        commands.push( mActionBinding[MoveLeft] );
-
-    if( event.type == sf::Event::JoystickButtonReleased )
+    if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
     {
-        switch( event.joystickButton.button )
+        // Network connected -> send event over network
+        if( mSocket )
         {
-        case 0:
-            //commands.push( mActionBinding[LaunchMissile] );
-            // std::cout << "Coin button (Y) activated" << std::endl;
-            break;
-        case 1:
-            // commands.push( mActionBinding[TurnAround] );
-            //std::cout << "button 1(A) activated" << std::endl;
-            break;
-        case 2:
-            // commands.push( mActionBinding[Fire] );
-             //std::cout << "button 2(B) activated" << std::endl;
-            break;
-        case 3:
-            //commands.push( mActionBinding[Fire] );
-           // std::cout << "button 3(X) activated" << std::endl;
-            break;
-        case 4:
-            //commands.push( mActionBinding[TurnAround] );
-            //std::cout << "button 4 (LeftTrigger) activated" << std::endl;
-            break;
-        case 5:
-            //commands.push( mActionBinding[LaunchMissile] );
-            //std::cout << "button 5 (RightTrigger) activated" << std::endl;
-            break;
-        case 6:
-            //commands.push( mActionBinding[Fire] );
-            //std::cout << "button 6 activated" << std::endl;
-            break;
-        case 7:
-            //commands.push( mActionBinding[Fire] );
-            //std::cout << "button 7 activated" << std::endl;
-        break;
-        case 8:
-            //commands.push( mActionBinding[Fire] );
-            // std::cout << "button 8 activated(SELECT BUTTON pause game)" << std::endl;
-        break;
-        case 9:
-            std::cout << "button 9 activated(START BUTTON pause game!!)" << std::endl;
-        break;
+            sf::Packet packet;
+            float x = event.mouseButton.x;
+            float y = event.mouseButton.y;
+            //float x = sf::Mouse::getPosition(*mWindow).x;
+            //float y = sf::Mouse::getPosition(*mWindow).y;
+            packet << static_cast<sf::Int32>( Client::LeftClick );
+            packet << mIdentifier;
+            packet << x;
+            packet << y;
+            mSocket->send( packet );
+        }
+        // Network disconnected -> local event
+        else
+        {
+            Command com;
+            com.category = Category::Grid;
+            com.action = derivedAction<Grid>( [event] ( Grid& g, sf::Time ){ g.handleLeftClick( sf::Vector2i( event.mouseButton.x, event.mouseButton.y ) ); } );
+            commands.push( com );
         }
     }
+    /*
     else if( event.type == sf::Event::KeyPressed )
     {
-        // Check if pressed key appears in key binding, trigger command if so
-        auto found = mKeyBinding.find( event.key.code );
-        if( found != mKeyBinding.end( ) && !isRealtimeAction( found->second ) )
-            commands.push( mActionBinding[found->second] );
+        PlayerAction::Type action;
+        if( mKeyBinding && mKeyBinding->checkAction( event.key.code, action ) && !isRealtimeAction( action ) )
+        {
+            // Network connected -> send event over network
+            if( mSocket )
+            {
+                sf::Packet packet;
+                packet << static_cast<sf::Int32>( Client::PlayerEvent );
+                packet << mIdentifier;
+                packet << static_cast<sf::Int32>( action );
+                mSocket->send( packet );
+            }
+
+            // Network disconnected -> local event
+            else
+            {
+                commands.push( mActionBinding[action] );
+            }
+        }
+        // Realtime change (network connected)
+        if( ( event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased ) && mSocket )
+        {
+            PlayerAction::Type action;
+            if( mKeyBinding && mKeyBinding->checkAction( event.key.code, action ) && isRealtimeAction( action ) )
+            {
+                // Send realtime change over network
+                sf::Packet packet;
+                packet << static_cast<sf::Int32>(Client::PlayerRealtimeChange);
+                packet << mIdentifier;
+                packet << static_cast<sf::Int32>(action);
+                packet << (event.type == sf::Event::KeyPressed);
+                mSocket->send(packet);
+            }
+        }
+    }
+    */
+}
+
+bool Player::isLocal( void ) const
+{
+    // No key binding means this player is remote
+    return mKeyBinding != nullptr;
+}
+
+void Player::disableAllRealtimeActions( void )
+{
+    for( auto& action : mActionProxies )
+    {
+        sf::Packet packet;
+        packet << static_cast<sf::Int32>(Client::PlayerRealtimeChange);
+        packet << mIdentifier;
+        packet << static_cast<sf::Int32>(action.first);
+        packet << false;
+        mSocket->send(packet);
     }
 }
 
 void Player::handleRealtimeInput( CommandQueue& commands )
 {
-    bool noInput = true;
-    // Traverse all assigned keys and check if they are pressed
-    for( auto pair : mKeyBinding )
+    // Check if this is a networked game and local player or just a single player game
+    if( ( mSocket && isLocal( ) ) || !mSocket )
     {
-        // If key is pressed, lookup action and trigger corresponding command
-        if( sf::Keyboard::isKeyPressed( pair.first ) && isRealtimeAction( pair.second ) )
+        //std::cout << "ERROR MESSAGE FROM PLAYER CLASS HANDLEREALTIMEINPUT" << std::endl;
+        //for( unsigned int i=0; i< sf::Joystick::Count; ++i )
+        //{
+            //if(sf::Joystick::isConnected(i))
+            //{
+                 //std::cout << "Joystick " << i << " is connected!" << std::endl;
+                 //std::cout << sf::Joystick::getIdentification( i ).name.toAnsiString() << ", " << sf::Joystick::getIdentification( i ).productId << std::endl;
+            //}
+            // else
+                 // std::cout << "Joystick " << i << " is NOT connected!" << std::endl;
+         //}
+
+        /*
+         *
+         *  Demo saved for when you want to add camera control
+        if( this->mIdentifier == Category::Player )
         {
-            commands.push( mActionBinding[pair.second] );
-            noInput = false;
+            if( sf::Joystick::getAxisPosition( 0, sf::Joystick::Y ) < 0 ) // move forward
+                commands.push( mActionBinding[PlayerAction::MoveUnit] );
+            else if( sf::Joystick::getAxisPosition( 0, sf::Joystick::X ) > 0 ) // rotate right
+                commands.push( mActionBinding[PlayerAction::AttackUnit] );
+            else if( sf::Joystick::getAxisPosition( 0, sf::Joystick::X ) < 0 )
+                commands.push( mActionBinding[PlayerAction::AttackBuilding] );
+            else if( sf::Joystick::isButtonPressed( 0, 1 ) )
+                commands.push( mActionBinding[PlayerAction::CaptureBuilding] );
+        }
+        else if( this->mIdentifier == Category::Player2 )
+        {
+            if( sf::Joystick::getAxisPosition( 1, sf::Joystick::Y ) < 0 ) // move forward
+                commands.push( mActionBinding[PlayerAction::MoveUnit] );
+            else if( sf::Joystick::getAxisPosition( 1, sf::Joystick::X ) > 0 ) // rotate right
+                commands.push( mActionBinding[PlayerAction::AttackUnit] );
+            else if( sf::Joystick::getAxisPosition( 1, sf::Joystick::X ) < 0 )
+                commands.push( mActionBinding[PlayerAction::AttackBuilding] );
+            else if( sf::Joystick::isButtonPressed( 1, 1 ) )
+                commands.push( mActionBinding[PlayerAction::CaptureBuilding] );
+        }
+*/
+        // Lookup all actions and push corresponding commands to queue
+        std::vector<PlayerAction::Type> activeActions = mKeyBinding->getRealtimeActions( );
+        for( PlayerAction::Type action : activeActions )
+            commands.push( mActionBinding[action] );
+   }
+}
+
+void Player::handleRealtimeNetworkInput(CommandQueue& commands)
+{
+    if ( mSocket && !isLocal( ) )
+    {
+       // Traverse all realtime input proxies. Because this is a networked game, the input isn't handled directly
+        for( auto pair : mActionProxies )
+        {
+            if( pair.second && isRealtimeAction( pair.first ) )
+                commands.push( mActionBinding[pair.first] );
         }
     }
-    if( noInput )
-        commands.push( mActionBinding[StopMoving] );
 }
 
-void Player::assignKey( Action action, sf::Keyboard::Key key )
+void Player::handleNetworkEvent(PlayerAction::Type action, CommandQueue& commands, sf::Vector2i pos )
 {
-    // Remove all keys that already map to action
-    for( auto itr = mKeyBinding.begin( ); itr != mKeyBinding.end( ); )
+    if( action == PlayerAction::LeftClick )
     {
-        if( itr->second == action )
-            mKeyBinding.erase( itr++ );
-        else
-            ++itr;
-    }
-    // Insert new binding
-    mKeyBinding[key] = action;
-}
-
-sf::Keyboard::Key Player::getAssignedKey( Action action ) const
-{
-    for( auto pair : mKeyBinding )
-    {
-        if( pair.second == action )
-            return pair.first;
-    }
-    return sf::Keyboard::Unknown;
-}
-
-void Player::initializeActions( )
-{
-    mActionBinding[MoveLeft].action      = derivedAction<Actor>( ActorMover( -1,  0 ) );
-    mActionBinding[MoveRight].action     = derivedAction<Actor>( ActorMover(  1,  0 ) );
-    mActionBinding[MoveUp].action        = derivedAction<Actor>( ActorMover(  0,  1 ) );
-    mActionBinding[MoveDown].action      = derivedAction<Actor>( ActorMover(  0, -1 ) );
-    mActionBinding[StopMoving].action    = derivedAction<Actor>( [] ( Actor& a, sf::Time ){ a.setVelocity( 0.0f, 0.0f ); } );
-}
-
-bool Player::isRealtimeAction( Action action )
-{
-    switch( action )
-    {
-        case MoveLeft:
-        case MoveRight:
-        case MoveDown:
-        case MoveUp:
-            return true;
-        default:
-            return false;
+        Command com;
+        com.category = Category::Grid;
+        com.action = derivedAction<Grid>( [pos] ( Grid& g, sf::Time ){ g.handleLeftClick( pos ); } );
+        commands.push( com );
     }
 }
+
+void Player::handleNetworkRealtimeChange(PlayerAction::Type action, bool actionEnabled ) { mActionProxies[action] = actionEnabled; }
+void Player::initializeActions( ) { }

@@ -12,7 +12,7 @@
 #include <SFML/Graphics/RectangleShape.hpp> // for debug rect
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include "SceneNode.hpp"
+#include "Graphics/SceneNode.hpp"
 #include "Globals.hpp"
 
 namespace CollisionMan {
@@ -106,12 +106,13 @@ namespace CollisionMan {
         Node* root;
     private:
         //## Attributes
-        Node* current;
+        //Node* current;
     };
     static QuadTree QUAD_TREE( 0, 0, 0, 0 );
 
     /// \brief update
-    static std::set<std::pair<SceneNode*, SceneNode*>> update( SceneNode* layer )
+    /*
+     * static std::set<std::pair<SceneNode*, SceneNode*>> update( SceneNode* layer )
     {
         // build object list from SceneGraph and let quad treee work it's magic.
         std::vector<Obj> objs;
@@ -124,6 +125,7 @@ namespace CollisionMan {
         QUAD_TREE.root->clear( );
         return QUAD_TREE.update( objs );
     }
+    */
 }
 
 #endif // COLLISIONMAN

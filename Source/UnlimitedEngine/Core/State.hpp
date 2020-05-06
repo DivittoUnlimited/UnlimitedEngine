@@ -14,10 +14,10 @@ namespace sf
 	class RenderWindow;
 }
 class StateStack;
-class Player;
+//class Player;
 class MusicPlayer;
 class SoundPlayer;
-
+class KeyBinding;
 
 class State
 {
@@ -30,15 +30,17 @@ public:
 
         }
 
-        Context( States::ID stateID, sf::RenderWindow& window, TextureManager& textures, FontManager& fonts, MusicPlayer& music, SoundPlayer& sounds, Player& player, std::vector<std::pair<std::string, int>>* highScores )
+        Context( States::ID stateID, sf::RenderWindow& window, TextureManager& textures, FontManager& fonts, MusicPlayer& music, SoundPlayer& sounds,
+                  KeyBinding& keys1, KeyBinding& keys2 )
         : stateID( stateID )
         , window( &window )
         , textures( &textures )
         , fonts( &fonts )
         , music( &music )
         , sounds( &sounds )
-        , player( &player )
-        , highScores( highScores )
+        //, player( nullptr )
+        , keys1( &keys1 )
+        , keys2( &keys2 )
         {
         }
 
@@ -48,9 +50,9 @@ public:
         FontManager*	  fonts;
         MusicPlayer*      music;
         SoundPlayer*      sounds;
-        Player*			  player;
-        std::string       tiledMapFilePath;
-        std::vector<std::pair<std::string, int>>* highScores;
+        //Player*			  player;
+        KeyBinding*			keys1;
+        KeyBinding*			keys2;
     };
 
     State( States::ID stateID, StateStack& stack, Context context );

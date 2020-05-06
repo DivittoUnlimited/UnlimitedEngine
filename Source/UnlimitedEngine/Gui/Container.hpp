@@ -25,6 +25,7 @@ public:
     void selectNext( void );
     void selectPrevious( void );
     void clear( void );
+    virtual bool contains( float, float ) { return false; }
 
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

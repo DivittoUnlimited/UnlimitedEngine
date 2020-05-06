@@ -1,8 +1,8 @@
 #include "Gui/MessageBoxNode.hpp"
 
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/Globals.hpp"
-#include "Core/TextNode.hpp"
+#include "Graphics/TextNode.hpp"
 
 #include "Gui/Container.hpp"
 #include "Gui/Button.hpp"
@@ -16,12 +16,14 @@ MessageBoxNode::MessageBoxNode( std::string convoName, FontManager& fonts )
     : mConversation( ConvoTable[ConversationMap.at( convoName )] )
     , mFonts( &fonts )
     , mComplete( false )
+    , mCurrentPortrait( 0 )
+    , mCurrentDialog( 0 )
 {
     assert( mConversation.conversationBranches.size( ) ); // if this fires then the conversation being loaded did not get the right vector of DialogNodes and mConversations is empty
 
     // this will be loaded like a css style sheet but in lua (Gui.lua? MessageBox.lua?) for now this works
     mBackgroundBox = sf::RectangleShape( sf::Vector2f( WINDOW_WIDTH - 100, WINDOW_HEIGHT / 3 ) );
-    mBackgroundBox.setFillColor( sf::Color( 204, 204, 255, 150 ) );
+    mBackgroundBox.setFillColor( sf::Color( 204, 204, 255, 200 ) );
     mBackgroundBox.setOutlineThickness( 2 );
     mBackgroundBox.setOutlineColor( sf::Color::Black );
 
@@ -31,7 +33,7 @@ MessageBoxNode::MessageBoxNode( std::string convoName, FontManager& fonts )
     mMessage.setFillColor( sf::Color::Black );
     mMessage.setCharacterSize( 18 );
 
-    transitionDialog( 0 );
+    transitionDialog( mCurrentDialog );
 }
 
 void MessageBoxNode::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
@@ -59,12 +61,14 @@ void MessageBoxNode::transitionDialog( int link )
     {
         mGUIContainer.clear( );
         mAnswers.clear( );
-        mMessage.setString( mConversation.conversationBranches[link].getDialog( ) );
-        mAnswers =  mConversation.conversationBranches[link].getResponses( );
+        mCurrentPortrait = mConversation.portrait.at( static_cast<unsigned int>( link ) );
+        mCurrentDialog = link;
+        mMessage.setString( mConversation.conversationBranches[static_cast<unsigned int>( link )].getDialog( ) );
+        mAnswers =  mConversation.conversationBranches[static_cast<unsigned int>( link )].getResponses( );
         sf::Vector2f pos =  mMessage.getPosition( ) + sf::Vector2f( 0, 100 ); // this needs to be changed!!!!
         for( unsigned int i = 0; i < mAnswers.size( ); ++i )
         {
-            auto option = std::make_shared<GUI::ResponseSelector>( mAnswers[i].first.c_str( ), *mFonts );
+            auto option = std::make_shared<GUI::ResponseSelector>( mAnswers[i].first.c_str( ), *mFonts, this );
             option->setPosition( pos.x, pos.y + i * 25 );
             option->setCallback( [this, i] ( )
             {
@@ -73,4 +77,14 @@ void MessageBoxNode::transitionDialog( int link )
             mGUIContainer.pack( option );
         }
     }
+}
+
+int MessageBoxNode::getPortrait( void )
+{
+    return mCurrentPortrait;
+}
+
+sf::Vector2f MessageBoxNode::getPortraitPosition( void )
+{
+    return mConversation.portraitPosition[static_cast<unsigned int>( mCurrentDialog )];
 }

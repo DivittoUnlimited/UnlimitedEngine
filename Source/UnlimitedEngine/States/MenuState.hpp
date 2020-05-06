@@ -19,6 +19,7 @@ public:
 
 private:
     sf::Text       mTitleText;
+    sf::Text       mDevNotes;
     GUI::Container mGUIContainer;
     sf::Time       mTimeOut;
 };

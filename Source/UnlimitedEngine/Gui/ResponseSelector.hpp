@@ -14,6 +14,8 @@
 #include "Core/ResourceIdentifiers.hpp"
 #include "Gui/Component.hpp"
 
+class MessageBoxNode;
+
 namespace GUI
 {
 
@@ -23,7 +25,7 @@ public:
     typedef std::shared_ptr<ResponseSelector>    Ptr;
     typedef std::function<void( )>               Callback;
 
-    ResponseSelector( std::string text, const FontManager& fonts );
+    ResponseSelector( std::string text, const FontManager& fonts , MessageBoxNode *owner );
 
     void setCallback( Callback callback );
     void setToggle( bool flag );
@@ -36,6 +38,7 @@ public:
     virtual void deactivate( void );
 
     virtual void handleEvent( const sf::Event& event );
+    virtual bool     contains( float x , float y);
 
 private:
     virtual void draw( sf::RenderTarget& target, sf::RenderStates states ) const;
@@ -48,6 +51,7 @@ private:
     sf::Text           mText;
     bool               mIsToggle;
     sf::RectangleShape mSprite;
+    MessageBoxNode*    mOwner;
 };
 
 }

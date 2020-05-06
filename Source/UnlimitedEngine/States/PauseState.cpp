@@ -1,18 +1,18 @@
 #include "PauseState.hpp"
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
-
+#include "Game/DataTables.hpp"
+#include "Core/Globals.hpp"
+#include "Gui/Button.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
 
-PauseState::PauseState( States::ID id, StateStack& stack, Context context )
+PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool allowUpdates )
 : State( id, stack, context )
-, mBackgroundSprite( )
 , mPausedText( )
-, mInstructionText( )
+, mAllowUpdates( allowUpdates )
 {
     sf::Font& font = context.fonts->get( FontMap.at( "Default" ) );
     sf::Vector2f viewSize = context.window->getView( ).getSize( );
@@ -21,55 +21,81 @@ PauseState::PauseState( States::ID id, StateStack& stack, Context context )
     mPausedText.setString( "Paused" );
     mPausedText.setCharacterSize( 70 );
     centerOrigin( mPausedText );
-    mPausedText.setPosition( 0.5f * viewSize.x, 0.4f * viewSize.y );
+    mPausedText.setPosition( 0.5f * viewSize.x, 0.2f * viewSize.y );
 
-    mInstructionText.setFont( font );
-    mInstructionText.setString( "(Press Backspace/Start to return to the main menu)" );
-    centerOrigin( mInstructionText );
-    mInstructionText.setPosition( 0.5f * viewSize.x, 0.6f * viewSize.y );
+    auto ResumeGame = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    ResumeGame->setPosition( WINDOW_WIDTH / 2 - 100, 290 );
+    ResumeGame->setText( "Resume" );
+    ResumeGame->setCallback( [this] ( )
+    {
+        requestStackPop( );
+    });
+
+    auto playerWins = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    playerWins->setPosition( WINDOW_WIDTH / 2 - 100, 350 );
+    playerWins->setText( "Player Wins!" );
+    playerWins->setCallback( [this] ( )
+    {
+        requestStateClear( );
+        requestStackPush( States::BattleStatScreen );
+    });
+
+    auto playerLoses = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    playerLoses->setPosition( WINDOW_WIDTH / 2 - 100, 410 );
+    playerLoses->setText( "Player Loses!" );
+    playerLoses->setCallback( [this] ( )
+    {
+        //requestStackPop( );
+        //requestStackPush( States::HostGame );
+    });
+
+    auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 470 );
+    settingsButton->setText( "Settings" );
+    settingsButton->setCallback([this] ( )
+    {
+        requestStackPush( States::SettingsState );
+    });
+
+    auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 530 );
+    exitButton->setText( "Return to Menu" );
+    exitButton->setCallback([this] ( )
+    {
+        requestStateClear( );
+        requestStackPush( States::Menu );
+    });
+
+    mGUIContainer.pack( ResumeGame );
+    mGUIContainer.pack( playerWins );
+    mGUIContainer.pack( playerLoses );
+    mGUIContainer.pack( settingsButton );
+    mGUIContainer.pack( exitButton );
 }
 
 void PauseState::draw( )
 {
     sf::RenderTarget& window = *getContext( ).window;
     window.setView(window.getDefaultView( ) );
-
-	sf::RectangleShape backgroundShape;
-    backgroundShape.setFillColor( sf::Color( 0, 0, 0, 150 ) );
-    backgroundShape.setSize( window.getView( ).getSize( ) );
-
-    window.draw( backgroundShape );
     window.draw( mPausedText );
-    window.draw( mInstructionText );
+    window.draw( mGUIContainer );
 }
 
 bool PauseState::update( sf::Time )
 {
-	return false;
+    return mAllowUpdates;
 }
 
 bool PauseState::handleEvent( const sf::Event& event )
 {
-    if( event.type != sf::Event::KeyPressed )
-		return false;
-
-    if( event.key.code == sf::Keyboard::Escape )
+    if( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )
 	{
 		// Escape pressed, remove itself to return to the game
         requestStackPop( );
 	}
-
-    ///
-    /// REAAD ME!!!
-    ///
-    // NEED TO ADD BOOLEAN TO KNOW IF START BUTTON SHOULD PAUSE OR UN-PAUSE
-
-    if( ( event.type == sf::Event::JoystickButtonReleased && event.joystickButton.button == 9 ) || ( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Backspace ) )
-	{
-		// Escape pressed, remove itself to return to the game
-        requestStateClear( );
-        requestStackPush( States::Menu );
-	}
-
+    else
+    {
+        mGUIContainer.handleEvent( event );
+    }
 	return false;
 }

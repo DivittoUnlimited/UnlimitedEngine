@@ -1,7 +1,7 @@
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
-#include "DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "ResourceManager.hpp"
 #include "Player.hpp"
 #include "StateStack.hpp"
@@ -29,23 +29,20 @@ private:
     //## Attributes
     static const sf::Time TimePerFrame;
 
-    // Engine Resources
-    sf::RenderWindow	  mWindow;
-
-    TextureManager		  mTextures;
-    FontManager  		  mFonts;
-    Player   			  mPlayer;
-    MusicPlayer           mMusic;
-    SoundPlayer           mSoundEffects;
-
+    TextureManager          mTextures;
+    FontManager             mFonts;
+    MusicPlayer             mMusic;
+    SoundPlayer             mSoundEffects;
+    KeyBinding              mKeyBinding1;
+    KeyBinding				mKeyBinding2;
     // Game FSM
-    State::Context        mContext;
-    StateStack			  mStateStack;
+    State::Context          mContext;
+    StateStack              mStateStack;
 
     // Debuging info
-    std::size_t			  mStatisticsNumFrames;
-    sf::Text			  mStatisticsText;
-    sf::Time			  mStatisticsUpdateTime;
+    std::size_t             mStatisticsNumFrames;
+    sf::Text                mStatisticsText;
+    sf::Time                mStatisticsUpdateTime;
 
 
     //## Behaviors

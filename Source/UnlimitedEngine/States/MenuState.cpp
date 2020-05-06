@@ -2,7 +2,7 @@
 #include "Gui/Button.hpp"
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/MusicPlayer.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -10,16 +10,36 @@
 #include "Core/Globals.hpp"
 #include "Core/Utility.hpp"
 
+#include <fstream>
+
 MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 : State( id, stack, context )
 , mGUIContainer( )
 , mTimeOut( sf::Time::Zero )
 {
-
-    //mContext.music->setVolume( 30 );
+    // mContext.music->setVolume( 30 );
     // mContext.music->play( MusicMap.at( "MenuTheme" ) );
 
-    mTitleText = sf::Text( "MAIN MENU", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
+    // get dev notes
+    std::ifstream stream;
+    std::string devNotes = "";
+    std::string line = "";
+    std::ifstream myfile( "Notes.txt" );
+    if( myfile.is_open( ) ) {
+        while( getline( myfile, line ) ) {
+             devNotes += line;
+             devNotes += "\n";
+        }
+        myfile.close( );
+    } else std::cout << "Unable to open to-do.txt" << std::endl;
+
+    mDevNotes = sf::Text( devNotes, mContext.fonts->get( FontMap.at( "Default" ) ), 20 );
+    mDevNotes.setFillColor( sf::Color( 255, 255, 255, 255 ) );
+    mDevNotes.setPosition( 10, 600 );
+    mDevNotes.setOutlineThickness( 1 );
+    mDevNotes.setOutlineColor( sf::Color( 0, 255, 0, 255 ) );
+
+    mTitleText = sf::Text( "Wizard's Request", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
     mTitleText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     centerOrigin( mTitleText );
     mTitleText.setPosition( WINDOW_WIDTH / 2, 200 );
@@ -27,27 +47,57 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     mTitleText.setOutlineThickness( 5 );
     mTitleText.setStyle( sf::Text::Bold );
 
+    auto testMap = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    testMap->setPosition( WINDOW_WIDTH / 2 - 100, 330 );
+    testMap->setText( "TEST_MAP" );
+    testMap->setCallback( [this] ( )
+    {
+        GAME_MODE = GameModes::QuickBattle;
+        requestStackPop( );
+        requestStackPush( States::SinglePlayerLevel1 );
+    });
+
     auto playButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
-    playButton->setText( "Play" );
+    playButton->setPosition( WINDOW_WIDTH / 2 - 100, 390 );
+    playButton->setText( "Local Game" );
     playButton->setCallback( [this] ( )
 	{
+        GAME_MODE = GameModes::Online;
         requestStackPop( );
-        requestStackPush( States::Loading );
+        requestStackPush( States::SinglePlayerMenuState );
 	});
 
-    /*
-     * Removed for debugging
+    auto playLocalButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    playLocalButton->setPosition( WINDOW_WIDTH / 2 - 100, 450 );
+    playLocalButton->setText( "Create Server" );
+    playLocalButton->setCallback( [this] ( )
+    {
+        GAME_MODE = GameModes::QuickBattle;
+        requestStackPop( );
+        requestStackPush( States::HostGame );
+    });
+
+    auto playMultiplayerButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
+    playMultiplayerButton->setPosition( WINDOW_WIDTH / 2 - 100, 510 );
+    playMultiplayerButton->setText( "Join Server" );
+    playMultiplayerButton->setCallback( [this] ( )
+    {
+        GAME_MODE = GameModes::Online;
+        requestStackPop( );
+        requestStackPush( States::JoinGame ); // used to be hostGame not sure why
+    });
+
     auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 525 );
+    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 570 );
     settingsButton->setText( "Settings" );
     settingsButton->setCallback([this] ( )
 	{
-        requestStackPush( States::Settings );
+        GAME_MODE = GameModes::NONE;
+        requestStackPush( States::SettingsState );
 	});
-    */
+
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 600 );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 630 );
     exitButton->setText( "Exit" );
     exitButton->setCallback([this] ( )
 	{
@@ -55,9 +105,11 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStateClear( );
 	});
 
-
-    //mGUIContainer.pack( settingsButton );
+    mGUIContainer.pack( testMap );
     mGUIContainer.pack( playButton );
+    mGUIContainer.pack( playLocalButton );
+    mGUIContainer.pack( playMultiplayerButton );
+    mGUIContainer.pack( settingsButton );
     mGUIContainer.pack( exitButton );
 }
 
@@ -71,15 +123,17 @@ void MenuState::draw( )
     sf::RenderTarget& window = *getContext( ).window;
 
     window.setView( window.getDefaultView( ) );
-
+    window.clear( sf::Color::Black );
     window.draw( mTitleText );
     window.draw( mGUIContainer );
+    window.draw( mDevNotes );
 }
 
 bool MenuState::update( sf::Time dt )
 {   
+    mDevNotes.move( 0, -28 * dt.asSeconds( ) );
     mTimeOut += dt;
-    if( mTimeOut > sf::seconds( 30 ) )
+    if( mTimeOut > sf::seconds( 60 ) )
     {
         requestStateClear( );
         requestStackPush( States::SplashScreen );

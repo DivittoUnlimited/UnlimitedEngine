@@ -1,7 +1,7 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
-#include "SceneNode.hpp"
+#include "Graphics/SceneNode.hpp"
 
 ///
 /// \brief The Entity class
@@ -15,9 +15,6 @@ class Entity : public SceneNode
         void			accelerate( sf::Vector2f velocity );
         void			accelerate( float vx, float vy );
         sf::Vector2f	getVelocity( ) const;
-        int				getHitpoints( ) const;
-        void			repair( int points );
-        void			damage( unsigned int points );
         void			destroy( );
         virtual bool    isDestroyed( ) const;
 

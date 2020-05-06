@@ -1,7 +1,7 @@
 #include "LoadingState.hpp"
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
-#include "Core/DataTables.hpp"
+#include "Game/DataTables.hpp"
 #include "Core/MusicPlayer.hpp"
 #include "Core/Globals.hpp"
 
@@ -19,7 +19,7 @@ LoadingState::LoadingState( States::ID id, StateStack& stack, Context context )
     mLoadingText->setPosition( WINDOW_WIDTH / 2, 300 );
     centerOrigin( *mLoadingText );
 
-    mLoadingTask.execute( context, "Game/Game.lua" );
+    mLoadingTask.execute( context, "Game/Lua/Game.lua" );
 }
 
 void LoadingState::draw( )
@@ -41,7 +41,7 @@ bool LoadingState::update( sf::Time dt )
 	{
         requestStackPop( );
         //mContext.music->stop( );
-        requestStackPush( States::Game );
+        requestStackPush( States::BattleState );
     }
 	return true;
 }
