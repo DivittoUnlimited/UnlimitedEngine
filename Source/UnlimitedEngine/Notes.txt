@@ -10,7 +10,7 @@ BUGS and ISSUES:
 FEATURES:
     - Update Turn logic
         - Must Go from unit to unit not from team to team.
-        - Call Grid::GetNextUnit() after a player ends a units turn and at the beggining of the match
+        - Call Grid::GetNextUnit() after a player ends a units turn
         - Call Grid::updateTurnOrderIndicators every time a player or unit does anything.
         - The value returned by getNext unit must be set to World->mSelectedUnit()
         - fix World->getSelectedUnit() to return proper value

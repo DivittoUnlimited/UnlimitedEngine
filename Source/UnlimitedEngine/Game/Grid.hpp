@@ -166,8 +166,8 @@ public:
     sf::Vector2i                        mSelectedGridIndex;
     unsigned int    mGridWidth;
     unsigned int    mGridHeight;
-
-    bool                                mUpdateFogOfWar;
+    bool            mUpdateFogOfWar;
+    bool            mEndTurn;
 
     bool mUpdateInfluenceMap;
     bool mUpdateThreatLevelMap;

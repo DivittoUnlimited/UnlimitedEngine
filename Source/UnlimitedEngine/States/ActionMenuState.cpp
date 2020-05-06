@@ -71,7 +71,7 @@ void ActionMenuState::draw( )
 
 bool ActionMenuState::update( sf::Time )
 {
-    return false;
+    return true;
 }
 
 bool ActionMenuState::handleEvent( const sf::Event& event )

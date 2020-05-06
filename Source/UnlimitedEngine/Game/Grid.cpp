@@ -16,6 +16,7 @@ Grid::Grid( World* world, unsigned int gridWidth, unsigned int gridHeight )
     , mGridWidth( gridWidth )
     , mGridHeight( gridHeight )
     , mUpdateFogOfWar( true )
+    , mEndTurn( true )
     , mUpdateInfluenceMap( true )
     , mUpdateThreatLevelMap( false )
     , mShowInfluenceMap( true )
@@ -47,6 +48,9 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
         updateFogOfWar( );
         mUpdateFogOfWar = false;
     }
+    if( mEndTurn ) this->endTurn();
+    else
+        mWorld->mStateStack->pushState( States::ActionMenuState );
 
     // The onscreen debugging view of influence set to show offensive influence by default
     if( mUpdateInfluenceMap ) updateInfluenceMap( );
@@ -298,7 +302,7 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
         unit->mHasMoved = true;
         unit->mGridIndex = newPos;
         mSelectedGridIndex = newPos;
-
+        unit->addModifier( StatModifier( "initiative", "10-25", 1 ) );
         // std::cout << "Grid::MoveUnit Unit Path:" << std::endl;
         unit->mPath = new PathFinder<Square>( mData, sf::Vector2i( mGridWidth, mGridHeight ), oldSquare, newSquare,
                 [=]( Square* start, Square* goal )->float {
@@ -362,16 +366,20 @@ void Grid::clearGrid( void )
 
 void Grid::endTurn( void )
 {
+    mEndTurn = false;
+    updateTurnOrderIndicators( );
+
     int next = getNextUnit( );
     if( next > -1 )
     {
         mSelectedGridIndex = sf::Vector2i( mCurrentUnits.at( next )->mGridIndex.x, mCurrentUnits.at( next )->mGridIndex.y );
-        //mWorld->setSelectedUnit( mCurrentUnits.at( next )->mID );
-        //mCurrentUnits.at( next )->mIsSelectedUnit = true;
+        mWorld->mWorldView.setCenter( mSelectedGridIndex.x * TILE_SIZE, mSelectedGridIndex.y * TILE_SIZE );
+
+        mWorld->setSelectedUnit( mCurrentUnits.at( next )->mID );
+        mCurrentUnits.at( next )->mIsSelectedUnit = true;
         mWorld->mStateStack->pushState( States::ActionMenuState );
     }
     // selectUnit( mCurrentUnits.at( next )->mGridIndex.x, mCurrentUnits.at( next )->mGridIndex.y );
-    updateTurnOrderIndicators( );
 }
 
 bool Grid::handleEvent( sf::Event )
@@ -453,18 +461,18 @@ void Grid::updateFogOfWar( void )
 
 int Grid::getNextUnit( void )
 {
-    int id = -1;
-    do
+    Unit* unit = nullptr;
+    while( true )
     {
-        for( auto unit : mCurrentUnits )
-        {
-            if( id == -1 ) id = unit.second->mID;
-            else if( unit.second->mInitiative > 99 && unit.second->mInitiative > mCurrentUnits.at( id )->mInitiative ) id = unit.second->mID;
-        }
-        if( id == -1 )
-            for( auto unit : mCurrentUnits ) unit.second->mInitiative += randomInt( unit.second->mSpeed * 10 ) + unit.second->mSpeed * 2;
-    }while( id == -1 );
-    return id;
+        for( unsigned int i = 0; i < mCurrentUnits.size(); ++i )
+            if( !unit || unit->mInitiative < mCurrentUnits.at( i )->mInitiative ) unit = mCurrentUnits.at(i);
+        std::cout << "The Player has no available units to use. Open spawn point menu or end match here." << std::endl;
+        assert( unit );
+        if( unit->mInitiative < 99 )
+            for( unsigned int i = 0; i < mCurrentUnits.size(); ++i ) mCurrentUnits.at(i)->mInitiative += randomInt( mCurrentUnits.at(i)->mSpeed * 10 ) + mCurrentUnits.at(i)->mSpeed * 2;
+        else break;
+    }
+    return unit->mID;
 }
 
 void Grid::updateTurnOrderIndicators( void )

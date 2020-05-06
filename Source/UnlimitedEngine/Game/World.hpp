@@ -77,7 +77,9 @@ public:
 private:
     sf::RenderTarget&					mTarget;
     sf::RenderTexture					mSceneTexture;
+public:
     sf::View							mWorldView;
+private:
     TextureManager						mTextures;
 public:
     FontManager&						mFonts;  // made private becuase grid needed it and i am lazy

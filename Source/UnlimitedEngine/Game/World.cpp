@@ -59,7 +59,6 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     mSceneTexture.setView( mWorldView );
     this->registerStates( );
     buildScene( MediaFileMap.at( "Maps" ).at( mLevel ) );
-    mMovementGrid->endTurn(  ); // sets up the next(first) turn
     centerOrigin( mChangeTurnText );
     mChangeTurnText.setPosition( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 200 );
     mChangeTurnText.setOutlineThickness( 3 );
@@ -73,7 +72,7 @@ World::~World( void )
 
 void World::draw( )
 {
-    if( !PostEffect::isSupported( ) )
+    if( PostEffect::isSupported( ) )
     {
         mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
         mSceneTexture.setView( mWorldView );
