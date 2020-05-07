@@ -36,7 +36,7 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mWindowSprite(  )
     , mSceneGraph( )
     , mSceneLayers( )
-    , mDeltaMousePosition( 0, 0 )
+    //, mDeltaMousePosition( 0, 0 )
     , mCameraPanSpeed( 8 )
     , mNetworkedWorld( networked )
     , mLocalMultiplayerWorld( isLocalMultiplayer )
@@ -55,7 +55,7 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
 {
     if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     // mWorldView.zoom( 2.0 );
-    // mWorldView.move( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 );
+    //mWorldView.move( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 );
     mSceneTexture.setView( mWorldView );
     this->registerStates( );
     buildScene( MediaFileMap.at( "Maps" ).at( mLevel ) );
@@ -77,11 +77,13 @@ void World::draw( )
         mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
+        /*
         if( mChangeTurnTextTimer > sf::Time::Zero )
         {
             mChangeTurnText.setPosition( WINDOW_WIDTH / 2 + mDeltaMousePosition.x, WINDOW_HEIGHT / 2 - 200 + mDeltaMousePosition.y );
             mSceneTexture.draw( mChangeTurnText );
         }
+        */
         mSceneTexture.display( );
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
         mTarget.draw( sf::Sprite( mWindowSprite ) );
@@ -91,11 +93,13 @@ void World::draw( )
     {
         mTarget.setView( mWorldView );
         mTarget.draw( mSceneGraph );
+        /* OLD WAY
         if( mChangeTurnTextTimer > sf::Time::Zero )
         {
             mChangeTurnText.setPosition( WINDOW_WIDTH / 2 + mDeltaMousePosition.x, WINDOW_HEIGHT / 2 - 200 + mDeltaMousePosition.y );
             mTarget.draw( mChangeTurnText );
         }
+        */
     }
 }
 
@@ -104,13 +108,18 @@ bool World::update( sf::Time dt )
     while( !mCommandQueue.isEmpty( ) ) mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     try{ mSceneGraph.update( dt, mCommandQueue ); }
     catch( std::exception& e ) { std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl; }
+
+
     /*
         try{ handleCollisions( ); }
         catch( std::exception& e ) {
             std::cout << "There was an exception during the collision update: " << e.what( ) << "\nDo all your map layer names in lua match from tiled?" << std::endl;
         }
     */
+    if( mMovementGrid->mEndTurn ) mMovementGrid->endTurn( );
     mSceneGraph.removeWrecks( );
+
+    /* OLD WAY
     if( mChangeTurnTextTimer > sf::Time::Zero )
         mChangeTurnTextTimer -= dt;
 
@@ -118,31 +127,32 @@ bool World::update( sf::Time dt )
     if( sf::Keyboard::isKeyPressed( sf::Keyboard::Up ) ) // || sf::Mouse::getPosition().y < 100 )
     {
         mWorldView.move( 0.0f, -1 * mCameraPanSpeed );
-        mDeltaMousePosition.y -= mCameraPanSpeed;
+        //mDeltaMousePosition.y -= mCameraPanSpeed;
         mBlueTeamStats->move( 0, -mCameraPanSpeed );
         mRedTeamStats->move( 0, -mCameraPanSpeed );
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Down  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
     {
         mWorldView.move( 0.0f, mCameraPanSpeed );
-        mDeltaMousePosition.y += mCameraPanSpeed;
+        //mDeltaMousePosition.y += mCameraPanSpeed;
         mBlueTeamStats->move( 0, mCameraPanSpeed );
         mRedTeamStats->move( 0, mCameraPanSpeed );
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Left  ) ) //  || sf::Mouse::getPosition().x < 100 )
     {
         mWorldView.move( -1 * mCameraPanSpeed, 0.0f );
-        mDeltaMousePosition.x -= mCameraPanSpeed;
+        //mDeltaMousePosition.x -= mCameraPanSpeed;
         mBlueTeamStats->move( -mCameraPanSpeed, 0 );
         mRedTeamStats->move( -mCameraPanSpeed, 0 );
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Right ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
     {
         mWorldView.move( mCameraPanSpeed, 0.0f );
-        mDeltaMousePosition.x += mCameraPanSpeed;
+        //mDeltaMousePosition.x += mCameraPanSpeed;
         mBlueTeamStats->move( mCameraPanSpeed, 0 );
         mRedTeamStats->move( mCameraPanSpeed, 0 );
     }
+    */
 
     return true;
 }
@@ -167,14 +177,17 @@ bool World::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Cat
 
 void World::handleEvent( const sf::Event& event )
 {
+    /*
     if( ( !this->mLocalMultiplayerWorld && mCurrentTurn & Category::Blue ) || this->mLocalMultiplayerWorld )
         if( event.type == sf::Event::KeyReleased &&
                 ( event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift ) )
             mStateStack->pushState( States::EndTurnMenuState );
+            */
 }
 
 void World::changeTurn( void )
 {
+    /* OLD WAY
     if( mCurrentTurn & Category::Red )
     {
         mCurrentTurn = Category::Blue;
@@ -213,7 +226,7 @@ void World::changeTurn( void )
         com.action = derivedAction<WifeBot>( [] ( WifeBot& bot, sf::Time ){ bot.recalculate( true ); } );
         mCommandQueue.push( com );
     }
-
+*/
 }
 
 void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )

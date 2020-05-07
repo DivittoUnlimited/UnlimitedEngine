@@ -215,6 +215,7 @@ bool MultiplayerGameState::handleEvent( const sf::Event& event )
     {
         if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
         {
+            /* OLd WAY
             // create a new event with delta mouse pos
             sf::Event newEvent;
             newEvent.type = sf::Event::MouseButtonReleased;
@@ -223,6 +224,9 @@ bool MultiplayerGameState::handleEvent( const sf::Event& event )
             newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
 
             mPlayer->handleEvent( newEvent, commands );
+            */
+            mPlayer->handleEvent( event, mWorld.getCommandQueue( ) );
+
         }
         else
             mPlayer->handleEvent( event, commands );

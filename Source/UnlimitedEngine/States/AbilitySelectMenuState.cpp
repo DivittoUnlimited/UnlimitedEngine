@@ -15,7 +15,7 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
     : State( id, stack, context )
 {
     sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
-    pos -= world->mDeltaMousePosition;
+    //pos -= world->mDeltaMousePosition;
 
     // Get current units abilities to name buttons
     std::vector<std::string> buttonNames;

@@ -96,7 +96,7 @@ private:
 public:
     /// \brief mDeltaMousePosition
     /// used to track mouse position considering the offset caused by moving the worldView (Camera)
-    sf::Vector2f                        mDeltaMousePosition;
+    //sf::Vector2f                        mDeltaMousePosition;
     float                               mCameraPanSpeed;
     bool								mNetworkedWorld;
     bool                                mLocalMultiplayerWorld;

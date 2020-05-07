@@ -168,6 +168,7 @@ public:
     unsigned int    mGridHeight;
     bool            mUpdateFogOfWar;
     bool            mEndTurn;
+    bool            mWaitingForPlayer;
 
     bool mUpdateInfluenceMap;
     bool mUpdateThreatLevelMap;

@@ -300,3 +300,8 @@ void Unit::modMorale( int amount )
         // sleep / strike animation  --  sound effects?
     }
 }
+
+bool Unit::isMoving( void )
+{
+    return mPath && mPath->size( ) > 0; // if path is empty then unit is not moving :)
+}

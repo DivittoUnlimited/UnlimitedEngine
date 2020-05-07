@@ -17,6 +17,7 @@ Grid::Grid( World* world, unsigned int gridWidth, unsigned int gridHeight )
     , mGridHeight( gridHeight )
     , mUpdateFogOfWar( true )
     , mEndTurn( true )
+    , mWaitingForPlayer( false )
     , mUpdateInfluenceMap( true )
     , mUpdateThreatLevelMap( false )
     , mShowInfluenceMap( true )
@@ -48,8 +49,9 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
         updateFogOfWar( );
         mUpdateFogOfWar = false;
     }
-    if( mEndTurn ) this->endTurn();
-    else
+
+    //if( mEndTurn ) this->endTurn( );
+    if( !mWaitingForPlayer && !mCurrentUnits.at( mWorld->mSelectedUnit )->mHasMoved && !mCurrentUnits.at( mWorld->mSelectedUnit )->isMoving() )
         mWorld->mStateStack->pushState( States::ActionMenuState );
 
     // The onscreen debugging view of influence set to show offensive influence by default
@@ -64,6 +66,7 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
             com.action( *this, dt );
         }
     }
+
 }
 void Grid::drawCurrent( sf::RenderTarget&, sf::RenderStates ) const
 {
@@ -84,6 +87,8 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                 flag = true; // break out loop, the square has been found
                 if( square->isVisible )
                 {
+                    std::cout << "Sqr Clicked: " << i << ", " << j << std::endl;
+
                     /* OLD WAY REMOVE ONCE INITATIVE SYSTEM COMPLETE
                     if( square->isOccupied && !this->mUnitAwaitingOrders )
                     {
@@ -133,6 +138,7 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                             unit->mSelectedAbility = "NONE";
                             unit->mHasSpentAction = true;
                             unit->mIsSelectedUnit = false;
+                            mWaitingForPlayer = false;
                             this->clearGrid();
                         }
                     }
@@ -148,6 +154,7 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                             mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
                             mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
                         }
+                        mWaitingForPlayer = false;
                     }
                 }
             }
@@ -277,6 +284,7 @@ void Grid::selectUnit( unsigned int i, unsigned int j )
             if( unit->mIsVisible && (( !mWorld->mNetworkedWorld && !mWorld->mLocalMultiplayerWorld && mWorld->mCurrentTurn & Category::Blue ) ||
                     mWorld->mNetworkedWorld || mWorld->mLocalMultiplayerWorld ) )
                 mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
+            std::cout << "Sqr Is New Location: " << loc.x << ", " << loc.y << std::endl;
         }
         mSelectedGridIndex = sf::Vector2i( i, j );
         mWorld->setSelectedUnit( unit->mID );
@@ -375,11 +383,12 @@ void Grid::endTurn( void )
         mSelectedGridIndex = sf::Vector2i( mCurrentUnits.at( next )->mGridIndex.x, mCurrentUnits.at( next )->mGridIndex.y );
         mWorld->mWorldView.setCenter( mSelectedGridIndex.x * TILE_SIZE, mSelectedGridIndex.y * TILE_SIZE );
 
-        mWorld->setSelectedUnit( mCurrentUnits.at( next )->mID );
+        // mWorld->setSelectedUnit( mCurrentUnits.at( next )->mID );
+        mWorld->mSelectedUnit = mCurrentUnits.at( next )->mID;
         mCurrentUnits.at( next )->mIsSelectedUnit = true;
         mWorld->mStateStack->pushState( States::ActionMenuState );
     }
-    // selectUnit( mCurrentUnits.at( next )->mGridIndex.x, mCurrentUnits.at( next )->mGridIndex.y );
+    else std::cout << "Error getting next unit to play, Grid::endTurn()" << std::endl;
 }
 
 bool Grid::handleEvent( sf::Event )
@@ -413,12 +422,11 @@ unsigned int Grid::getMoveCost( int unitType, unsigned int terrainType )
 
 void Grid::updateFogOfWar( void )
 {
-    /*
     if( mUpdateFogOfWar && !mWorld->mLocalMultiplayerWorld )
     {
         // Fill fog completly
         for( unsigned int i = 0; i < mData.size(); ++i )
-            mData[i].isVisible = false;
+            mData[i].isVisible = true;
 
         // traverse units and buildPos using perception to mark visible squares
         for( auto unit : mCurrentUnits )
@@ -456,7 +464,6 @@ void Grid::updateFogOfWar( void )
                 else if( square.buildingID > -1 ) mCurrentBuildings.at( square.buildingID )->mIsVisible = true;
             }
     }
-    */
 }
 
 int Grid::getNextUnit( void )
@@ -466,8 +473,9 @@ int Grid::getNextUnit( void )
     {
         for( unsigned int i = 0; i < mCurrentUnits.size(); ++i )
             if( !unit || unit->mInitiative < mCurrentUnits.at( i )->mInitiative ) unit = mCurrentUnits.at(i);
-        std::cout << "The Player has no available units to use. Open spawn point menu or end match here." << std::endl;
+
         assert( unit );
+
         if( unit->mInitiative < 99 )
             for( unsigned int i = 0; i < mCurrentUnits.size(); ++i ) mCurrentUnits.at(i)->mInitiative += randomInt( mCurrentUnits.at(i)->mSpeed * 10 ) + mCurrentUnits.at(i)->mSpeed * 2;
         else break;

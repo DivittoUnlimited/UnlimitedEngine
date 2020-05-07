@@ -15,8 +15,9 @@
 ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
 {
-    sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
-    pos -= world->mDeltaMousePosition;
+    sf::Vector2f pos = world->mWorldView.getCenter();
+    //sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
+    //pos -= world->mDeltaMousePosition;
 
     auto Move = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     Move->setPosition( pos.x - 64, pos.y - 96 );
@@ -24,6 +25,7 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     Move->setCallback( [this, world] ( )
     {
         world->mMovementGrid->selectUnit( world->mMovementGrid->mSelectedGridIndex.x, world->mMovementGrid->mSelectedGridIndex.y );
+        world->mMovementGrid->mWaitingForPlayer = true;
         this->requestStackPop( );
     });
 
@@ -53,6 +55,7 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     none->setCallback( [this, world] ( )
     {
         world->mMovementGrid->endTurn();
+        world->mMovementGrid->mWaitingForPlayer = false;
         requestStackPop( );
     });
 
@@ -71,7 +74,7 @@ void ActionMenuState::draw( )
 
 bool ActionMenuState::update( sf::Time )
 {
-    return true;
+    return false;
 }
 
 bool ActionMenuState::handleEvent( const sf::Event& event )

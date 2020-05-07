@@ -39,6 +39,7 @@ public:
 
     void                    modHealth( int amount );
     void                    modMorale( int amount );
+    bool                    isMoving( void );
 
     //## Attributes
     unsigned int mID;

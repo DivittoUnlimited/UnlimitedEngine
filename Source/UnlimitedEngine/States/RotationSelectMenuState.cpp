@@ -19,7 +19,7 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
     AbilityData* ability = &unit->mAbilities.at( unit->mSelectedAbility );
 
     sf::Vector2f pos = sf::Vector2f( ability->origin.x * TILE_SIZE, ability->origin.y * TILE_SIZE );
-    pos -= world->mDeltaMousePosition;
+    //pos -= world->mDeltaMousePosition;
 
     auto button1 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     button1->setPosition( pos.x - 64, pos.y - 96 );

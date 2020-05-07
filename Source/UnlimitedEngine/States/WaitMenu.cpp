@@ -19,7 +19,7 @@ WaitMenu::WaitMenu( States::ID id, StateStack& stack, Context context, World* wo
     : State( id, stack, context )
 {
     sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
-    pos -= world->mDeltaMousePosition;
+    //pos -= world->mDeltaMousePosition;
 
     auto rest = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     rest->setPosition( pos.x - 64, pos.y - 96 );
