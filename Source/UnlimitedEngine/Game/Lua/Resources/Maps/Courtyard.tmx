@@ -53,31 +53,6 @@
     <property name="Team" value="Red"/>
    </properties>
   </object>
-  <object id="4" type="Fighter" gid="50" x="128" y="256" width="64" height="64">
-   <properties>
-    <property name="Team" value="Red"/>
-   </properties>
-  </object>
-  <object id="5" type="Fighter" gid="50" x="128" y="128" width="64" height="64">
-   <properties>
-    <property name="Team" value="Red"/>
-   </properties>
-  </object>
-  <object id="6" type="Fighter" gid="50" x="384" y="1856" width="64" height="64">
-   <properties>
-    <property name="Team" value="Blue"/>
-   </properties>
-  </object>
-  <object id="7" type="Fighter" gid="50" x="960" y="704" width="64" height="64">
-   <properties>
-    <property name="Team" value="Blue"/>
-   </properties>
-  </object>
-  <object id="8" type="Fighter" gid="50" x="704" y="1792" width="64" height="64">
-   <properties>
-    <property name="Team" value="Blue"/>
-   </properties>
-  </object>
   <object id="9" type="TacticalLocation" x="320" y="1856" width="64" height="64">
    <properties>
     <property name="Importance" value="10"/>

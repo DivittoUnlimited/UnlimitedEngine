@@ -109,7 +109,6 @@ bool World::update( sf::Time dt )
     try{ mSceneGraph.update( dt, mCommandQueue ); }
     catch( std::exception& e ) { std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl; }
 
-
     /*
         try{ handleCollisions( ); }
         catch( std::exception& e ) {
@@ -118,10 +117,6 @@ bool World::update( sf::Time dt )
     */
     if( mMovementGrid->mEndTurn ) mMovementGrid->endTurn( );
     mSceneGraph.removeWrecks( );
-
-    /* OLD WAY
-    if( mChangeTurnTextTimer > sf::Time::Zero )
-        mChangeTurnTextTimer -= dt;
 
     // Update the view
     if( sf::Keyboard::isKeyPressed( sf::Keyboard::Up ) ) // || sf::Mouse::getPosition().y < 100 )
@@ -152,7 +147,6 @@ bool World::update( sf::Time dt )
         mBlueTeamStats->move( mCameraPanSpeed, 0 );
         mRedTeamStats->move( mCameraPanSpeed, 0 );
     }
-    */
 
     return true;
 }

@@ -14,8 +14,9 @@
 AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
 {
-    sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
-    //pos -= world->mDeltaMousePosition;
+    sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
+    pos.x += WINDOW_WIDTH / 2;
+    pos.y += WINDOW_HEIGHT / 2;
 
     // Get current units abilities to name buttons
     std::vector<std::string> buttonNames;
@@ -173,6 +174,7 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
     exit->setCallback( [this] ( )
     {
         requestStackPop( );
+        requestStackPush( States::ActionMenuState );
     });
 
     mGUIContainer.pack( button1 );

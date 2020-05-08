@@ -50,10 +50,6 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
         mUpdateFogOfWar = false;
     }
 
-    //if( mEndTurn ) this->endTurn( );
-    if( !mWaitingForPlayer && !mCurrentUnits.at( mWorld->mSelectedUnit )->mHasMoved && !mCurrentUnits.at( mWorld->mSelectedUnit )->isMoving() )
-        mWorld->mStateStack->pushState( States::ActionMenuState );
-
     // The onscreen debugging view of influence set to show offensive influence by default
     if( mUpdateInfluenceMap ) updateInfluenceMap( );
 
@@ -113,7 +109,11 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                             mCurrentUnits.at( mCurrentUnits.size() - 1 )->mHasMoved = true;
                             clearGrid( );
                         }
-                        else moveUnit( mCurrentUnits.at( mWorld->getSelectedUnit() )->mGridIndex, square->gridIndex  );
+                        else
+                        {
+                            moveUnit( mCurrentUnits.at( mWorld->getSelectedUnit() )->mGridIndex, square->gridIndex  );
+                        }
+                        mWaitingForPlayer = false;
                     }
                     else if( square->isPossibleAttackPosition  )
                     {
@@ -289,6 +289,7 @@ void Grid::selectUnit( unsigned int i, unsigned int j )
         mSelectedGridIndex = sf::Vector2i( i, j );
         mWorld->setSelectedUnit( unit->mID );
         unit->mIsSelectedUnit = true;
+        mWaitingForPlayer = true;
     }
 }
 
@@ -377,15 +378,17 @@ void Grid::endTurn( void )
     mEndTurn = false;
     updateTurnOrderIndicators( );
 
-    int next = getNextUnit( );
-    if( next > -1 )
+    Unit* next = getNextUnit( );
+    if( next )
     {
-        mSelectedGridIndex = sf::Vector2i( mCurrentUnits.at( next )->mGridIndex.x, mCurrentUnits.at( next )->mGridIndex.y );
+        mSelectedGridIndex = sf::Vector2i( next->mGridIndex.x, next->mGridIndex.y );
         mWorld->mWorldView.setCenter( mSelectedGridIndex.x * TILE_SIZE, mSelectedGridIndex.y * TILE_SIZE );
 
+        std::cout << "endTurn worldView Pos: " << mWorld->mWorldView.getCenter().x << ", " << mWorld->mWorldView.getCenter().y << std::endl;
+
         // mWorld->setSelectedUnit( mCurrentUnits.at( next )->mID );
-        mWorld->mSelectedUnit = mCurrentUnits.at( next )->mID;
-        mCurrentUnits.at( next )->mIsSelectedUnit = true;
+        mWorld->mSelectedUnit = next->mID;
+        next->mIsSelectedUnit = true;
         mWorld->mStateStack->pushState( States::ActionMenuState );
     }
     else std::cout << "Error getting next unit to play, Grid::endTurn()" << std::endl;
@@ -466,7 +469,7 @@ void Grid::updateFogOfWar( void )
     }
 }
 
-int Grid::getNextUnit( void )
+Unit* Grid::getNextUnit( void )
 {
     Unit* unit = nullptr;
     while( true )
@@ -480,7 +483,7 @@ int Grid::getNextUnit( void )
             for( unsigned int i = 0; i < mCurrentUnits.size(); ++i ) mCurrentUnits.at(i)->mInitiative += randomInt( mCurrentUnits.at(i)->mSpeed * 10 ) + mCurrentUnits.at(i)->mSpeed * 2;
         else break;
     }
-    return unit->mID;
+    return unit;
 }
 
 void Grid::updateTurnOrderIndicators( void )

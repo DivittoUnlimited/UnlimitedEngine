@@ -18,8 +18,9 @@
 WaitMenu::WaitMenu( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
 {
-    sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
-    //pos -= world->mDeltaMousePosition;
+    sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
+    pos.x += WINDOW_WIDTH / 2;
+    pos.y += WINDOW_HEIGHT / 2;
 
     auto rest = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     rest->setPosition( pos.x - 64, pos.y - 96 );
@@ -66,6 +67,7 @@ WaitMenu::WaitMenu( States::ID id, StateStack& stack, Context context, World* wo
     none->setCallback( [this] ( )
     {
         this->requestStackPop( );
+        requestStackPush( States::ActionMenuState );
     });
 
     mGUIContainer.pack( rest );

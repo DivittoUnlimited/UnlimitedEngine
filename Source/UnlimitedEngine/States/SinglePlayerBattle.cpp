@@ -111,17 +111,17 @@ bool SinglePlayerBattle::handleEvent( const sf::Event& event )
         requestStackPush( States::Pause );
     else if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
     {
-        mPlayer.handleEvent( event, mWorld.getCommandQueue() );
-        /* OLD WAY REMOVE ONCE WORKING
+        //mPlayer.handleEvent( event, mWorld.getCommandQueue() );
+
         // create a new event with delta mouse pos
         sf::Event newEvent;
         newEvent.type = sf::Event::MouseButtonReleased;
         newEvent.mouseButton.button = sf::Mouse::Left;
-        newEvent.mouseButton.x = event.mouseButton.x + mWorld.mDeltaMousePosition.x;
-        newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
+        newEvent.mouseButton.x = event.mouseButton.x - mWorld.mWorldView.getCenter().x;
+        newEvent.mouseButton.y = event.mouseButton.y - mWorld.mWorldView.getCenter().y;
 
         mPlayer.handleEvent( newEvent, mWorld.getCommandQueue( ) );
-        */
+
     }
     else
     {

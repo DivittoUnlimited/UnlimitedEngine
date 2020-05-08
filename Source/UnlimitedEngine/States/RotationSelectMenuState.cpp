@@ -18,8 +18,9 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
     Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
     AbilityData* ability = &unit->mAbilities.at( unit->mSelectedAbility );
 
-    sf::Vector2f pos = sf::Vector2f( ability->origin.x * TILE_SIZE, ability->origin.y * TILE_SIZE );
-    //pos -= world->mDeltaMousePosition;
+    sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
+    pos.x += WINDOW_WIDTH / 2;
+    pos.y += WINDOW_HEIGHT / 2;
 
     auto button1 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     button1->setPosition( pos.x - 64, pos.y - 96 );
@@ -100,6 +101,7 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
     exit->setCallback( [this] ( )
     {
         requestStackPop( );
+        requestStackPush( States::AbilitySelectMenuState );
     });
 
     mGUIContainer.pack( button1 );
