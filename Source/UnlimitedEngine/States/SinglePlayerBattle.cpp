@@ -117,8 +117,8 @@ bool SinglePlayerBattle::handleEvent( const sf::Event& event )
         sf::Event newEvent;
         newEvent.type = sf::Event::MouseButtonReleased;
         newEvent.mouseButton.button = sf::Mouse::Left;
-        newEvent.mouseButton.x = event.mouseButton.x - mWorld.mWorldView.getCenter().x;
-        newEvent.mouseButton.y = event.mouseButton.y - mWorld.mWorldView.getCenter().y;
+        newEvent.mouseButton.x = event.mouseButton.x - mWorld.mDeltaMousePosition.x;
+        newEvent.mouseButton.y = event.mouseButton.y - mWorld.mDeltaMousePosition.y;
 
         mPlayer.handleEvent( newEvent, mWorld.getCommandQueue( ) );
 

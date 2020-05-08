@@ -118,34 +118,31 @@ bool World::update( sf::Time dt )
     if( mMovementGrid->mEndTurn ) mMovementGrid->endTurn( );
     mSceneGraph.removeWrecks( );
 
+
     // Update the view
-    if( sf::Keyboard::isKeyPressed( sf::Keyboard::Up ) ) // || sf::Mouse::getPosition().y < 100 )
+    if( sf::Keyboard::isKeyPressed( sf::Keyboard::W ) ) // || sf::Mouse::getPosition().y < 100 )
     {
         mWorldView.move( 0.0f, -1 * mCameraPanSpeed );
-        //mDeltaMousePosition.y -= mCameraPanSpeed;
-        mBlueTeamStats->move( 0, -mCameraPanSpeed );
-        mRedTeamStats->move( 0, -mCameraPanSpeed );
+        mBlueTeamStats->move( 0.0f, -1 * mCameraPanSpeed );
+        mRedTeamStats->move( 0.0f, -1 * mCameraPanSpeed );
     }
-    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Down  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::S  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
     {
         mWorldView.move( 0.0f, mCameraPanSpeed );
-        //mDeltaMousePosition.y += mCameraPanSpeed;
-        mBlueTeamStats->move( 0, mCameraPanSpeed );
-        mRedTeamStats->move( 0, mCameraPanSpeed );
+        mBlueTeamStats->move( 0.0f, mCameraPanSpeed );
+        mRedTeamStats->move( 0.0f, mCameraPanSpeed );
     }
-    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Left  ) ) //  || sf::Mouse::getPosition().x < 100 )
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::A  ) ) //  || sf::Mouse::getPosition().x < 100 )
     {
         mWorldView.move( -1 * mCameraPanSpeed, 0.0f );
-        //mDeltaMousePosition.x -= mCameraPanSpeed;
-        mBlueTeamStats->move( -mCameraPanSpeed, 0 );
-        mRedTeamStats->move( -mCameraPanSpeed, 0 );
+        mBlueTeamStats->move( -1 * mCameraPanSpeed, 0.0f );
+        mRedTeamStats->move( -1 * mCameraPanSpeed, 0.0f );
     }
-    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::Right ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::D ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
     {
         mWorldView.move( mCameraPanSpeed, 0.0f );
-        //mDeltaMousePosition.x += mCameraPanSpeed;
-        mBlueTeamStats->move( mCameraPanSpeed, 0 );
-        mRedTeamStats->move( mCameraPanSpeed, 0 );
+        mBlueTeamStats->move( mCameraPanSpeed, 0.0f );
+        mRedTeamStats->move( mCameraPanSpeed, 0.0f );
     }
 
     return true;
@@ -532,9 +529,11 @@ void World::buildScene( std::string tileMapFilePath )
         // Add HUD
         std::unique_ptr<TeamStats> mBlueTeam( new TeamStats( Category::TeamBlue, mFonts ) );
         mBlueTeamStats = mBlueTeam.get();
+        mBlueTeamStats->setPosition( mWorldView.getViewport().left, mWorldView.getViewport().top );
         mSceneGraph.attachChild( std::move( mBlueTeam ) );
         std::unique_ptr<TeamStats> mRedTeam( new TeamStats( Category::TeamRed, mFonts ) );
         mRedTeamStats = mRedTeam.get();
+        mRedTeamStats->setPosition( mWorldView.getViewport().left, mWorldView.getViewport().top );
         mSceneGraph.attachChild( std::move( mRedTeam ) );
         mRedTeamStats->mDisplay = false;
         mBlueTeamStats->mDisplay = true;
