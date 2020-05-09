@@ -303,5 +303,5 @@ void Unit::modMorale( int amount )
 
 bool Unit::isMoving( void )
 {
-    return mPath && mPath->size( ) > 0; // if path is empty then unit is not moving :)
+    return mDestination != sf::Vector2f( -1.0f, -1.0f ); // if path is empty then unit is not moving :)
 }

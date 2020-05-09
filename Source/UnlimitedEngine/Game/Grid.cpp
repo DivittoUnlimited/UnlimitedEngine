@@ -50,6 +50,13 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
         mUpdateFogOfWar = false;
     }
 
+    if( mCurrentUnits.at( mWorld->mSelectedUnit )->isMoving( ) )
+        mCurrentUnits.at( mWorld->mSelectedUnit )->mHasMoved = true;
+    else if( !mWaitingForPlayer && !mCurrentUnits.at( mWorld->mSelectedUnit )->isMoving( ) && mCurrentUnits.at( mWorld->mSelectedUnit )->mHasMoved )
+    {
+        mWorld->mStateStack->pushState( States::ActionMenuState );
+    }
+
     // The onscreen debugging view of influence set to show offensive influence by default
     if( mUpdateInfluenceMap ) updateInfluenceMap( );
 
@@ -273,7 +280,7 @@ void Grid::removeUnit( sf::Vector2i position )
 void Grid::selectUnit( unsigned int i, unsigned int j )
 {
     Unit* unit = mCurrentUnits[mData[j * mGridWidth + i].unitID];
-    if( unit ) // units can only move once per turn
+    if( unit && !unit->mHasMoved ) // units can only move once per turn
     {
         std::vector<sf::Vector2i> possibleLocations = getPossiblePositions(
                                                     sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ),
@@ -284,12 +291,16 @@ void Grid::selectUnit( unsigned int i, unsigned int j )
             if( unit->mIsVisible && (( !mWorld->mNetworkedWorld && !mWorld->mLocalMultiplayerWorld && mWorld->mCurrentTurn & Category::Blue ) ||
                     mWorld->mNetworkedWorld || mWorld->mLocalMultiplayerWorld ) )
                 mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
-            std::cout << "Sqr Is New Location: " << loc.x << ", " << loc.y << std::endl;
         }
         mSelectedGridIndex = sf::Vector2i( i, j );
         mWorld->setSelectedUnit( unit->mID );
         unit->mIsSelectedUnit = true;
         mWaitingForPlayer = true;
+    }
+    else
+    {
+        mWorld->mStateStack->pushState( States::ActionMenuState );
+        // Play error sound effect or something to indicate the unit cant move
     }
 }
 
@@ -308,7 +319,6 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
         oldSquare->unitID = -1;
         oldSquare->isOccupied = false;
         newSquare->isOccupied = true;
-        unit->mHasMoved = true;
         unit->mGridIndex = newPos;
         mSelectedGridIndex = newPos;
         unit->addModifier( StatModifier( "initiative", "10-25", 1 ) );
@@ -383,16 +393,14 @@ void Grid::endTurn( void )
     {
         mSelectedGridIndex = sf::Vector2i( next->mGridIndex.x, next->mGridIndex.y );
         mWorld->mWorldView.setCenter( mSelectedGridIndex.x * TILE_SIZE, mSelectedGridIndex.y * TILE_SIZE );
-
-        std::cout << "endTurn worldView Pos: " << mWorld->mWorldView.getCenter().x << ", " << mWorld->mWorldView.getCenter().y << std::endl;
-        //sf::Mouse::setPosition( sf::Vector2i( next->getPosition() ) );
         mWorld->mDeltaMousePosition.x -= next->getPosition().x - WINDOW_WIDTH / 2;
         mWorld->mDeltaMousePosition.y -= next->getPosition().y - WINDOW_HEIGHT / 2 + TILE_SIZE / 2;
-
         mWorld->mBlueTeamStats->setPosition( next->getPosition().x - 500, next->getPosition().y - 350 );
         mWorld->mRedTeamStats->setPosition( next->getPosition().x - 500,  next->getPosition().y - 350 );
 
-        // mWorld->setSelectedUnit( mCurrentUnits.at( next )->mID );
+        // clear unit stats for a fresh turn here
+        next->mHasMoved = false;
+        next->mHasSpentAction = false;
         mWorld->mSelectedUnit = next->mID;
         next->mIsSelectedUnit = true;
         mWorld->mStateStack->pushState( States::ActionMenuState );

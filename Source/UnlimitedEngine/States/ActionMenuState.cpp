@@ -29,7 +29,6 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     {
         world->mMovementGrid->mWaitingForPlayer = true;
         world->mMovementGrid->selectUnit( world->mMovementGrid->mSelectedGridIndex.x, world->mMovementGrid->mSelectedGridIndex.y );
-
         this->requestStackPop( );
     });
 
