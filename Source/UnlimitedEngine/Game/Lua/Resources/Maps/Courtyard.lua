@@ -226,8 +226,8 @@ return {
           name = "",
           type = "Fighter",
           shape = "rectangle",
-          x = 192,
-          y = 320,
+          x = 320,
+          y = 512,
           width = 64,
           height = 64,
           rotation = 0,
@@ -235,22 +235,6 @@ return {
           visible = true,
           properties = {
             ["Team"] = "Blue"
-          }
-        },
-        {
-          id = 11,
-          name = "",
-          type = "Fighter",
-          shape = "rectangle",
-          x = 192,
-          y = 192,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 50,
-          visible = true,
-          properties = {
-            ["Team"] = "Red"
           }
         }
       }

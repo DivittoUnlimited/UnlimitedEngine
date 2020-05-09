@@ -385,8 +385,9 @@ void Grid::endTurn( void )
         mWorld->mWorldView.setCenter( mSelectedGridIndex.x * TILE_SIZE, mSelectedGridIndex.y * TILE_SIZE );
 
         std::cout << "endTurn worldView Pos: " << mWorld->mWorldView.getCenter().x << ", " << mWorld->mWorldView.getCenter().y << std::endl;
-        sf::Mouse::setPosition( sf::Vector2i( next->getPosition() ) );
-        mWorld->mDeltaMousePosition = next->getPosition();
+        //sf::Mouse::setPosition( sf::Vector2i( next->getPosition() ) );
+        mWorld->mDeltaMousePosition.x -= next->getPosition().x - WINDOW_WIDTH / 2;
+        mWorld->mDeltaMousePosition.y -= next->getPosition().y - WINDOW_HEIGHT / 2 + TILE_SIZE / 2;
 
         mWorld->mBlueTeamStats->setPosition( next->getPosition().x - 500, next->getPosition().y - 350 );
         mWorld->mRedTeamStats->setPosition( next->getPosition().x - 500,  next->getPosition().y - 350 );
