@@ -14,9 +14,11 @@
 
 ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
+    , mWorld( world )
 {
 
     sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
+    //sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
     pos.x += WINDOW_WIDTH / 2;
     pos.y += WINDOW_HEIGHT / 2;
 
@@ -27,9 +29,11 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     Move->setText( "Move" );
     Move->setCallback( [this, world] ( )
     {
-        world->mMovementGrid->mWaitingForPlayer = true;
-        world->mMovementGrid->selectUnit( world->mMovementGrid->mSelectedGridIndex.x, world->mMovementGrid->mSelectedGridIndex.y );
-        this->requestStackPop( );
+        if( !mWorld->mMovementGrid->mCurrentUnits.at( world->mSelectedUnit )->mHasMoved )
+        {
+            world->mMovementGrid->selectUnit( world->mMovementGrid->mSelectedGridIndex.x, world->mMovementGrid->mSelectedGridIndex.y );
+            this->requestStackPop( );
+        }
     });
 
     auto Actions = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -37,10 +41,12 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     Actions->setText( "Actions" );
     Actions->setCallback( [this, world] ( )
     {
-        this->requestStackPop( );
         Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
         if( !unit->mHasSpentAction )
+        {
+            this->requestStackPop( );
             this->requestStackPush( States::AbilitySelectMenuState );
+        }
     });
 
     auto Wait = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -57,8 +63,7 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     none->setText( "End Turn" );
     none->setCallback( [this, world] ( )
     {
-        world->mMovementGrid->endTurn();
-        world->mMovementGrid->mWaitingForPlayer = false;
+        world->mMovementGrid->mEndTurn = true;
         requestStackPop( );
     });
 
@@ -71,13 +76,30 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
 void ActionMenuState::draw( )
 {
     sf::RenderTarget& window = *getContext( ).window;
-    window.setView(window.getDefaultView( ) );
+    window.setView( window.getDefaultView( ) );
     window.draw( mGUIContainer );
 }
 
 bool ActionMenuState::update( sf::Time )
 {
-    return false;
+    // Update the view
+    if( sf::Keyboard::isKeyPressed( sf::Keyboard::W ) ) // || sf::Mouse::getPosition().y < 100 )
+    {
+        this->mGUIContainer.move( 0, mWorld->mCameraPanSpeed );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::S  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
+    {
+        this->mGUIContainer.move( 0, -1 * mWorld->mCameraPanSpeed );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::A  ) ) //  || sf::Mouse::getPosition().x < 100 )
+    {
+        this->mGUIContainer.move( mWorld->mCameraPanSpeed, 0 );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::D ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
+    {
+        this->mGUIContainer.move( -1 * mWorld->mCameraPanSpeed, 0 );
+    }
+    return true;
 }
 
 bool ActionMenuState::handleEvent( const sf::Event& event )

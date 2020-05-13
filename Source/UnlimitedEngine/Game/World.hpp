@@ -68,9 +68,6 @@ public:
     /// Register all possible states for later use
     void registerStates( );
 
-    int getSelectedUnit( void ) { return mSelectedUnit; }
-    void setSelectedUnit( int id ) { this->mSelectedUnit = id; }
-
     void setSelectedBuilding( int selectedBuilding ) { this->mSelectedBuilding = selectedBuilding; }
     int getSelectedBuilding( void ) { return mSelectedBuilding; }
 

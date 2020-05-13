@@ -13,8 +13,10 @@
 
 AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
+    , mWorld( world )
 {
     sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
+    //sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
     pos.x += WINDOW_WIDTH / 2;
     pos.y += WINDOW_HEIGHT / 2;
 
@@ -30,7 +32,6 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
     button1->setCallback( [=] ( )
     {
         // get targetSquares
-        world->setSelectedUnit( unit->mID );
         unit->mSelectedAbility = buttonNames[0];
         AbilityData* ability = &unit->mAbilities.at( buttonNames[0] );
         std::vector<sf::Vector2i> targets;
@@ -62,13 +63,12 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
                 {
                     // get all units inside AOE from grid
                     int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-                    if( id > 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( buttonNames[0], world->mMovementGrid->mCurrentUnits.at( id ) );
+                    if( id >= 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( buttonNames[0], world->mMovementGrid->mCurrentUnits.at( id ) );
                 }
                 this->requestStackPop( );
-                unit->mSelectedAbility = "NONE";
-                unit->mHasSpentAction = true;
-                unit->mIsSelectedUnit = false;
+                world->mMovementGrid->mWaitingForPlayer = false;
             }
+
         }
     });
 
@@ -78,7 +78,6 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
     button2->setCallback( [=] ( )
     {
         // get targetSquares
-        world->setSelectedUnit( unit->mID );
         unit->mSelectedAbility = buttonNames[1];
         AbilityData* ability = &unit->mAbilities.at( buttonNames[1] );
         std::vector<sf::Vector2i> targets;
@@ -113,10 +112,8 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
                     if( id > 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( buttonNames[1], world->mMovementGrid->mCurrentUnits.at( id ) );
                 }
                 this->requestStackPop( );
-                unit->mSelectedAbility = "NONE";
-                unit->mHasSpentAction = true;
-                unit->mIsSelectedUnit = false;
-            }
+                world->mMovementGrid->mWaitingForPlayer = false;
+            }          
         }
     });
 
@@ -126,7 +123,6 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
     button3->setCallback( [=] ( )
     {
         // get targetSquares
-        world->setSelectedUnit( unit->mID );
         unit->mSelectedAbility = buttonNames[2];
         AbilityData* ability = &unit->mAbilities.at( buttonNames[2] );
         std::vector<sf::Vector2i> targets;
@@ -161,10 +157,8 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
                     if( id > 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( buttonNames[2], world->mMovementGrid->mCurrentUnits.at( id ) );
                 }
                 this->requestStackPop( );
-                unit->mSelectedAbility = "NONE";
-                unit->mHasSpentAction = true;
-                unit->mIsSelectedUnit = false;;
-            }
+                world->mMovementGrid->mWaitingForPlayer = false;
+            }          
         }
     });
 
@@ -195,7 +189,24 @@ void AbilitySelectMenuState::draw( )
 
 bool AbilitySelectMenuState::update( sf::Time )
 {
-    return false;
+    // Update the view
+    if( sf::Keyboard::isKeyPressed( sf::Keyboard::W ) ) // || sf::Mouse::getPosition().y < 100 )
+    {
+        this->mGUIContainer.move( 0, mWorld->mCameraPanSpeed );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::S  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
+    {
+        this->mGUIContainer.move( 0, -1 * mWorld->mCameraPanSpeed );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::A  ) ) //  || sf::Mouse::getPosition().x < 100 )
+    {
+        this->mGUIContainer.move( mWorld->mCameraPanSpeed, 0 );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::D ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
+    {
+        this->mGUIContainer.move( -1 * mWorld->mCameraPanSpeed, 0 );
+    }
+    return true;
 }
 
 bool AbilitySelectMenuState::handleEvent( const sf::Event& event )

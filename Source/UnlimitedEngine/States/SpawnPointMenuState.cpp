@@ -33,7 +33,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     fighter->setText( "Fighter" );
     fighter->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Fighter" ) );
         this->requestStackPop( );
     });
 
@@ -42,7 +41,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     templar->setText( "Templar" );
     templar->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Templar" ) );
         this->requestStackPop( );
     });
 
@@ -51,7 +49,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     medic->setText( "Medic" );
     medic->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Medic" ) );
         this->requestStackPop( );
     });
 
@@ -60,7 +57,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     rogue->setText( "Rogue" );
     rogue->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Rogue" ) );
         this->requestStackPop( );
     });
 
@@ -69,7 +65,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     archer->setText( "Archer" );
     archer->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Archer" ) );
         this->requestStackPop( );
     });
 
@@ -78,7 +73,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     scout->setText( "Scout" );
     scout->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Scout" ) );
         this->requestStackPop( );
     });
 
@@ -87,7 +81,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     wizard->setText( "Wizard" );
     wizard->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Wizard" ) );
         this->requestStackPop( );
     });
 
@@ -96,7 +89,6 @@ SpawnPointMenuState::SpawnPointMenuState( States::ID id, StateStack& stack, Cont
     bard->setText( "Bard" );
     bard->setCallback( [this, world] ( )
     {
-        world->setSelectedUnit( UnitTypeMap.at( "Bard" ) );
         this->requestStackPop( );
     });
 

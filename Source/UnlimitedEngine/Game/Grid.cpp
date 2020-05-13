@@ -50,10 +50,26 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
         mUpdateFogOfWar = false;
     }
 
-    if( mCurrentUnits.at( mWorld->mSelectedUnit )->isMoving( ) )
-        mCurrentUnits.at( mWorld->mSelectedUnit )->mHasMoved = true;
-    else if( !mWaitingForPlayer && !mCurrentUnits.at( mWorld->mSelectedUnit )->isMoving( ) && mCurrentUnits.at( mWorld->mSelectedUnit )->mHasMoved )
+    Unit* unit = mCurrentUnits.at( mWorld->mSelectedUnit );
+    if( unit->mHasMoved && unit->mHasSpentAction && unit->mAnimationTimer == sf::Time::Zero && !unit->isMoving()) mEndTurn = true;
+
+    if( mEndTurn && unit->mAnimationTimer <= sf::Time::Zero && !unit->isMoving( ) )
+        endTurn( );
+    else if( !mWaitingForPlayer && !unit->mHasSpentAction && unit->mHasMoved && !unit->isMoving() && unit->mAnimationTimer == sf::Time::Zero )
     {
+        Unit* next = mCurrentUnits.at( mWorld->mSelectedUnit );
+        mWorld->mWorldView.setCenter( mSelectedGridIndex.x * TILE_SIZE, mSelectedGridIndex.y * TILE_SIZE );
+        mWorld->mDeltaMousePosition = sf::Vector2f( 0,0 );
+        mWorld->mDeltaMousePosition.x -= next->getPosition().x - WINDOW_WIDTH / 2;
+        mWorld->mDeltaMousePosition.y -= next->getPosition().y - WINDOW_HEIGHT / 2 + TILE_SIZE / 2;
+        mWorld->mBlueTeamStats->setPosition( next->getPosition().x - 500, next->getPosition().y - 350 );
+        mWorld->mRedTeamStats->setPosition( next->getPosition().x - 500,  next->getPosition().y - 350 );
+        mWaitingForPlayer = true;
+        mWorld->mStateStack->pushState( States::ActionMenuState );
+    }
+    else if( !mWaitingForPlayer && unit->mHasSpentAction && unit->mAnimationTimer == sf::Time::Zero && !unit->mHasMoved && !unit->isMoving( ) )
+    {
+        mWaitingForPlayer = true;
         mWorld->mStateStack->pushState( States::ActionMenuState );
     }
 
@@ -69,7 +85,6 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
             com.action( *this, dt );
         }
     }
-
 }
 void Grid::drawCurrent( sf::RenderTarget&, sf::RenderStates ) const
 {
@@ -90,7 +105,7 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                 flag = true; // break out loop, the square has been found
                 if( square->isVisible )
                 {
-                    std::cout << "Sqr Clicked: " << i << ", " << j << std::endl;
+                   //  std::cout << "Sqr Clicked: " << i << ", " << j << std::endl;
 
                     /* OLD WAY REMOVE ONCE INITATIVE SYSTEM COMPLETE
                     if( square->isOccupied && !this->mUnitAwaitingOrders )
@@ -110,7 +125,7 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                     {
                         if( mWorld->getSelectedBuilding() > -1 )  // a spawn was selected before so the player wants to drop a new unit this could be done better
                         {
-                            mWorld->spawnUnit( static_cast<unsigned int>(mWorld->getSelectedUnit()), sf::Vector2i( static_cast<int>(i), static_cast<int>(j) ) );
+                            mWorld->spawnUnit( static_cast<unsigned int>(mWorld->mSelectedUnit), sf::Vector2i( static_cast<int>(i), static_cast<int>(j) ) );
                             if( mWorld->mNetworkedWorld )
                                 mWorld->mNetworkNode->notifyGameAction( GameActions::Type::SpawnUnit, sf::Vector2f( i, j ) );
                             mCurrentUnits.at( mCurrentUnits.size() - 1 )->mHasMoved = true;
@@ -118,9 +133,10 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                         }
                         else
                         {
-                            moveUnit( mCurrentUnits.at( mWorld->getSelectedUnit() )->mGridIndex, square->gridIndex  );
+                            moveUnit( mCurrentUnits.at( mWorld->mSelectedUnit )->mGridIndex, square->gridIndex  );
                         }
-                        mWaitingForPlayer = false;
+                        if( !mCurrentUnits.at( mWorld->mSelectedUnit )->mHasSpentAction )
+                            mWaitingForPlayer = false;
                     }
                     else if( square->isPossibleAttackPosition  )
                     {
@@ -137,16 +153,13 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                             {
                                 // get all units inside AOE from grid
                                 int id = this->mData.at( (t.y+square->gridIndex.y) * (this->mGridWidth) + (t.x+square->gridIndex.x) ).unitID;
-                                if( id > 0 && id != static_cast<int>( unit->mID ) )
+                                if( id >= 0 && id != static_cast<int>( unit->mID ) )
                                 {
                                     unit->useAbility( unit->mSelectedAbility, this->mCurrentUnits.at( id ) );
                                 }
                             }
-                            unit->mSelectedAbility = "NONE";
-                            unit->mHasSpentAction = true;
-                            unit->mIsSelectedUnit = false;
-                            mWaitingForPlayer = false;
                             this->clearGrid();
+                            mWaitingForPlayer = false;
                         }
                     }
                     else if( square->buildingID > -1 && mCurrentBuildings.at( square->buildingID )->mCategory & mWorld->mCurrentTurn )
@@ -155,7 +168,7 @@ void Grid::handleLeftClick( sf::Vector2i pos )
                         mWorld->setSelectedBuilding(square->buildingID );
                         mWorld->mStateStack->pushState( States::SpawnPointMenuState );
                         // where to spawn the unit??
-                        std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( static_cast<unsigned int>(mWorld->getSelectedBuilding()) )->mGridIndex, static_cast<unsigned int>(mWorld->getSelectedUnit()), 1 );
+                        std::vector<sf::Vector2i> possibleLocations = getPossiblePositions( mCurrentBuildings.at( static_cast<unsigned int>(mWorld->getSelectedBuilding()) )->mGridIndex, static_cast<unsigned int>(mWorld->mSelectedUnit), 1 );
                         for( auto loc : possibleLocations )
                         {
                             mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
@@ -280,7 +293,7 @@ void Grid::removeUnit( sf::Vector2i position )
 void Grid::selectUnit( unsigned int i, unsigned int j )
 {
     Unit* unit = mCurrentUnits[mData[j * mGridWidth + i].unitID];
-    if( unit && !unit->mHasMoved ) // units can only move once per turn
+    if( !unit->mHasMoved ) // units can only move once per turn
     {
         std::vector<sf::Vector2i> possibleLocations = getPossiblePositions(
                                                     sf::Vector2i( static_cast<int>( i ), static_cast<int>( j ) ),
@@ -293,7 +306,7 @@ void Grid::selectUnit( unsigned int i, unsigned int j )
                 mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
         }
         mSelectedGridIndex = sf::Vector2i( i, j );
-        mWorld->setSelectedUnit( unit->mID );
+        mWorld->mSelectedUnit = unit->mID;
         unit->mIsSelectedUnit = true;
         mWaitingForPlayer = true;
     }
@@ -321,7 +334,7 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
         newSquare->isOccupied = true;
         unit->mGridIndex = newPos;
         mSelectedGridIndex = newPos;
-        unit->addModifier( StatModifier( "initiative", "10-25", 1 ) );
+        unit->addModifier( StatModifier( "initiative", "20-45", 1 ) );
         // std::cout << "Grid::MoveUnit Unit Path:" << std::endl;
         unit->mPath = new PathFinder<Square>( mData, sf::Vector2i( mGridWidth, mGridHeight ), oldSquare, newSquare,
                 [=]( Square* start, Square* goal )->float {
@@ -344,14 +357,13 @@ bool Grid::moveUnit( sf::Vector2i currentPos, sf::Vector2i newPos )
             mData[i].rect->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
         }
         mUpdateFogOfWar = true;
-        updateTurnOrderIndicators( );
     }
     return true;
 }
 
 void Grid::getTartgets( std::vector<sf::Vector2i> possibleAttackLocations )
 {
-    // std::cout << "Get Targets was called." << std::endl;
+    std::cout << "Get Targets was called." << std::endl;
     for( auto loc : possibleAttackLocations )
         if( static_cast<unsigned int>( loc.y * mGridWidth + loc.x ) < mData.size() )
         {
@@ -366,6 +378,7 @@ void Grid::getTartgets( std::vector<sf::Vector2i> possibleAttackLocations )
                 location->rect->getSprite( )->setFillColor( sf::Color( 255, 165, 0, 255 ) );
             }
         }
+    mWaitingForPlayer = true;
 }
 
 void Grid::clearGrid( void )
@@ -386,27 +399,33 @@ void Grid::clearGrid( void )
 void Grid::endTurn( void )
 {
     mEndTurn = false;
-    updateTurnOrderIndicators( );
-
     Unit* next = getNextUnit( );
     if( next )
     {
+        // clear unit stats for a fresh turn here
+        mWorld->mMovementGrid->mCurrentUnits.at( mWorld->mSelectedUnit )->mWasTheLastUnit = false;
+        next->mHasMoved = false;
+        next->mHasSpentAction = false;
+        next->mBeginingOfTurn = true;
+        mWorld->mSelectedUnit = next->mID;
+        std::cout << "The next unit id: " << next->mID << std::endl;
+        next->mIsSelectedUnit = true;
+        mWaitingForPlayer = true;
+
+        next->mWasTheLastUnit = true;
         mSelectedGridIndex = sf::Vector2i( next->mGridIndex.x, next->mGridIndex.y );
         mWorld->mWorldView.setCenter( mSelectedGridIndex.x * TILE_SIZE, mSelectedGridIndex.y * TILE_SIZE );
+        mWorld->mDeltaMousePosition = sf::Vector2f( 0, 0 );
         mWorld->mDeltaMousePosition.x -= next->getPosition().x - WINDOW_WIDTH / 2;
         mWorld->mDeltaMousePosition.y -= next->getPosition().y - WINDOW_HEIGHT / 2 + TILE_SIZE / 2;
         mWorld->mBlueTeamStats->setPosition( next->getPosition().x - 500, next->getPosition().y - 350 );
         mWorld->mRedTeamStats->setPosition( next->getPosition().x - 500,  next->getPosition().y - 350 );
-
-        // clear unit stats for a fresh turn here
-        next->mHasMoved = false;
-        next->mHasSpentAction = false;
-        mWorld->mSelectedUnit = next->mID;
-        next->mIsSelectedUnit = true;
         mWorld->mStateStack->pushState( States::ActionMenuState );
     }
     else std::cout << "Error getting next unit to play, Grid::endTurn()" << std::endl;
+    updateTurnOrderIndicators( );
 }
+
 
 bool Grid::handleEvent( sf::Event )
 {
@@ -489,12 +508,10 @@ Unit* Grid::getNextUnit( void )
     while( true )
     {
         for( unsigned int i = 0; i < mCurrentUnits.size(); ++i )
-            if( !unit || unit->mInitiative < mCurrentUnits.at( i )->mInitiative ) unit = mCurrentUnits.at(i);
+            if( !mCurrentUnits.at( i )->mWasTheLastUnit && ( unit == nullptr || ( unit->mInitiative < mCurrentUnits.at( i )->mInitiative ) ) ) unit = mCurrentUnits.at(i);
 
-        assert( unit );
-
-        if( unit->mInitiative < 99 )
-            for( unsigned int i = 0; i < mCurrentUnits.size(); ++i ) mCurrentUnits.at(i)->mInitiative += randomInt( mCurrentUnits.at(i)->mSpeed * 10 ) + mCurrentUnits.at(i)->mSpeed * 2;
+        if( unit->mInitiative < 100 )
+            for( unsigned int i = 0; i < mCurrentUnits.size(); ++i ) mCurrentUnits.at(i)->mInitiative += randomInt( mCurrentUnits.at(i)->mSpeed * 5 ) + mCurrentUnits.at(i)->mSpeed * 2;
         else break;
     }
     return unit;

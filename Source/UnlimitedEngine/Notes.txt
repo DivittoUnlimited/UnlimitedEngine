@@ -6,36 +6,16 @@ BUGS and ISSUES:
         - Project must be cleaned every time the server is run for it to work again.
     - Units can be spawned on  top of spawn points
     - Dead units crash game when turn ends
-    - That one unit is immortal....
-FEATURES:
-    - Update Turn logic
-        - Must Go from unit to unit not from team to team.
-        - Call Grid::GetNextUnit() after a player ends a units turn
-        - Call Grid::updateTurnOrderIndicators every time a player or unit does anything.
-        - The value returned by getNext unit must be set to World->mSelectedUnit()
-        - fix World->getSelectedUnit() to return proper value
-        - End turn menu no longer needed
-            - Ending turn will be done from the action menu
-        - Handle Left click will not have to "Select Unit" It will already be selected
-        - Unit ability menu will pop automaticly
-        - Must change Wife bot logic to handle one unit at a time and be able to end the unit's turn.
-        - All stat mods that a unit has aquired take place at the beggining of it's turn.
 
-    - Unit Abilities and menus
-        - Use unit->mBeginingOfTurn to enact statMod effects in update method
-            - create Abilities with longer duration statMods to test.
-            - Must finish initiative system first
-        - What happens when you use a waitMenu ability
-            - Take Gaurd
-                - boost morale and stamina
-                - if unit should be attacked before next turn they will gain an oppertunity attack
-                - Apply symbol to mark unit as taking guard on the map
-            - Recover
-                - Boost morale and stamina more than other wait menu Abilities
-                - Show stat mod effects as they happed
-            - Evade
-                - If the unit gets attacked they have an opertunity to escape without being punished.
-                - Apply symbol to indicate they are ready to run.
+FEATURES:
+
+    - I Broke the spawn points ability to spawn units :)
+    - Change unit->mWasLastUnit to int mMustWait = 0; if mMustWait > 0 unit cant be next unit
+        - This blocks units from taking a turn untill x amount of other units have moved.
+        - Also block from initiative rolls if mMustWait > 0 so they dont build up insane amount
+
+    - Update Turn logic
+        - Must change Wife bot logic to handle one unit at a time and be able to end the unit's turn.
 
     - Gold (Bonus points for Morale)
         - Player given points for total unit morale at the end of every turn

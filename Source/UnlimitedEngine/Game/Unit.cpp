@@ -27,6 +27,7 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     , mHealthBar( nullptr )
     , mFonts( fonts )
     , mCurrentStatModHUD( nullptr )
+    , mWasTheLastUnit( false )
 {
     // define unit based on data from lua
     this->mUnitType      = static_cast<unsigned int>( UnitTypeMap[data.type] );
@@ -96,7 +97,7 @@ bool Unit::isDestroyed( ) const
 {
     return mHealth <= 0;
 }
-void Unit::updateCurrent( sf::Time, CommandQueue& )
+void Unit::updateCurrent( sf::Time dt, CommandQueue& )
 {
     if( mBeginingOfTurn )
     {
@@ -158,8 +159,8 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
     if( mPath && mPath->size() > 0 && mDestination == sf::Vector2f( -1.0f, -1.0f ) )
     {
         mDestination = sf::Vector2f( mPath->getNextMove() );
-        mDestination.x *= 64;
-        mDestination.y *= 64;
+        mDestination.x *= TILE_SIZE;
+        mDestination.y *= TILE_SIZE;
     }
     // is currently following a path
     if( mDestination != sf::Vector2f( -1.0f, -1.0f ) )
@@ -179,14 +180,29 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
                 mDestination.x *= 64;
                 mDestination.y *= 64;
                 if( mPath->mPath.size() == 0 ) mPath = nullptr;
+
             }
             else mDestination = sf::Vector2f( -1.0f, -1.0f );
+            mHasMoved = true;
         }
     }
 
     // update HUD
     mInitiativeHUD.setPosition( getPosition( ).x, getPosition().y + 47 );
     mInitiativeHUDBackground.setPosition( getPosition( ).x - 5, getPosition().y + 45 );
+
+    // Animations for attacks and abilities
+    if( mAnimationTimer > sf::Time::Zero )
+    {
+        mAnimationTimer -= dt;
+    }
+    else if( mAnimationTimer < sf::Time::Zero )
+    {
+        mAnimationTimer = sf::Time::Zero;
+        mHasSpentAction = true;
+
+        std::cout << "Unit ActionTimer Test 2: " << std::endl;
+    }
 }
 void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
@@ -212,8 +228,11 @@ void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
 
 void Unit::useAbility( std::string abilityID, Unit* target )
 {
+    std::cout << "Target Id: " << target->mID << std::endl;
+
     if( mAbilities.find( abilityID ) != mAbilities.end() )
     {
+        std::cout << "Unit::useAbility: " << abilityID << std::endl;
         if( (this->mAttack + randomInt( 20 ) > target->mArmour + randomInt( 20 ) ) )  // or the ability type is not an attack
         {
             std::cout << "The Attack was a hit!" << std::endl;
@@ -225,6 +244,7 @@ void Unit::useAbility( std::string abilityID, Unit* target )
 
         for( auto t : mAbilities.at( abilityID ).userMods )
             this->addModifier( t );
+        mAnimationTimer += sf::milliseconds( 1000 );
     }
 }
 

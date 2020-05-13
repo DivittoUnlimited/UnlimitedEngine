@@ -117,7 +117,8 @@ public:
     /// Heads up display of this units current turn order
     sf::Text mInitiativeHUD;
     sf::CircleShape mInitiativeHUDBackground;
-
+    sf::Time mAnimationTimer;
+    bool mWasTheLastUnit;
 };
 
 #endif // UNIT_HPP

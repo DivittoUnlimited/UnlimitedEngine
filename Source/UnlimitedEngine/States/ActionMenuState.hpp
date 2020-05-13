@@ -19,5 +19,6 @@ public:
 
 private:
     GUI::Container      mGUIContainer;
+    World* mWorld;
 };
 #endif // ACTIONMENUSTATE_HPP

@@ -14,6 +14,7 @@
 
 RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
+    , mWorld( world )
 {
     Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
     AbilityData* ability = &unit->mAbilities.at( unit->mSelectedAbility );
@@ -30,15 +31,12 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         for( auto t : ability->AOE.at( "north" ) ) // use abililty on all units inside the ability AOE[0]
         {
             // get all units inside AOE from grid
-            world->mMovementGrid->mData.at( (t.y+ability->origin.y) * (world->mMovementGrid->mGridWidth) + (t.x+ability->origin.x) ).rect->getSprite()->setFillColor( sf::Color::Red );
+            //world->mMovementGrid->mData.at( (t.y+ability->origin.y) * (world->mMovementGrid->mGridWidth) + (t.x+ability->origin.x) ).rect->getSprite()->setFillColor( sf::Color::Red );
             int id = world->mMovementGrid->mData.at( (t.y+ability->origin.y) * (world->mMovementGrid->mGridWidth) + (t.x+ability->origin.x) ).unitID;
-            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+            if( id >= 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
         }
-        unit->mSelectedAbility = "NONE";
-        unit->mHasSpentAction = true;
-        unit->mIsSelectedUnit = false;
-        world->mMovementGrid->clearGrid();
         requestStackPop( );
+        world->mMovementGrid->mWaitingForPlayer = false;
     });
 
     auto button2 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -50,13 +48,10 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         {
             // get all units inside AOE from grid
             int id = world->mMovementGrid->mData.at( (t.y+ability->origin.y) * (world->mMovementGrid->mGridWidth) + (t.x+ability->origin.x) ).unitID;
-            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+            if( id >= 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
         }
-        unit->mSelectedAbility = "NONE";
-        unit->mHasSpentAction = true;
-        unit->mIsSelectedUnit = false;
-        world->mMovementGrid->clearGrid();
         requestStackPop( );
+        world->mMovementGrid->mWaitingForPlayer = false;
     });
 
     auto button3 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -68,13 +63,10 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         {
             // get all units inside AOE from grid
             int id = world->mMovementGrid->mData.at( (t.y+ability->origin.y) * (world->mMovementGrid->mGridWidth) + (t.x+ability->origin.x) ).unitID;
-            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+            if( id >= 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
         }
-        unit->mSelectedAbility = "NONE";
-        unit->mHasSpentAction = true;
-        unit->mIsSelectedUnit = false;
-        world->mMovementGrid->clearGrid();
         requestStackPop( );
+        world->mMovementGrid->mWaitingForPlayer = false;
     });
 
     auto button4 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -86,13 +78,10 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         {
             // get all units inside AOE from grid
             int id = world->mMovementGrid->mData.at( (t.y+ability->origin.y) * (world->mMovementGrid->mGridWidth) + (t.x+ability->origin.x) ).unitID;
-            if( id > 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+            if( id >= 0 ) unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
         }
-        unit->mSelectedAbility = "NONE";
-        unit->mHasSpentAction = true;
-        unit->mIsSelectedUnit = false;
-        world->mMovementGrid->clearGrid( );
         requestStackPop( );
+        world->mMovementGrid->mWaitingForPlayer = false;
     });
 
     auto exit = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -120,17 +109,34 @@ void RotationSelectMenuState::draw( )
 
 bool RotationSelectMenuState::update( sf::Time )
 {
-    return false;
+    // Update the view
+    if( sf::Keyboard::isKeyPressed( sf::Keyboard::W ) ) // || sf::Mouse::getPosition().y < 100 )
+    {
+        this->mGUIContainer.move( 0, mWorld->mCameraPanSpeed );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::S  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
+    {
+        this->mGUIContainer.move( 0, -1 * mWorld->mCameraPanSpeed );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::A  ) ) //  || sf::Mouse::getPosition().x < 100 )
+    {
+        this->mGUIContainer.move( mWorld->mCameraPanSpeed, 0 );
+    }
+    else if( sf::Keyboard::isKeyPressed( sf::Keyboard::D ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
+    {
+        this->mGUIContainer.move( -1 * mWorld->mCameraPanSpeed, 0 );
+    }
+    return true;
 }
 
 bool RotationSelectMenuState::handleEvent( const sf::Event& event )
 {
-    if( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )
+    //if( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )
     {
         // Escape pressed, remove itself to return to the game
-        requestStackPop( );
+        //requestStackPop( );
     }
-    else
+    //else
     {
         mGUIContainer.handleEvent( event );
     }

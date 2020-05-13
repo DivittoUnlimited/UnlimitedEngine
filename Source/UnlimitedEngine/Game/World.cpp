@@ -36,7 +36,7 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mWindowSprite(  )
     , mSceneGraph( )
     , mSceneLayers( )
-    //, mDeltaMousePosition( 0, 0 )
+    , mDeltaMousePosition( 0, 0 )
     , mCameraPanSpeed( 8 )
     , mNetworkedWorld( networked )
     , mLocalMultiplayerWorld( isLocalMultiplayer )
@@ -54,8 +54,6 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mRedTeamStats( nullptr )
 {
     if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
-    // mWorldView.zoom( 2.0 );
-    //mWorldView.move( WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 );
     mSceneTexture.setView( mWorldView );
     this->registerStates( );
     buildScene( MediaFileMap.at( "Maps" ).at( mLevel ) );
@@ -77,13 +75,6 @@ void World::draw( )
         mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
-        /*
-        if( mChangeTurnTextTimer > sf::Time::Zero )
-        {
-            mChangeTurnText.setPosition( WINDOW_WIDTH / 2 + mDeltaMousePosition.x, WINDOW_HEIGHT / 2 - 200 + mDeltaMousePosition.y );
-            mSceneTexture.draw( mChangeTurnText );
-        }
-        */
         mSceneTexture.display( );
         mWindowSprite.setTexture( mSceneTexture.getTexture( ) );
         mTarget.draw( sf::Sprite( mWindowSprite ) );
@@ -93,13 +84,6 @@ void World::draw( )
     {
         mTarget.setView( mWorldView );
         mTarget.draw( mSceneGraph );
-        /* OLD WAY
-        if( mChangeTurnTextTimer > sf::Time::Zero )
-        {
-            mChangeTurnText.setPosition( WINDOW_WIDTH / 2 + mDeltaMousePosition.x, WINDOW_HEIGHT / 2 - 200 + mDeltaMousePosition.y );
-            mTarget.draw( mChangeTurnText );
-        }
-        */
     }
 }
 
@@ -115,9 +99,7 @@ bool World::update( sf::Time dt )
             std::cout << "There was an exception during the collision update: " << e.what( ) << "\nDo all your map layer names in lua match from tiled?" << std::endl;
         }
     */
-    if( mMovementGrid->mEndTurn ) mMovementGrid->endTurn( );
     mSceneGraph.removeWrecks( );
-
 
     // Update the view
     if( sf::Keyboard::isKeyPressed( sf::Keyboard::W ) ) // || sf::Mouse::getPosition().y < 100 )
@@ -170,7 +152,7 @@ bool World::matchesCategories( std::pair<SceneNode*, SceneNode*>& colliders, Cat
     return false;
 }
 
-void World::handleEvent( const sf::Event& event )
+void World::handleEvent( const sf::Event& )
 {
     /*
     if( ( !this->mLocalMultiplayerWorld && mCurrentTurn & Category::Blue ) || this->mLocalMultiplayerWorld )
@@ -233,12 +215,9 @@ void World::spawnUnit( unsigned int unitType, sf::Vector2i gridIndex )
     else std::cout << "ERROR reading unit Team/Category! check buildScene/Tiled map save file." << std::endl;
 
     std::unique_ptr<Unit> unit( new Unit( mMovementGrid->mCurrentUnits.size(), category, UnitDataTable.at( unitType ), mTextures, mFonts ) );
-    //sf::Rect<float> object = mMovementGrid->mData[gridIndex.y * (WINDOW_WIDTH / TILE_SIZE) + gridIndex.x].mBounds;
     unit->setPosition( gridIndex.x * TILE_SIZE, gridIndex.y * TILE_SIZE );
     unit->mSprite.setTextureRect( UnitDataTable.at( unitType ).textureRect );
     mMovementGrid->addUnit( unit.get( ) );
-
-    //std::cout << "LayerMap is Mis-aligned. ObjectLayer1 should be layer1"
     mSceneLayers.at( LayerMap.at( "ObjectLayer1" ) )->attachChild( std::move( unit ) );
 }
 
