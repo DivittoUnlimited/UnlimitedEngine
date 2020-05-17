@@ -89,6 +89,7 @@ void World::draw( )
 
 bool World::update( sf::Time dt )
 {
+    mSceneGraph.removeWrecks( );
     while( !mCommandQueue.isEmpty( ) ) mSceneGraph.onCommand( mCommandQueue.pop( ), dt );
     try{ mSceneGraph.update( dt, mCommandQueue ); }
     catch( std::exception& e ) { std::cout << "There was an exception in the SceneGraph update: " << e.what( ) << std::endl; }
@@ -99,7 +100,7 @@ bool World::update( sf::Time dt )
             std::cout << "There was an exception during the collision update: " << e.what( ) << "\nDo all your map layer names in lua match from tiled?" << std::endl;
         }
     */
-    mSceneGraph.removeWrecks( );
+
 
     // Update the view
     if( sf::Keyboard::isKeyPressed( sf::Keyboard::W ) ) // || sf::Mouse::getPosition().y < 100 )

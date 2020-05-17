@@ -59,13 +59,18 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
             }
             else
             {
+                bool flag = false;
                 for( auto t : ability->AOE.at( "only" ) ) // use abililty on all units inside the ability AOE[0]
                 {
                     // get all units inside AOE from grid
                     int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-                    if( id >= 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( buttonNames[0], world->mMovementGrid->mCurrentUnits.at( id ) );
+                    if( id > 0 && id != static_cast<int>( unit->mID ) )
+                    {
+                        unit->useAbility( buttonNames[1], world->mMovementGrid->mCurrentUnits.at( id ) );
+                        flag = true;
+                    }
                 }
-                this->requestStackPop( );
+                if( flag ) this->requestStackPop( );
                 world->mMovementGrid->mWaitingForPlayer = false;
             }
 
@@ -105,13 +110,18 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
             }
             else
             {
+                bool flag = false;
                 for( auto t : ability->AOE.at( "only" ) ) // use abililty on all units inside the ability AOE[0]
                 {
                     // get all units inside AOE from grid
                     int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-                    if( id > 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( buttonNames[1], world->mMovementGrid->mCurrentUnits.at( id ) );
+                    if( id > 0 && id != static_cast<int>( unit->mID ) )
+                    {
+                        unit->useAbility( buttonNames[1], world->mMovementGrid->mCurrentUnits.at( id ) );
+                        flag = true;
+                    }
                 }
-                this->requestStackPop( );
+                if( flag ) this->requestStackPop( );
                 world->mMovementGrid->mWaitingForPlayer = false;
             }          
         }
@@ -150,13 +160,18 @@ AbilitySelectMenuState::AbilitySelectMenuState( States::ID id, StateStack& stack
             }
             else
             {
+                bool flag = false;
                 for( auto t : ability->AOE.at( "only" ) ) // use abililty on all units inside the ability AOE[0]
                 {
                     // get all units inside AOE from grid
                     int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-                    if( id > 0 && id != static_cast<int>( unit->mID ) ) unit->useAbility( buttonNames[2], world->mMovementGrid->mCurrentUnits.at( id ) );
+                    if( id > 0 && id != static_cast<int>( unit->mID ) )
+                    {
+                        unit->useAbility( buttonNames[1], world->mMovementGrid->mCurrentUnits.at( id ) );
+                        flag = true;
+                    }
                 }
-                this->requestStackPop( );
+                if( flag ) this->requestStackPop( );
                 world->mMovementGrid->mWaitingForPlayer = false;
             }          
         }

@@ -76,6 +76,14 @@ void Grid::updateCurrent( sf::Time dt, CommandQueue& commands )
     // The onscreen debugging view of influence set to show offensive influence by default
     if( mUpdateInfluenceMap ) updateInfluenceMap( );
 
+    // Remove dead units so they don't get updated :)
+    for( unsigned int i = 0; i < mCurrentUnits.size(); ++i )
+        if( mCurrentUnits.at( i ) == nullptr )
+        {
+            mWorld->mSceneGraph.removeWrecks();
+            removeUnit( mCurrentUnits.at( i )->mGridIndex );
+        }
+
     // Handle relevant commands
     while( !commands.isEmpty() )
     {
@@ -300,10 +308,13 @@ void Grid::selectUnit( unsigned int i, unsigned int j )
                                                     unit->mUnitType, static_cast<unsigned int>( unit->mSpeed ) );
         for( auto loc : possibleLocations )
         {
-            mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
-            if( unit->mIsVisible && (( !mWorld->mNetworkedWorld && !mWorld->mLocalMultiplayerWorld && mWorld->mCurrentTurn & Category::Blue ) ||
-                    mWorld->mNetworkedWorld || mWorld->mLocalMultiplayerWorld ) )
-                mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
+            if( !mData[loc.y * mGridWidth + loc.x].isOccupied )
+            {
+                mData[loc.y * mGridWidth + loc.x].isPossibleNewLocation = true;
+                if( unit->mIsVisible && (( !mWorld->mNetworkedWorld && !mWorld->mLocalMultiplayerWorld && mWorld->mCurrentTurn & Category::Blue ) ||
+                        mWorld->mNetworkedWorld || mWorld->mLocalMultiplayerWorld ) )
+                    mData[loc.y * mGridWidth + loc.x].rect->getSprite()->setFillColor( sf::Color::Cyan );
+            }
         }
         mSelectedGridIndex = sf::Vector2i( i, j );
         mWorld->mSelectedUnit = unit->mID;
@@ -467,15 +478,22 @@ void Grid::updateFogOfWar( void )
         // traverse units and buildPos using perception to mark visible squares
         for( auto unit : mCurrentUnits )
         {
-            unit.second->mIsVisible = false;
-            if( unit.second->mCategory & Category::Type::Blue )
+            if( unit.second != nullptr )
             {
-                std::vector<sf::Vector2i> visibleSquares;
-                buildPossiblePositions( &visibleSquares, unit.second->mGridIndex, -1, unit.second->mPerception );
-                for( auto loc : visibleSquares )
-                    mData[loc.y * mGridWidth + loc.x].isVisible = true;
+                unit.second->mIsVisible = false;
+                if( unit.second->mCategory & Category::Type::Blue )
+                {
+                    std::vector<sf::Vector2i> visibleSquares;
+                    buildPossiblePositions( &visibleSquares, unit.second->mGridIndex, -1, unit.second->mPerception );
+                    for( auto loc : visibleSquares )
+                        mData[loc.y * mGridWidth + loc.x].isVisible = true;
+                }
+                if( mData[unit.second->mGridIndex.y * mGridWidth + unit.second->mGridIndex.x].isVisible ) unit.second->mIsVisible = true;
             }
-            if( mData[unit.second->mGridIndex.y * mGridWidth + unit.second->mGridIndex.x].isVisible ) unit.second->mIsVisible = true;
+            else
+            {
+                removeUnit( mCurrentUnits.at( unit.second->mID )->mGridIndex );
+            }
         }
 
         // update fog based on new data
@@ -505,11 +523,11 @@ void Grid::updateFogOfWar( void )
 Unit* Grid::getNextUnit( void )
 {
     Unit* unit = nullptr;
+
     while( true )
     {
         for( unsigned int i = 0; i < mCurrentUnits.size(); ++i )
             if( !mCurrentUnits.at( i )->mWasTheLastUnit && ( unit == nullptr || ( unit->mInitiative < mCurrentUnits.at( i )->mInitiative ) ) ) unit = mCurrentUnits.at(i);
-
         if( unit->mInitiative < 100 )
             for( unsigned int i = 0; i < mCurrentUnits.size(); ++i ) mCurrentUnits.at(i)->mInitiative += randomInt( mCurrentUnits.at(i)->mSpeed * 5 ) + mCurrentUnits.at(i)->mSpeed * 2;
         else break;

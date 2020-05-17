@@ -5,7 +5,13 @@ BUGS and ISSUES:
         - Server often can't be started more than once per session
         - Project must be cleaned every time the server is run for it to work again.
     - Units can be spawned on  top of spawn points
+
+    ===============================
+    =================================
     - Dead units crash game when turn ends
+========================================
+=======================================
+
 
 FEATURES:
 

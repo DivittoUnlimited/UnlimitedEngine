@@ -16,16 +16,12 @@ ActionMenuState::ActionMenuState( States::ID id, StateStack& stack, Context cont
     : State( id, stack, context )
     , mWorld( world )
 {
-
     sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
-    //sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
     pos.x += WINDOW_WIDTH / 2;
     pos.y += WINDOW_HEIGHT / 2;
 
     auto Move = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     Move->setPosition( pos.x - 64, pos.y - 96 );
-    //Move->setPosition( pos.x, pos.y );
-
     Move->setText( "Move" );
     Move->setCallback( [this, world] ( )
     {

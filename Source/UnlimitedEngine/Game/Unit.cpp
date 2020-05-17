@@ -111,7 +111,7 @@ void Unit::updateCurrent( sf::Time dt, CommandQueue& )
             int power = mod.power.roll();
             if( mod.stat == "health" )
             {
-                modHealth( power ); // Dif because they must also update the graphics bars representign them to the player
+                modHealth( power ); // Dif because they must also update the graphics bars representing them to the player
                 mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nHealth " + std::to_string( power ) );
             }
             else if( mod.stat == "morale" )
@@ -228,9 +228,7 @@ void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
 
 void Unit::useAbility( std::string abilityID, Unit* target )
 {
-    std::cout << "Target Id: " << target->mID << std::endl;
-
-    if( mAbilities.find( abilityID ) != mAbilities.end() )
+    if( target && ! target->isDestroyed() && mAbilities.find( abilityID ) != mAbilities.end() )
     {
         std::cout << "Unit::useAbility: " << abilityID << std::endl;
         if( (this->mAttack + randomInt( 20 ) > target->mArmour + randomInt( 20 ) ) )  // or the ability type is not an attack
