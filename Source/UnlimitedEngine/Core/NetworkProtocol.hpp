@@ -21,7 +21,6 @@ namespace Server
         UpdateClientState,
         LeftClick,
         RightClick,
-        ChangeTurn,
         SpawnSelf,
         SpawnUnit
 	};
@@ -38,7 +37,6 @@ namespace Client
         Quit,
         LeftClick,
         RightClick,
-        ChangeTurn,
         SpawnUnit
 	};
 }

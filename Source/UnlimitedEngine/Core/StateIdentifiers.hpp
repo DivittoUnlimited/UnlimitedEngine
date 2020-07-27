@@ -70,7 +70,6 @@ namespace States
         // World DialogBox States ( Unit selection, end turn ec... )
         EndTurnMenuState,
         SpawnPointMenuState,
-        ActionMenuState,
         AbilitySelectMenuState,
         RotationSelectMenuState,
         WaitMenuState

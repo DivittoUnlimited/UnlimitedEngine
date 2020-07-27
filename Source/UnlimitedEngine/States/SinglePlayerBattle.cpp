@@ -4,22 +4,15 @@
 #include "Core/Utility.hpp"
 #include "Gui/Button.hpp"
 #include "Gui/Container.hpp"
-#include "Game/WifeBot.hpp"
+/// #include "Game/WifeBot.hpp"
 #include <memory>
 
 SinglePlayerBattle::SinglePlayerBattle(States::ID id, StateStack& stack, Context context , unsigned int level)
     : State( id, stack, context )
     , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, level, false, false )
-    , mPlayer( nullptr, Category::Player, context.keys1 )
+    , mPlayer( &mWorld, nullptr, Category::Player, context.keys1 )
     , mLevel( level )
-    , mWifeBot( nullptr )
 {
-    std::unique_ptr<WifeBot> bot( new WifeBot( mWorld.mMovementGrid,
-                                               &mWorld.mMovementGrid->mCurrentUnits,
-                                               &mWorld.mMovementGrid->mCurrentBuildings,
-                                               &mWorld.mCurrentTurn ) );
-    this->mWifeBot = bot.get( );
-    mWorld.mSceneGraph.attachChild( std::move( bot ) );
 }
 
 SinglePlayerBattle::~SinglePlayerBattle( )
@@ -122,7 +115,6 @@ bool SinglePlayerBattle::handleEvent( const sf::Event& event )
     else
     {
         mWorld.handleEvent( event );
-        mWifeBot->handleEvent( event );
     }
     return true;
 }

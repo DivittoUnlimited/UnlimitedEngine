@@ -9,6 +9,7 @@ LIBS += -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-window -lsfml-system
 
 DISTFILES += \
     Core/ip.txt \
+    GDD.txt \
     Game/Application.lua \
     Game/Game.lua \
     Game/Lua/Abilities.lua \
@@ -21,6 +22,7 @@ DISTFILES += \
     Game/Lua/Resources/Conversations.lua \
     Game/Lua/Resources/Maps/Courtyard.lua \
     Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua \
+    Game/Lua/Resources/Maps/smallMap.lua \
     Game/Lua/Resources/Particles.lua \
     Game/Lua/Resources/SourceFileMap.lua \
     Game/Lua/Resources/Warps.lua \
@@ -84,7 +86,6 @@ HEADERS += \
     Game/Building.hpp \
     Game/DataTables.hpp \
     Game/Dice.hpp \
-    Game/Grid.hpp \
     Game/StatModHUD.hpp \
     Game/TeamStats.hpp \
     Game/Unit.hpp \
@@ -108,7 +109,6 @@ HEADERS += \
     Gui/MessageBoxNode.hpp \
     Gui/ResponseSelector.hpp \
     States/AbilitySelectMenuState.hpp \
-    States/ActionMenuState.hpp \
     States/BattleStatScreen.hpp \
     States/ConquestBattleSetupState.hpp \
     States/ConquestModeSetup.hpp \
@@ -182,7 +182,6 @@ SOURCES += \
     Game/Building.cpp \
     Game/DataTables.cpp \
     Game/Dice.cpp \
-    Game/Grid.cpp \
     Game/StatModHUD.cpp \
     Game/TeamStats.cpp \
     Game/Unit.cpp \
@@ -205,13 +204,11 @@ SOURCES += \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
     States/AbilitySelectMenuState.cpp \
-    States/ActionMenuState.cpp \
     States/BattleStatScreen.cpp \
     States/ConquestBattleSetupState.cpp \
     States/ConquestModeSetup.cpp \
     States/ConquestOverviewState.cpp \
     States/CutSceneState.cpp \
-    States/EndTurnMenuState.cpp \
     States/GameState.cpp \
     States/LoadingState.cpp \
     States/MenuState.cpp \

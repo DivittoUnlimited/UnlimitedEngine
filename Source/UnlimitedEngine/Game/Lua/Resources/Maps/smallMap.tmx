@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="16" height="12" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="7">
+ <editorsettings>
+  <export target="smallMap.lua" format="lua"/>
+ </editorsettings>
+ <tileset firstgid="1" source="TexturePack.tsx"/>
+ <tileset firstgid="101" source="UnitSpriteSheet.tsx"/>
+ <tileset firstgid="201" source="SpawnPoint.tsx"/>
+ <layer id="1" name="TileLayer1" width="16" height="12">
+  <data encoding="csv">
+4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+4,4,2,2,2,2,2,2,2,2,2,2,2,2,4,4,
+4,2,1,1,1,1,1,33,33,1,1,1,1,1,2,4,
+4,2,1,1,1,1,1,33,33,1,1,1,1,1,2,4,
+4,2,1,1,1,1,1,33,33,1,1,1,1,1,2,4,
+4,2,23,23,23,23,23,33,33,23,23,23,23,23,2,4,
+4,2,23,23,23,23,23,33,33,23,23,23,23,23,2,4,
+4,2,1,1,1,1,1,33,33,1,1,1,1,1,2,4,
+4,2,1,1,1,1,1,33,33,1,1,1,1,1,2,4,
+4,2,1,1,1,1,1,33,33,1,1,1,1,1,2,4,
+4,4,2,2,2,2,2,2,2,2,2,2,2,2,4,4,
+4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+</data>
+ </layer>
+ <objectgroup id="2" name="ObjectLayer1">
+  <object id="1" type="Fighter" gid="101" x="320" y="256" width="64" height="64">
+   <properties>
+    <property name="Team" value="Red"/>
+   </properties>
+  </object>
+  <object id="2" type="Fighter" gid="101" x="640" y="256" width="64" height="64">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+  <object id="3" type="SpawnPoint" gid="201" x="768" y="256" width="64" height="64">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+  <object id="4" type="SpawnPoint" gid="201" x="192" y="256" width="64" height="64">
+   <properties>
+    <property name="Team" value="Red"/>
+   </properties>
+  </object>
+  <object id="5" type="Fighter" gid="101" x="704" y="320" width="64" height="64">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+  <object id="6" type="Fighter" gid="101" x="704" y="192" width="64" height="64">
+   <properties>
+    <property name="Team" value="Blue"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="3" name="TileLayer2" width="16" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,25,25,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,35,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>

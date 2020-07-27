@@ -1,7 +1,7 @@
 return {
   version = "1.2",
   luaversion = "5.1",
-  tiledversion = "1.3.3",
+  tiledversion = "1.3.5",
   orientation = "orthogonal",
   renderorder = "left-down",
   width = 32,
@@ -9,7 +9,7 @@ return {
   tilewidth = 64,
   tileheight = 64,
   nextlayerid = 3,
-  nextobjectid = 14,
+  nextobjectid = 19,
   properties = {},
   tilesets = {
     {
@@ -226,8 +226,8 @@ return {
           name = "",
           type = "Fighter",
           shape = "rectangle",
-          x = 256,
-          y = 256,
+          x = 576,
+          y = 640,
           width = 64,
           height = 64,
           rotation = 0,
@@ -258,8 +258,8 @@ return {
           name = "",
           type = "Fighter",
           shape = "rectangle",
-          x = 256,
-          y = 128,
+          x = 448,
+          y = 640,
           width = 64,
           height = 64,
           rotation = 0,
@@ -283,6 +283,38 @@ return {
           visible = true,
           properties = {
             ["Team"] = "Red"
+          }
+        },
+        {
+          id = 17,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 512,
+          y = 768,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 18,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 384,
+          y = 768,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
           }
         }
       }

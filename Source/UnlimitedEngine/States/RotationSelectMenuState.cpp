@@ -16,7 +16,9 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
     : State( id, stack, context )
     , mWorld( world )
 {
-    Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
+    Unit* unit;
+    for( auto u : mWorld->mCurrentUnits ) if( u->mID == world->mGrid[world->mSelectedGridIndex.y * world->mGridWidth + world->mSelectedGridIndex.x].unitID ) { unit = u;  break; }
+
     AbilityData* ability = &unit->mAbilities.at( unit->mSelectedAbility );
 
     sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
@@ -32,19 +34,16 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         for( auto t : ability->AOE.at( "north" ) ) // use abililty on all units inside the ability AOE[0]
         {
             // get all units inside AOE from grid
-            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-            if( id > 0 && id != static_cast<int>( unit->mID ) )
+            std::string id = world->mGrid.at( (t.y+unit->mGridIndex.y) * (world->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            for( auto u : mWorld->mCurrentUnits ) if( u->mID == id )
             {
-                unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+                unit->useAbility( unit->mSelectedAbility, u );
                 flag = true;
+                break;
             }
         }
-        if( flag ) this->requestStackPop( );
-
-
-
-
-        world->mMovementGrid->mWaitingForPlayer = false;
+        this->requestStackPop( );
+        world->mWaitingForPlayer = false;
     });
 
     auto button2 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -56,15 +55,16 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         for( auto t : ability->AOE.at( "east" ) ) // use abililty on all units inside the ability AOE[0]
         {
             // get all units inside AOE from grid
-            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-            if( id > 0 && id != static_cast<int>( unit->mID ) )
+            std::string id = world->mGrid.at( (t.y+unit->mGridIndex.y) * (world->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            for( auto u : mWorld->mCurrentUnits ) if( u->mID == id )
             {
-                unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+                unit->useAbility( unit->mSelectedAbility, u );
                 flag = true;
+                break;
             }
         }
-        if( flag ) this->requestStackPop( );
-        world->mMovementGrid->mWaitingForPlayer = false;
+        this->requestStackPop( );
+        world->mWaitingForPlayer = false;
     });
 
     auto button3 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -76,15 +76,16 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         for( auto t : ability->AOE.at( "south" ) ) // use abililty on all units inside the ability AOE[0]
         {
             // get all units inside AOE from grid
-            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-            if( id > 0 && id != static_cast<int>( unit->mID ) )
+            std::string id = world->mGrid.at( (t.y+unit->mGridIndex.y) * (world->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            for( auto u : mWorld->mCurrentUnits ) if( u->mID == id )
             {
-                unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+                unit->useAbility( unit->mSelectedAbility, u );
                 flag = true;
+                break;
             }
         }
-        if( flag ) this->requestStackPop( );
-        world->mMovementGrid->mWaitingForPlayer = false;
+        this->requestStackPop( );
+        world->mWaitingForPlayer = false;
     });
 
     auto button4 = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -96,15 +97,16 @@ RotationSelectMenuState::RotationSelectMenuState( States::ID id, StateStack& sta
         for( auto t : ability->AOE.at( "west" ) ) // use abililty on all units inside the ability AOE[0]
         {
             // get all units inside AOE from grid
-            int id = world->mMovementGrid->mData.at( (t.y+unit->mGridIndex.y) * (world->mMovementGrid->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
-            if( id > 0 && id != static_cast<int>( unit->mID ) )
+            std::string id = world->mGrid.at( (t.y+unit->mGridIndex.y) * (world->mGridWidth) + (t.x+unit->mGridIndex.x) ).unitID;
+            for( auto u : mWorld->mCurrentUnits ) if( u->mID == id )
             {
-                unit->useAbility( unit->mSelectedAbility, world->mMovementGrid->mCurrentUnits.at( id ) );
+                unit->useAbility( unit->mSelectedAbility, u );
                 flag = true;
+                break;
             }
         }
-        if( flag ) this->requestStackPop( );
-        world->mMovementGrid->mWaitingForPlayer = false;
+        this->requestStackPop( );
+        world->mWaitingForPlayer = false;
     });
 
     auto exit = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

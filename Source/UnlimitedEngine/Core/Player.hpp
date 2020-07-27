@@ -6,13 +6,14 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Network/TcpSocket.hpp>
 #include <map>
+#include "Game/World.hpp"
 
 class Player
 {
 public:
     typedef PlayerAction::Type Action;
 
-    Player( sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding );
+    Player( World* world, sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding );
 
     void handleEvent( const sf::Event& event, CommandQueue& commands );
     void handleRealtimeInput( CommandQueue& commands );
@@ -29,6 +30,7 @@ private:
     std::map<PlayerAction::Type, Command>	mActionBinding;
     std::map<PlayerAction::Type, bool>		mActionProxies;
     sf::TcpSocket*                          mSocket;
+    World*                                  mWorld;
 public:
     int                                     mIdentifier;
 };

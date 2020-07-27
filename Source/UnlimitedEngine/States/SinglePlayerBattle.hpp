@@ -3,7 +3,6 @@
 
 #include "Game/World.hpp"
 #include "Core/Player.hpp"
-#include "Game/WifeBot.hpp"
 
 // Forward declaration
 namespace sf
@@ -25,7 +24,7 @@ protected:
     World           mWorld;
     Player          mPlayer;
     unsigned int    mLevel;
-    WifeBot*         mWifeBot;
+
 };
 
 #endif // SINGLEPLAYERBATTLE_HPP

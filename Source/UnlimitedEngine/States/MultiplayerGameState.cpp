@@ -169,17 +169,11 @@ bool MultiplayerGameState::update( sf::Time dt )
         GameActions::Action gameAction;
         while( mWorld.pollGameAction( gameAction ) )
         {
-            if( gameAction.type == GameActions::ChangeTurn )
-            {
-                sf::Packet packet;
-                packet << static_cast<sf::Int32>( Client::ChangeTurn );
-                mSocket.send( packet );
-            }
-            else if( gameAction.type == GameActions::SpawnUnit )
+            if( gameAction.type == GameActions::SpawnUnit )
             {
                 sf::Packet packet;
                 packet << static_cast<sf::Int32>( Client::SpawnUnit );
-                Unit* unit = mWorld.mMovementGrid->mCurrentUnits.rbegin( )->second;
+                Unit* unit = mWorld.mCurrentUnits.front();
                 packet << unit->mUnitType;
                 packet << gameAction.position.x;
                 packet << gameAction.position.y;
@@ -211,26 +205,22 @@ bool MultiplayerGameState::handleEvent( const sf::Event& event )
     CommandQueue& commands = mWorld.getCommandQueue( );
 
     // Forward event to all players ----
-    if( mClientTeamColor & mWorld.mCurrentTurn )
+    if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
     {
-        if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
-        {
-            /* OLd WAY
-            // create a new event with delta mouse pos
-            sf::Event newEvent;
-            newEvent.type = sf::Event::MouseButtonReleased;
-            newEvent.mouseButton.button = sf::Mouse::Left;
-            newEvent.mouseButton.x = event.mouseButton.x + mWorld.mDeltaMousePosition.x;
-            newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
+        /* OLd WAY
+        // create a new event with delta mouse pos
+        sf::Event newEvent;
+        newEvent.type = sf::Event::MouseButtonReleased;
+        newEvent.mouseButton.button = sf::Mouse::Left;
+        newEvent.mouseButton.x = event.mouseButton.x + mWorld.mDeltaMousePosition.x;
+        newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
 
-            mPlayer->handleEvent( newEvent, commands );
-            */
-            mPlayer->handleEvent( event, mWorld.getCommandQueue( ) );
-
-        }
-        else
-            mPlayer->handleEvent( event, commands );
+        mPlayer->handleEvent( newEvent, commands );
+        */
+        mPlayer->handleEvent( event, mWorld.getCommandQueue( ) );
     }
+    else
+        mPlayer->handleEvent( event, commands );
 
     mWorld.handleEvent( event );
 
@@ -292,7 +282,7 @@ void MultiplayerGameState::handlePacket( sf::Int32 packetType, sf::Packet& packe
             sf::Vector2f pos;
             sf::Int32 teamColor;
             packet >> identifier >> pos.x >> pos.y >> teamColor;
-            mPlayer.reset( new Player( &mSocket, identifier, getContext().keys1 ) );
+            mPlayer.reset( new Player( &mWorld, &mSocket, identifier, getContext().keys1 ) );
             mLocalPlayerIdentifiers.push_back( identifier );
             mGameStarted = true;
             this->mClientTeamColor = static_cast<Category::Type>( teamColor );
@@ -338,10 +328,6 @@ void MultiplayerGameState::handlePacket( sf::Int32 packetType, sf::Packet& packe
             packet >> identifier >> pos.x >> pos.y;
             mPlayer->handleNetworkEvent( PlayerAction::LeftClick, mWorld.getCommandQueue( ), pos );
         } break;
-        case Server::ChangeTurn:
-        {
-            mWorld.changeTurn( );
-        } break;
         case Server::SpawnUnit:
         {
             unsigned int unitType;
@@ -350,7 +336,7 @@ void MultiplayerGameState::handlePacket( sf::Int32 packetType, sf::Packet& packe
             packet >> unitType;
             packet >> x;
             packet >> y;
-            mWorld.spawnUnit( unitType, sf::Vector2i( x, y ) );
+            // mWorld.spawnUnit( unitType, sf::Vector2i( x, y ) );
         } break;
         // Mission successfully completed
         case Server::MissionSuccess:

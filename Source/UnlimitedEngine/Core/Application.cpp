@@ -156,8 +156,8 @@ void Application::registerStates( )
     mStateStack.registerState<PauseState>               ( States::NetworkPause, true );
 
     // Levels 1 Player vs A.I
-    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel1, LevelMap.at( "Courtyard" ) );
-    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel2, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel1, LevelMap.at( "SmallMap" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel2, LevelMap.at( "Courtyard" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel3, LevelMap.at( "TacticsTribeDemoLevel" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel4, LevelMap.at( "TacticsTribeDemoLevel" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel5, LevelMap.at( "TacticsTribeDemoLevel" ) );
@@ -169,7 +169,7 @@ void Application::registerStates( )
 
 
     // Levels (2 player local machine)
-    mStateStack.registerState<GameState>                ( States::Level1, LevelMap.at( "TacticsTribeDemoLevel" ) );
+    mStateStack.registerState<GameState>                ( States::Level1, LevelMap.at( "Courtyard" ) );
     mStateStack.registerState<GameState>                ( States::Level2, LevelMap.at( "TacticsTribeDemoLevel" ) );
     mStateStack.registerState<GameState>                ( States::Level3, LevelMap.at( "TacticsTribeDemoLevel" ) );
     mStateStack.registerState<GameState>                ( States::Level4, LevelMap.at( "TacticsTribeDemoLevel" ) );
