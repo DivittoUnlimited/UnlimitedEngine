@@ -156,7 +156,7 @@ void Application::registerStates( )
     mStateStack.registerState<PauseState>               ( States::NetworkPause, true );
 
     // Levels 1 Player vs A.I
-    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel1, LevelMap.at( "SmallMap" ) );
+    mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel1, LevelMap.at( "GeneratedGrassyPlains" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel2, LevelMap.at( "Courtyard" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel3, LevelMap.at( "TacticsTribeDemoLevel" ) );
     mStateStack.registerState<SinglePlayerBattle>       ( States::SinglePlayerLevel4, LevelMap.at( "TacticsTribeDemoLevel" ) );

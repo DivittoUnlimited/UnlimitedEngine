@@ -39,6 +39,7 @@ return {
         [Map.TacticsTribeDemoLevel] = "Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua";
         [Map.Courtyard]             = "Game/Lua/Resources/Maps/Courtyard.lua";
         [Map.SmallMap]              = "Game/Lua/Resources/Maps/smallMap.lua";
+        [Map.GeneratedGrassyPlains] = "Game/Lua/Resources/Maps/GeneratedGrassyPlains.lua";
 
     };
 }

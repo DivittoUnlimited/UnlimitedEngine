@@ -11,6 +11,7 @@
 #include "Core/State.hpp"
 #include "Core/CommandQueue.hpp"
 #include "Core/StateStack.hpp"
+#include "Core/PerlinNoise.hpp"
 #include "Tiled/TiledManager.hpp"
 #include "Game/TeamStats.hpp"
 #include "Game/DataTables.hpp"
@@ -190,6 +191,13 @@ public:
     /// \param tileMapFilePath
     ///
     void buildScene( std::string tileMapFilePath );
+    /// \brief generateTileMap
+    /// \param width
+    /// \param height
+    /// \param increment
+    /// \return
+    ///
+    std::vector<unsigned int> generateTileMap( unsigned int width, unsigned int height, double increment );
     /// \brief registerStates
     /// Register all possible states for later use
     void registerStates( );

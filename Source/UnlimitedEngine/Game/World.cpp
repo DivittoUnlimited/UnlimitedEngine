@@ -478,13 +478,18 @@ void World::buildScene( std::string tileMapFilePath )
                 else
                 */
                 {
+                    // make sure there is level data to load
+                    if( !map.layers[i].data.size() )
+                        map.layers[i].data = generateTileMap( map.layers[i].width, map.layers[i].height, 0.01 );
+
                     std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode(  ) );
                     if( !layer.get()->load( mTextures.get( TextureMap.at( map.tileSets[0].name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data, map.width, map.height ) )
                         std::cout << "ERROR loading TiledMap! BuildScene ln: 249" << std::endl;
                     else
                     {
-                            mGridWidth = map.layers[0].width;
-                            mGridHeight = map.layers[0].height;
+                            mGridWidth = map.layers[i].width;
+                            mGridHeight = map.layers[i].height;
+
 
                             mSceneLayers.push_back( layer.get( ) );
                             unsigned int counter = 0;
@@ -500,15 +505,15 @@ void World::buildScene( std::string tileMapFilePath )
                                                                                                    static_cast<int>( j * tileSets.tileHeight ) ),
                                                                                      sf::Vector2i( static_cast<int>( tileSets.tileWidth ),
                                                                                                    static_cast<int>( tileSets.tileHeight ) ) ) ) );
-                                    rect.get()->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
-                                    rect.get()->getSprite()->setOutlineThickness( 1 );
-                                    rect.get()->getSprite()->setOutlineColor( sf::Color( 0, 0, 0, 10 ) );
+                                    rect.get( )->getSprite( )->setFillColor( sf::Color( 0, 0, 0, 0 ) );
+                                    rect.get( )->getSprite( )->setOutlineThickness( 1 );
+                                    rect.get( )->getSprite( )->setOutlineColor( sf::Color( 0, 0, 0, 10 ) );
 
                                     ++counter;
                                     std::unique_ptr<TextNode> debugText( new TextNode( mFonts, "" ) );
-                                    debugText.get()->setPosition( rect.get()->getSprite()->getPosition().x + 25, rect.get()->getSprite()->getPosition().y + 25 );
-                                    mGrid.back().debugText = debugText.get();
-                                    mGrid.back().rect = rect.get();
+                                    debugText.get( )->setPosition( rect.get( )->getSprite()->getPosition().x + 25, rect.get()->getSprite()->getPosition().y + 25 );
+                                    mGrid.back( ).debugText = debugText.get( );
+                                    mGrid.back( ).rect = rect.get( );
                                     layer->attachChild( std::move( rect ) );
                                     layer->attachChild( std::move( debugText ) );
                                 }
@@ -728,6 +733,36 @@ void World::buildScene( std::string tileMapFilePath )
         else
             std::cout << "BuildScene Complete!!" << std::endl;
 }
+std::vector<unsigned int> World::generateTileMap( unsigned int width, unsigned int height, double increment )
+{
+    // Create Perlin Graph to base level on
+    PerlinNoise pn( randomInt( 1000 ) );
+    std::vector<unsigned int> tileMap;
+
+    for( unsigned int i = 0; i < height; ++i ) // y
+        for( unsigned int j = 0; j < width; ++j ) // x
+        {
+            double x = (double)j / (double)width;
+            double y = (double)i / (double)height;
+            unsigned int value = ( pn.noise( x, y, increment ) ) * 100;
+            std::cout << value << std::endl;
+
+            if( value < 20 )
+                tileMap.push_back( 3 );
+            else if( value < 50 )
+                tileMap.push_back( 1 );
+            else if( value < 60 )
+                tileMap.push_back( 2 );
+            else if( value < 80 )
+                tileMap.push_back( 4 );
+            else if( value < 100 )
+                tileMap.push_back( 5 );
+            else
+                tileMap.push_back( 1 );
+        }
+    return tileMap;
+}
+
 
 void World::registerStates( )
 {

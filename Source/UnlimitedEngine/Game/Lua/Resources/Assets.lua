@@ -65,5 +65,6 @@ return {
         Courtyard             = 0;
         TacticsTribeDemoLevel = 1;
         SmallMap              = 2;
+        GeneratedGrassyPlains = 3;
     };
 };

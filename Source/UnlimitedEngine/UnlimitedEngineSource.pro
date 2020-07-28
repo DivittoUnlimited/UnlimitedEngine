@@ -21,6 +21,7 @@ DISTFILES += \
     Game/Lua/Resources/Assets.lua \
     Game/Lua/Resources/Conversations.lua \
     Game/Lua/Resources/Maps/Courtyard.lua \
+    Game/Lua/Resources/Maps/GeneratedGrassyPlains.lua \
     Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua \
     Game/Lua/Resources/Maps/smallMap.lua \
     Game/Lua/Resources/Particles.lua \
@@ -70,6 +71,7 @@ HEADERS += \
     Core/PathFinder.cpp.autosave \
     Core/PathFinder.hpp \
     Core/PathFinder.inl \
+    Core/PerlinNoise.hpp \
     Core/Player.hpp \
     Core/ResourceIdentifiers.hpp \
     Core/ResourceManager.hpp \
@@ -173,6 +175,7 @@ SOURCES += \
     Core/MusicPlayer.cpp \
     Core/NetworkNode.cpp \
     Core/ParallelTask.cpp \
+    Core/PerlinNoise.cpp \
     Core/Player.cpp \
     Core/SoundNode.cpp \
     Core/SoundPlayer.cpp \
