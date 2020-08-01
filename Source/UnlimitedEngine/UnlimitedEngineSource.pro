@@ -46,6 +46,7 @@ DISTFILES += \
     Media/Textures/LightInfantry.png \
     Media/Textures/Particle.png \
     Media/Textures/SpawnPoint.png \
+    Media/Textures/TexturePack.png \
     Media/Textures/UnitSpriteSheet.png \
     Notes.txt \
     Story.txt

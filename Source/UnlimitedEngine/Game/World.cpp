@@ -478,9 +478,11 @@ void World::buildScene( std::string tileMapFilePath )
                 else
                 */
                 {
+
+
                     // make sure there is level data to load
                     if( !map.layers[i].data.size() )
-                        map.layers[i].data = generateTileMap( map.layers[i].width, map.layers[i].height, 0.01 );
+                        map.layers[i].data = generateTileMap( map.layers[i].width, map.layers[i].height, 0.15 );
 
                     std::unique_ptr<VertexArrayNode> layer( new VertexArrayNode(  ) );
                     if( !layer.get()->load( mTextures.get( TextureMap.at( map.tileSets[0].name ) ), sf::Vector2u( tileSets.tileWidth, tileSets.tileHeight ), map.layers[i].data, map.width, map.height ) )
@@ -489,7 +491,6 @@ void World::buildScene( std::string tileMapFilePath )
                     {
                             mGridWidth = map.layers[i].width;
                             mGridHeight = map.layers[i].height;
-
 
                             mSceneLayers.push_back( layer.get( ) );
                             unsigned int counter = 0;
@@ -739,27 +740,54 @@ std::vector<unsigned int> World::generateTileMap( unsigned int width, unsigned i
     PerlinNoise pn( randomInt( 1000 ) );
     std::vector<unsigned int> tileMap;
 
+    // build base terrain
     for( unsigned int i = 0; i < height; ++i ) // y
         for( unsigned int j = 0; j < width; ++j ) // x
         {
             double x = (double)j / (double)width;
             double y = (double)i / (double)height;
-            unsigned int value = ( pn.noise( x, y, increment ) ) * 100;
-            std::cout << value << std::endl;
+            unsigned int value = ( ( ( pn.noise( x, y, increment ) ) * 10 ) );
+            //std::cout << value << std::endl;
 
-            if( value < 20 )
-                tileMap.push_back( 3 );
-            else if( value < 50 )
-                tileMap.push_back( 1 );
-            else if( value < 60 )
-                tileMap.push_back( 2 );
-            else if( value < 80 )
+            if( value < 3 )
                 tileMap.push_back( 4 );
-            else if( value < 100 )
-                tileMap.push_back( 5 );
+            else if( value < 5 )
+                tileMap.push_back( 2 );
+            else if( value < 7 )
+                tileMap.push_back( 1 );
+            else if( value < 10 )
+                tileMap.push_back( 4 );
             else
                 tileMap.push_back( 1 );
+
         }
+    // add roads
+    int numRoads = 5;
+    while( randomInt( --numRoads ) )
+    {
+        // add vertical road
+        unsigned int xPos = randomInt( width - 4 ) + 2;
+        for( unsigned int i = 0; i < height; ++i )
+        {
+            // use perlin noise to make more random?
+            tileMap[i * width + xPos] = 3;
+        }
+    }
+    numRoads++;
+    while( randomInt( --numRoads ) )
+    {
+        // add horizontal road
+        unsigned int yPos = randomInt( height - 4 ) + 2;
+        for( unsigned int i = 0; i < width; ++i )
+        {
+            // use perlin noise to make more random?
+            tileMap[yPos * width + i] = 3;
+        }
+    }
+
+    // Ensure all areas of map are reachable!
+    // ( water cant be allowed to cut of corner of map. )
+
     return tileMap;
 }
 

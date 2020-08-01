@@ -15,6 +15,9 @@ BUGS and ISSUES:
         - need to update HUD during ( right after ) movement
 
 FEATURES:
+    - Random Map Generation:
+        - make roads more randomly bendy (perlin noise?)
+
     - Wait options menu.
         - Currently just stubs
         - (will) Modify stats of unit that used the ability.
