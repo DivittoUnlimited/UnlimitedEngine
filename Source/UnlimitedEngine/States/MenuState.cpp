@@ -39,7 +39,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     mDevNotes.setOutlineThickness( 1 );
     mDevNotes.setOutlineColor( sf::Color( 0, 255, 0, 255 ) );
 
-    mTitleText = sf::Text( "Wizard's Request", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
+    mTitleText = sf::Text( "EMPTY TITLE", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
     mTitleText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     centerOrigin( mTitleText );
     mTitleText.setPosition( WINDOW_WIDTH / 2, 200 );
@@ -53,8 +53,8 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     testMap->setCallback( [this] ( )
     {
         GAME_MODE = GameModes::QuickBattle;
-        requestStackPop( );
-        requestStackPush( States::SinglePlayerLevel1 );
+        //requestStackPop( );
+        //requestStackPush( States::SinglePlayerLevel1 );
     });
 
     auto playButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -63,8 +63,8 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playButton->setCallback( [this] ( )
 	{
         GAME_MODE = GameModes::Online;
-        requestStackPop( );
-        requestStackPush( States::SinglePlayerMenuState );
+        //requestStackPop( );
+        //requestStackPush( States::SinglePlayerMenuState );
 	});
 
     auto playLocalButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -73,8 +73,8 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playLocalButton->setCallback( [this] ( )
     {
         GAME_MODE = GameModes::QuickBattle;
-        requestStackPop( );
-        requestStackPush( States::HostGame );
+        //requestStackPop( );
+        //requestStackPush( States::HostGame );
     });
 
     auto playMultiplayerButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -83,8 +83,8 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playMultiplayerButton->setCallback( [this] ( )
     {
         GAME_MODE = GameModes::Online;
-        requestStackPop( );
-        requestStackPush( States::JoinGame ); // used to be hostGame not sure why
+        // requestStackPop( );
+        //requestStackPush( States::JoinGame ); // used to be hostGame not sure why
     });
 
     auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

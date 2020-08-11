@@ -53,8 +53,8 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
         else
         {
             Command com;
-            com.category = Category::Grid;
-            mWorld->handleLeftClick( sf::Vector2i( event.mouseButton.x, event.mouseButton.y ) );
+            //com.category = Category::Grid;
+            //mWorld->handleLeftClick( sf::Vector2i( event.mouseButton.x, event.mouseButton.y ) );
             commands.push( com );
         }
     }

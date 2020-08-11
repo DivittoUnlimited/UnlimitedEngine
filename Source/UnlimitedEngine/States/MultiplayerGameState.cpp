@@ -173,8 +173,8 @@ bool MultiplayerGameState::update( sf::Time dt )
             {
                 sf::Packet packet;
                 packet << static_cast<sf::Int32>( Client::SpawnUnit );
-                Unit* unit = mWorld.mCurrentUnits.front();
-                packet << unit->mUnitType;
+                //Unit* unit = mWorld.mCurrentUnits.front();
+                //packet << unit->mUnitType;
                 packet << gameAction.position.x;
                 packet << gameAction.position.y;
                 mSocket.send( packet );
@@ -285,8 +285,6 @@ void MultiplayerGameState::handlePacket( sf::Int32 packetType, sf::Packet& packe
             mPlayer.reset( new Player( &mWorld, &mSocket, identifier, getContext().keys1 ) );
             mLocalPlayerIdentifiers.push_back( identifier );
             mGameStarted = true;
-            this->mClientTeamColor = static_cast<Category::Type>( teamColor );
-            mWorld.mClientTeamColor = static_cast<Category::Type>( teamColor );
         }break;
         // Send message to all clients
         case Server::BroadcastMessage:
