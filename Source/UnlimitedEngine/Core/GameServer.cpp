@@ -236,12 +236,6 @@ void GameServer::handleIncomingPacket( sf::Packet& packet, RemotePeer& receiving
     {
 
     }break;
-    case Client::ChangeTurn:
-    {
-        sf::Packet packet;
-        packet << static_cast<sf::Int32>( Server::ChangeTurn );
-        sendToAll( packet );
-    }break;
     case Client::SpawnUnit:
     {
         sf::Int32 unitType;

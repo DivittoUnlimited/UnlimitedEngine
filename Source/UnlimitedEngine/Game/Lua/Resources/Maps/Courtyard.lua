@@ -1,7 +1,7 @@
 return {
   version = "1.2",
   luaversion = "5.1",
-  tiledversion = "1.3.3",
+  tiledversion = "1.3.5",
   orientation = "orthogonal",
   renderorder = "left-down",
   width = 32,
@@ -9,7 +9,7 @@ return {
   tilewidth = 64,
   tileheight = 64,
   nextlayerid = 3,
-  nextobjectid = 12,
+  nextobjectid = 19,
   properties = {},
   tilesets = {
     {
@@ -207,86 +207,6 @@ return {
           }
         },
         {
-          id = 4,
-          name = "",
-          type = "Fighter",
-          shape = "rectangle",
-          x = 128,
-          y = 256,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 50,
-          visible = true,
-          properties = {
-            ["Team"] = "Red"
-          }
-        },
-        {
-          id = 5,
-          name = "",
-          type = "Fighter",
-          shape = "rectangle",
-          x = 128,
-          y = 128,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 50,
-          visible = true,
-          properties = {
-            ["Team"] = "Red"
-          }
-        },
-        {
-          id = 6,
-          name = "",
-          type = "Fighter",
-          shape = "rectangle",
-          x = 384,
-          y = 1856,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 50,
-          visible = true,
-          properties = {
-            ["Team"] = "Blue"
-          }
-        },
-        {
-          id = 7,
-          name = "",
-          type = "Fighter",
-          shape = "rectangle",
-          x = 960,
-          y = 704,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 50,
-          visible = true,
-          properties = {
-            ["Team"] = "Blue"
-          }
-        },
-        {
-          id = 8,
-          name = "",
-          type = "Fighter",
-          shape = "rectangle",
-          x = 704,
-          y = 1792,
-          width = 64,
-          height = 64,
-          rotation = 0,
-          gid = 50,
-          visible = true,
-          properties = {
-            ["Team"] = "Blue"
-          }
-        },
-        {
           id = 9,
           name = "",
           type = "TacticalLocation",
@@ -306,8 +226,8 @@ return {
           name = "",
           type = "Fighter",
           shape = "rectangle",
-          x = 192,
-          y = 320,
+          x = 576,
+          y = 640,
           width = 64,
           height = 64,
           rotation = 0,
@@ -331,6 +251,70 @@ return {
           visible = true,
           properties = {
             ["Team"] = "Red"
+          }
+        },
+        {
+          id = 12,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 448,
+          y = 640,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 13,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 128,
+          y = 320,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Red"
+          }
+        },
+        {
+          id = 17,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 512,
+          y = 768,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
+          }
+        },
+        {
+          id = 18,
+          name = "",
+          type = "Fighter",
+          shape = "rectangle",
+          x = 384,
+          y = 768,
+          width = 64,
+          height = 64,
+          rotation = 0,
+          gid = 50,
+          visible = true,
+          properties = {
+            ["Team"] = "Blue"
           }
         }
       }

@@ -55,9 +55,9 @@ void Container::handleEvent( const sf::Event& event )
         mChildren[static_cast<unsigned int>(mSelectedChild)]->handleEvent( event );
     else if( event.type == sf::Event::KeyReleased )
 	{
-        if( event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up )
+        if( event.key.code == sf::Keyboard::Up )
             selectPrevious( );
-        else if( event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down )
+        else if( event.key.code == sf::Keyboard::Down )
             selectNext( );
         else if( event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Space )
             if( hasSelection( ) )

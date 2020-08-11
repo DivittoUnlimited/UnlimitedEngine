@@ -19,6 +19,7 @@ public:
 
 private:
     GUI::Container      mGUIContainer;
+    World* mWorld;
 };
 
 #endif // ROTATIONSELECTMENUSTATE_HPP

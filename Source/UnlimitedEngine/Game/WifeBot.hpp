@@ -1,9 +1,10 @@
 #ifndef WIFEBOT_HPP
 #define WIFEBOT_HPP
 
-#include "Graphics/SceneNode.hpp"
-#include "Game/Grid.hpp"
+#include "Game/Unit.hpp"
 #include "Core/PathFinder.hpp"
+
+class World;
 
 class Zone
 {
@@ -67,13 +68,13 @@ public:
 ///
 /// \brief The WifeBot class
 /// Wired Intelligence For Enemy Bot
-class WifeBot : public SceneNode
+class WifeBot
 {
 public:
-    WifeBot(Grid *grid, std::map<unsigned int, Unit*>* mUnits, std::vector<Building*> *mBuildings , Category::Type *currentTurn);
+    WifeBot( World* world, std::vector<Unit*>* mUnits);
     ~WifeBot( void );
 
-    void updateCurrent( sf::Time dt, CommandQueue &queue );
+    void update( sf::Time dt );
     void handleEvent( const sf::Event &event );
     void selectUnit( Unit* unit );
 
@@ -85,11 +86,12 @@ public:
     void findTargetZone( std::vector<unsigned int> excludedZones = std::vector<unsigned int>() );
 
     Category::Type mCategory;
-    Grid* mGrid;
+    World* mWorld;
     //std::function<float(Square*, Square*)> mHeuristic;
-    std::map<unsigned int, Unit*>* mUnits;
-    std::vector<Building*>* mBuildings;
-
+    std::vector<Unit*>* mUnits;
+    /// \brief mRecalculate
+    /// Flag to signal whether or not to rerun logic for unit or to continue on current path
+    bool mRecalculate;
 private:
     /// \brief mRootZone
     /// A Quad tree structure used to divide up the map based on influences the troops impose on their surroundings
@@ -105,23 +107,18 @@ private:
 
     /// \brief mPathFinders
     /// Key is the unitId that the pathfinder belongs to.
-    std::map<unsigned int, PathFinder<Square>*> mUnitPathFinders;
-
-    /// \brief mRecalculate
-    /// Flag to signal whether or not to rerun logic for unit or to continue on current path
-    bool mRecalculate;
+    std::map<std::string, PathFinder<Square>*> mUnitPathFinders;
 
     /// \brief mAnimationTimer
     /// Allows the units enough time to move to their new squares
     sf::Time mAnimationTimer;
 
-    /// \brief mCurrentTurn
-    /// Category enum to tell whose turn it is
-    Category::Type* mCurrentTurn;
-
     /// \brief mAllUnitsMoved
     /// flag to tell whether or not to end the turn
     bool mAllUnitsMoved;
+    /// \brief mUnit
+    ///
+    Unit* mUnit;
 };
 
 #endif // WIFEBOT_HPP

@@ -22,6 +22,7 @@ return {
         HeavyInfantry            = 7;
         SpawnPoint               = 8;
         UnitSpriteSheet          = 9;
+        TexturePack              = 10;
     };
 
     SoundEffects = {            
@@ -63,5 +64,7 @@ return {
     Maps = {
         Courtyard             = 0;
         TacticsTribeDemoLevel = 1;
+        SmallMap              = 2;
+        GeneratedGrassyPlains = 3;
     };
 };

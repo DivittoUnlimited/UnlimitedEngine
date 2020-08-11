@@ -405,10 +405,11 @@ static auto loadFromFile = []( std::string filePath ) -> Tiled::TiledMap
                                     lua_pop( L, 1 );
                                 }
                             }
+                            lua_pop( L, 1 ); // data array
                         }
                         else
                             std::cout << "ERROR Tiled Map tilelayer data invalid" << std::endl;
-                        lua_pop( L, 1 ); // data array
+
                         currentTileMap.layers.push_back( currentLayer );
                         lua_pop( L, 1 );
                     }

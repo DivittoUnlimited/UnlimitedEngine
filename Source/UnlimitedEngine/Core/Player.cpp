@@ -2,7 +2,6 @@
 #include "CommandQueue.hpp"
 
 #include "NetworkProtocol.hpp"
-#include "Game/Grid.hpp"
 #include "Core/Globals.hpp"
 
 #include <SFML/Network/Packet.hpp>
@@ -12,9 +11,10 @@
 #include <math.h>
 
 
-Player::Player( sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding )
+Player::Player( World* world, sf::TcpSocket* socket, sf::Int32 identifier, const KeyBinding* binding )
     : mKeyBinding( binding )
     , mSocket( socket )
+    , mWorld( world )
     , mIdentifier( identifier )
     {
         // Set initial action bindings
@@ -54,7 +54,7 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
         {
             Command com;
             com.category = Category::Grid;
-            com.action = derivedAction<Grid>( [event] ( Grid& g, sf::Time ){ g.handleLeftClick( sf::Vector2i( event.mouseButton.x, event.mouseButton.y ) ); } );
+            mWorld->handleLeftClick( sf::Vector2i( event.mouseButton.x, event.mouseButton.y ) );
             commands.push( com );
         }
     }
@@ -187,7 +187,8 @@ void Player::handleNetworkEvent(PlayerAction::Type action, CommandQueue& command
     {
         Command com;
         com.category = Category::Grid;
-        com.action = derivedAction<Grid>( [pos] ( Grid& g, sf::Time ){ g.handleLeftClick( pos ); } );
+        std::cout << "Player class handleNetworkEvent incomplete!" << std::endl;
+        //com.action = derivedAction<World>( [pos] ( World& g, sf::Time ){ g.handleLeftClick( pos ); } );
         commands.push( com );
     }
 }

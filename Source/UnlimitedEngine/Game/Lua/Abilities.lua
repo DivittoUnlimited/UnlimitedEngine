@@ -41,7 +41,7 @@ return {
                         } };
         targetMods =
         {
-            { stat = "health"; power = "36-52"; duration = 1; },
+            { stat = "health"; power = "80-100"; duration = 1; },
             { stat = "morale"; power = "30-45"; duration = 1; },
             { stat = "armour"; power = "2-4";   duration = 1; }
         };

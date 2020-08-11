@@ -5,9 +5,9 @@
 #include <vector>
 #include <set>
 #include <math.h>
-
+#include<memory.h>
+#include<functional>
 #include <SFML/System/Vector2.hpp>
-#include "Game/Grid.hpp"
 
 template <class T>
 class PathFinder

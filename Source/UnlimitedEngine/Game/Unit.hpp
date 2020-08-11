@@ -15,7 +15,7 @@ class Square;
 class Unit : public SceneNode
 {
 public:
-    Unit(unsigned int mId, Category::Type category, UnitTypeData data , const TextureManager &textures , const FontManager &fonts);
+    Unit( std::string mId, Category::Type category, UnitTypeData data , const TextureManager &textures , const FontManager &fonts);
     ~Unit( void );
     virtual unsigned int	getCategory( ) const;
     virtual bool			isMarkedForRemoval( ) const;
@@ -39,9 +39,10 @@ public:
 
     void                    modHealth( int amount );
     void                    modMorale( int amount );
+    bool                    isMoving( void );
 
     //## Attributes
-    unsigned int mID;
+    std::string mID;
     sf::Sprite mSprite;
     unsigned int mUnitType;
     Category::Type mCategory;
@@ -112,11 +113,9 @@ public:
     /// \brief mCurrentStatModHUD
     /// Pointer to the text that floats above the unit when something changes one of it's stats
     StatModHUD* mCurrentStatModHUD;
-    /// \brief mInitiativeHUD
-    /// Heads up display of this units current turn order
-    sf::Text mInitiativeHUD;
-    sf::CircleShape mInitiativeHUDBackground;
 
+    sf::Time mAnimationTimer;
+    bool mWasTheLastUnit;
 };
 
 #endif // UNIT_HPP

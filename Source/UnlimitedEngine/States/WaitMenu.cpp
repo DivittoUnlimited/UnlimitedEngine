@@ -1,7 +1,4 @@
 #include "WaitMenu.hpp"
-
-#include "ActionMenuState.hpp"
-
 #include "Core/Utility.hpp"
 #include "Core/ResourceManager.hpp"
 #include "Game/DataTables.hpp"
@@ -18,15 +15,18 @@
 WaitMenu::WaitMenu( States::ID id, StateStack& stack, Context context, World* world )
     : State( id, stack, context )
 {
-    sf::Vector2f pos = sf::Vector2f( world->mMovementGrid->mSelectedGridIndex.x * TILE_SIZE, world->mMovementGrid->mSelectedGridIndex.y * TILE_SIZE );
-    pos -= world->mDeltaMousePosition;
+    sf::Vector2f pos = sf::Vector2f( world->mWorldView.getViewport().left, world->mWorldView.getViewport().top );
+    pos.x += WINDOW_WIDTH / 2;
+    pos.y += WINDOW_HEIGHT / 2;
 
     auto rest = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     rest->setPosition( pos.x - 64, pos.y - 96 );
     rest->setText( "Recover" );
     rest->setCallback( [this, world] ( )
     {
-        Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
+        Unit* unit;
+        for( auto u : world->mCurrentUnits ) if( u->mID == world->mGrid[world->mSelectedGridIndex.y * world->mGridWidth + world->mSelectedGridIndex.x].unitID ) { unit = u;  break; }
+
         unit->addModifier( StatModifier( "stamina", "10+20", 1 ) );
         unit->addModifier( StatModifier( "morale",  "10+15", 1 ) );
         unit->mHasMoved = true;
@@ -39,7 +39,8 @@ WaitMenu::WaitMenu( States::ID id, StateStack& stack, Context context, World* wo
     evade->setText( "Evade" );
     evade->setCallback( [this, world] ( )
     {
-        Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
+        Unit* unit;
+        for( auto u : world->mCurrentUnits ) if( u->mID == world->mGrid[world->mSelectedGridIndex.y * world->mGridWidth + world->mSelectedGridIndex.x].unitID ) { unit = u;  break; }
         unit->addModifier( StatModifier( "stamina", "10+20", 1 ) );
         unit->addModifier( StatModifier( "morale",  "10+15", 1 ) );
         unit->mHasMoved = true;
@@ -52,7 +53,8 @@ WaitMenu::WaitMenu( States::ID id, StateStack& stack, Context context, World* wo
     defend->setText( "Take Guard" );
     defend->setCallback( [this, world] ( )
     {
-        Unit* unit = world->mMovementGrid->mCurrentUnits.at( world->mMovementGrid->mData[world->mMovementGrid->mSelectedGridIndex.y * world->mMovementGrid->mGridWidth + world->mMovementGrid->mSelectedGridIndex.x].unitID );
+        Unit* unit;
+        for( auto u : world->mCurrentUnits ) if( u->mID == world->mGrid[world->mSelectedGridIndex.y * world->mGridWidth + world->mSelectedGridIndex.x].unitID ) { unit = u;  break; }
         unit->addModifier( StatModifier( "stamina", "10+20", 1 ) );
         unit->addModifier( StatModifier( "morale",  "10+15", 1 ) );
         unit->mHasMoved = true;
@@ -66,6 +68,7 @@ WaitMenu::WaitMenu( States::ID id, StateStack& stack, Context context, World* wo
     none->setCallback( [this] ( )
     {
         this->requestStackPop( );
+        requestStackPush( States::AbilitySelectMenuState );
     });
 
     mGUIContainer.pack( rest );

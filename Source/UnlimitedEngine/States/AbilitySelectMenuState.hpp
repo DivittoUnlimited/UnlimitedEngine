@@ -20,6 +20,7 @@ private:
     GUI::Container      mGUIContainer;
     sf::Text            mText;
     sf::RectangleShape  mBackground;
+    World* mWorld;
 };
 
 #endif // ABILLITYSELECTMENUSTATE_HPP

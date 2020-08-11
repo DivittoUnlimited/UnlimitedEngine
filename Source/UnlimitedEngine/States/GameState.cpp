@@ -7,8 +7,8 @@
 
 GameState::GameState(States::ID id, StateStack& stack, Context context , unsigned int level)
     : State( id, stack, context )
-    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, false, false )
-    , mPlayer( nullptr, Category::Player, context.keys1 )
+    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, level, false, false )
+    , mPlayer( &mWorld, nullptr, Category::Player, context.keys1 )
     , mLevel( level )
 {
 }
@@ -103,6 +103,7 @@ bool GameState::handleEvent( const sf::Event& event )
         requestStackPush( States::Pause );
     else if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
     {
+        /* OLD WAY
         // create a new event with delta mouse pos
         sf::Event newEvent;
         newEvent.type = sf::Event::MouseButtonReleased;
@@ -111,6 +112,9 @@ bool GameState::handleEvent( const sf::Event& event )
         newEvent.mouseButton.y = event.mouseButton.y + mWorld.mDeltaMousePosition.y;
 
         mPlayer.handleEvent( newEvent, mWorld.getCommandQueue( ) );
+        */
+        mPlayer.handleEvent( event, mWorld.getCommandQueue( ) );
+
     }
     else
     {

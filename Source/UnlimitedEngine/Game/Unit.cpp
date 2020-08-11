@@ -1,8 +1,5 @@
 #include "Unit.hpp"
-
 #include <SFML/Graphics/RenderTarget.hpp>
-#include "Game/DataTables.hpp"
-#include "Game/Grid.hpp"
 #include "Game/DataTables.hpp"
 
 namespace
@@ -10,7 +7,7 @@ namespace
     const std::vector<AbilityData> Abilities = initializeAbilityData;
 }
 
-Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const TextureManager& textures, const FontManager& fonts )
+Unit::Unit( std::string mId, Category::Type category, UnitTypeData data, const TextureManager& textures, const FontManager& fonts )
     : mID( mId )
     , mGridIndex( sf::Vector2i( 0, 0 ) )
     , mInitiative( 0 )
@@ -27,10 +24,13 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     , mHealthBar( nullptr )
     , mFonts( fonts )
     , mCurrentStatModHUD( nullptr )
+    , mWasTheLastUnit( false )
 {
+    // std::cout << "Unit constructor called with category: " << category << std::endl;
     // define unit based on data from lua
     this->mUnitType      = static_cast<unsigned int>( UnitTypeMap[data.type] );
     this->mCategory      = category;
+    this->mDefaultCategory = category;
     this->mAttack        = static_cast<unsigned int>( data.attack );
     this->mSpeed         = static_cast<unsigned int>( data.speed );
     this->mHealth        = static_cast<unsigned int>( data.health );
@@ -67,15 +67,6 @@ Unit::Unit( unsigned int mId, Category::Type category, UnitTypeData data, const 
     this->mCurrentStatModHUD = statHud.get( );
     this->mCurrentStatModHUD->mText.setFillColor( sf::Color::White );
     this->attachChild( std::move( statHud ) );
-
-    // initiative turn order
-    mInitiativeHUD = sf::Text( "0", mFonts.get( FontMap.at( "Default" ) ), 14  );
-    mInitiativeHUD.setFillColor( sf::Color::White );
-    mInitiativeHUD.setPosition( getPosition( ) );
-
-    mInitiativeHUDBackground = sf::CircleShape( 11 );
-    mInitiativeHUDBackground.setFillColor( sf::Color::Black );
-    mInitiativeHUDBackground.setPosition( getPosition( ) );
 }
 
 Unit::~Unit( void )
@@ -96,7 +87,7 @@ bool Unit::isDestroyed( ) const
 {
     return mHealth <= 0;
 }
-void Unit::updateCurrent( sf::Time, CommandQueue& )
+void Unit::updateCurrent( sf::Time dt, CommandQueue& )
 {
     if( mBeginingOfTurn )
     {
@@ -110,7 +101,7 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
             int power = mod.power.roll();
             if( mod.stat == "health" )
             {
-                modHealth( power ); // Dif because they must also update the graphics bars representign them to the player
+                modHealth( power ); // Dif because they must also update the graphics bars representing them to the player
                 mCurrentStatModHUD->mText.setString( mCurrentStatModHUD->mText.getString() + "\nHealth " + std::to_string( power ) );
             }
             else if( mod.stat == "morale" )
@@ -143,7 +134,7 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
                 std::cout << "Attempting to modifiy a unit stat that does not exist!" << std::endl;
                 assert( mod.stat == "health" );
             }
-            mCurrentStatModHUD->mTimer += sf::milliseconds( 2000 );
+            mCurrentStatModHUD->mTimer += sf::milliseconds( 500 );
 
             mod.duration--;
             if( mod.duration > 0 )
@@ -158,8 +149,8 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
     if( mPath && mPath->size() > 0 && mDestination == sf::Vector2f( -1.0f, -1.0f ) )
     {
         mDestination = sf::Vector2f( mPath->getNextMove() );
-        mDestination.x *= 64;
-        mDestination.y *= 64;
+        mDestination.x *= TILE_SIZE;
+        mDestination.y *= TILE_SIZE;
     }
     // is currently following a path
     if( mDestination != sf::Vector2f( -1.0f, -1.0f ) )
@@ -179,14 +170,25 @@ void Unit::updateCurrent( sf::Time, CommandQueue& )
                 mDestination.x *= 64;
                 mDestination.y *= 64;
                 if( mPath->mPath.size() == 0 ) mPath = nullptr;
+
             }
             else mDestination = sf::Vector2f( -1.0f, -1.0f );
+            mHasMoved = true;
         }
     }
 
-    // update HUD
-    mInitiativeHUD.setPosition( getPosition( ).x, getPosition().y + 47 );
-    mInitiativeHUDBackground.setPosition( getPosition( ).x - 5, getPosition().y + 45 );
+    // Animations for attacks and abilities
+    if( mAnimationTimer > sf::Time::Zero )
+    {
+        mAnimationTimer -= dt;
+    }
+    else if( mAnimationTimer < sf::Time::Zero )
+    {
+        mAnimationTimer = sf::Time::Zero;
+        mHasSpentAction = true;
+
+        std::cout << "Unit ActionTimer Test 2: " << std::endl;
+    }
 }
 void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
@@ -199,8 +201,6 @@ void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
         else if( mCategory & Category::Red )
             this->mHealthBarBorder->getSprite()->setOutlineColor( sf::Color::Red ); // red
         target.draw( mSprite, states );
-        target.draw( mInitiativeHUDBackground );
-        target.draw( mInitiativeHUD );
     }
     else
     {
@@ -212,8 +212,9 @@ void Unit::drawCurrent( sf::RenderTarget& target, sf::RenderStates states ) cons
 
 void Unit::useAbility( std::string abilityID, Unit* target )
 {
-    if( mAbilities.find( abilityID ) != mAbilities.end() )
+    if( target && !target->isDestroyed() && mAbilities.find( abilityID ) != mAbilities.end() )
     {
+        std::cout << "Unit::useAbility: " << abilityID << std::endl;
         if( (this->mAttack + randomInt( 20 ) > target->mArmour + randomInt( 20 ) ) )  // or the ability type is not an attack
         {
             std::cout << "The Attack was a hit!" << std::endl;
@@ -225,6 +226,7 @@ void Unit::useAbility( std::string abilityID, Unit* target )
 
         for( auto t : mAbilities.at( abilityID ).userMods )
             this->addModifier( t );
+        mAnimationTimer += sf::milliseconds( 500 );
     }
 }
 
@@ -299,4 +301,9 @@ void Unit::modMorale( int amount )
         this->mMoraleBar->getSprite()->setFillColor( sf::Color( 0, 0, 0, 0 ) );
         // sleep / strike animation  --  sound effects?
     }
+}
+
+bool Unit::isMoving( void )
+{
+    return mDestination != sf::Vector2f( -1.0f, -1.0f ); // if path is empty then unit is not moving :)
 }
