@@ -1,4 +1,4 @@
-Wizards Request - Game Design Document
+GAME TITLE - Game Design Document
 
 Premise:
 
@@ -10,96 +10,56 @@ Book of lenses:
 
 1. The lens of essential experience:
     What experience do i want the player to have?
-        Wizards will be a mentally challenging game akin to chess. The player will feel a sense of accomplishment from figuring out how to succeed in
-        each scenerio by devloping their own tactics to out play the opponent given the same information tools, and rules.
     What is essential to that experience?
-        It is essential that the game provides a logical challenge to the player with multiple solutions that the player can create. If the player loses
-        it should feel as though they could have won but lost due to their own mistakes or something they can grow from, Not just overwhelming them with
-        forces etc...
     How can my game capture that essence?
-        The way Wizards Request creates this environnment is similiar to chess. Both players start out with the same information and tools. Only then
-        are they set free to use these tools to manipulate their opponent untill either side comes out on top. Very little should be left to chance,
-        instead players should feel like "luck" is a calculated risk. Much like the risk board game.
 
 2. The lens of suprise:
     What will suprise the player when they play this game?
-        The depth of strategy and tactics that will be possible to create based on the simple unit types provided.
 
     Does the story have suprises? the artwork? The rules? The technology being used?
-        The story might have plot twists, The artwork is kept as simple as possible to make everything clear without detrating from the tactical experience.
 
     Do the rules allow players to suprise each other?
-        Absolutly. Wizards is a game that requires players to create new stratgies to defeat their opponent.
 
     Can the player suprise even themselves?
-        With The many ways to change unit tactics and stats the player can suprise themselves by stumbling accross an effective strategy.
 
 3. The lens of fun:
     What part of my game are fun? why?
-        The "fun" part of my game comes from solving the problem of defeating the opposing army. Tactics and resource managment will play a large roll in maintaining the playes
-        interest.
 
     What part needs to be more fun?
-        The story element of the game could use work, perhaps adding a vareity of different style cutscenes, along with hidden messages or easter eggs that are not required to finish
-        the game but might help.
 
 4. The lens of Curiosity
-    What question does my game put into the players mind?
-        Am i smart enough to outwit the computer? Am i smart enough to defeat other human players? How can a create a new strategy that will catch oppenents unprepared?
 
     What does the game do to make them care about these questions?
-        The Game tells a story to motivate the player at first. However, the player will create these challenges on their own to better themselves. 
 
     What can i do to make them invent their own questions?
-        Keep the strategy elements as open ended as possible the closer to chess the better.
 
 5. The lens of Endogenous value:
     What is valueable to the players in my game?
-        The morale of the player's units, how well they have eliminated the players morale. How many troops the player has or can generate by saving gold.
 
     How can i make these things more valuable?
-        Units can become more valuable by limiting the number of units or of a certain type of units as well as making the cost more to create. Units could also 
-        benifit from a level up system that rewards the player for keeping the unit alive during battle. This could even be extended to allow the player to spawn
-        higher level units that survived the last battle in the next battle.
 
     What is the relationship between value in the game and the player's motivations?
-        Everything that the player should hold value in are key components in completing the goals of the game as well as personal goals designed by the player.
 
 6. The lens of Problem solving:
     What problem does my game ask the player to solve?
-        Create a tactical solution that will eliminate the enemy threat while limiting the player's own damage as much as possible.
 
     Are there hidden problems to solve that arise from gameplay?
-        The player can create and will face an endless combination of possible unit formations, attacks, and stances. Combined these things will generate a unique problem 
-        every time the player plays the game.
 
     How can the game create new problems so that the players keep coming back? (break high scores etc...)
-        Mutliplayer is a great way to add replay value. Goals could be added to missions to give players something more to do then total victory in every map.
 
 7. The lens of the elemental tetrad: ( technology, story, mechanics, aesthetics )
     Is my game using elements of all four types?
-        Yes. Mechanics will easily be the strongest element of the game. The story is enough to keep the player entertained while they learn how to play. Eventually players
-        will want to play other people. The art being used is kept as simple as possible to not clutter the game with anything that would make the battle less clear. While my
-        engine isn't the most advanced out there. It is more then enough for this style game.
     
     Could the game design be improved by enhancing elements in one or more of the categories?
-        The story element could be improved to go beyond just a linear storyline that is unfolded as players beat levels. Bonus challenges could greatly improve the mechanics
-        element. The game will also require character art for the cutscenes, as well as better fonts and menu buttons.
     
     Are the four elements in harmony? Do they work together to enforce a common theme?
-        Yes. They all work together to create an experience that enables the playe to create complex battle strategy without having to learn a complicated interface or a ton of 
-        rules. Just a simple system that gives the player as much freedom to make battle choices as possible.
 
 8. The lens of Holographic design:
     What elements of the game make the experience enjoyable?
-        The mechanics of the game are the most notable aspect. People will come back for the challenge of the game. The art is done in a timeless style that will age well
-        and allow players to enjoy the game for a long time.
     
     What elements of the game detract from the experience?
-        The battle menus and buttons could be improved with better art, and particle effects.
     
     How can i change these game elements to improve the experience?
-        I need to create new smaller, better themed buttons to go in the battle menus as well as particle effects and music to match. 
     
 9. The Lens of Unification:
     What is the theme?

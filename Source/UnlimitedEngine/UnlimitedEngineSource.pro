@@ -12,24 +12,17 @@ DISTFILES += \
     GDD.txt \
     Game/Application.lua \
     Game/Game.lua \
-    Game/Lua/Abilities.lua \
     Game/Lua/Application.lua \
-    Game/Lua/Buildings.lua \
     Game/Lua/Game.lua \
-    Game/Lua/InfluenceMaps.lua \
     Game/Lua/Resources/Actors.lua \
     Game/Lua/Resources/Assets.lua \
     Game/Lua/Resources/Conversations.lua \
     Game/Lua/Resources/Maps/Courtyard.lua \
-    Game/Lua/Resources/Maps/GeneratedGrassyPlains.lua \
     Game/Lua/Resources/Maps/TacticsTribeDemoLevel.lua \
     Game/Lua/Resources/Maps/smallMap.lua \
     Game/Lua/Resources/Particles.lua \
     Game/Lua/Resources/SourceFileMap.lua \
     Game/Lua/Resources/Warps.lua \
-    Game/Lua/TerrainTypes.lua \
-    Game/Lua/UnitMovementCost.lua \
-    Game/Lua/UnitTypes.lua \
     Media/Sansation.ttf \
     Media/Shaders/Add.frag \
     Media/Shaders/Brightness.frag \
@@ -39,15 +32,9 @@ DISTFILES += \
     Media/Sound/Button.wav \
     Media/Textures/Buttons.png \
     Media/Textures/Default.png \
-    Media/Textures/DemoLevel.png \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
-    Media/Textures/Girl.png \
-    Media/Textures/HeavyInfantry.png \
-    Media/Textures/LightInfantry.png \
     Media/Textures/Particle.png \
-    Media/Textures/SpawnPoint.png \
     Media/Textures/TexturePack.png \
-    Media/Textures/UnitSpriteSheet.png \
     Notes.txt \
     Story.txt
 
@@ -86,13 +73,8 @@ HEADERS += \
     Core/SteeringBehaviors.inl \
     Core/Utility.hpp \
     Core/Utility.inl \
-    Game/Building.hpp \
     Game/DataTables.hpp \
     Game/Dice.hpp \
-    Game/StatModHUD.hpp \
-    Game/TeamStats.hpp \
-    Game/Unit.hpp \
-    Game/WifeBot.hpp \
     Game/World.hpp \
     Graphics/Animation.hpp \
     Graphics/BloomEffect.hpp \
@@ -111,13 +93,6 @@ HEADERS += \
     Gui/Label.hpp \
     Gui/MessageBoxNode.hpp \
     Gui/ResponseSelector.hpp \
-    States/AbilitySelectMenuState.hpp \
-    States/BattleStatScreen.hpp \
-    States/ConquestBattleSetupState.hpp \
-    States/ConquestModeSetup.hpp \
-    States/ConquestOverviewState.hpp \
-    States/CutSceneState.hpp \
-    States/EndTurnMenuState.hpp \
     States/GameState.hpp \
     States/IntroCutSceneState.cpp.autosave \
     States/LoadingState.hpp \
@@ -125,17 +100,10 @@ HEADERS += \
     States/MessageBoxState.hpp \
     States/MultiplayerGameState.hpp \
     States/PauseState.hpp \
-    States/QuickBattleSetupState.hpp \
-    States/RotationSelectMenuState.hpp \
     States/SettingsState.hpp \
-    States/ShopState.hpp \
     States/SinglePlayerBattle.hpp \
-    States/SinglePlayerMenuState.hpp \
-    States/SpawnPointMenuState.hpp \
     States/SplashScreen.hpp \
-    States/StoryModeSetupState.hpp \
     States/TitleState.hpp \
-    States/WaitMenu.hpp \
     States/cutSceneState.hpp.autosave \
     Tiled/TiledManager.hpp \
     lua/lapi.h \
@@ -183,13 +151,8 @@ SOURCES += \
     Core/State.cpp \
     Core/StateStack.cpp \
     Core/Utility.cpp \
-    Game/Building.cpp \
     Game/DataTables.cpp \
     Game/Dice.cpp \
-    Game/StatModHUD.cpp \
-    Game/TeamStats.cpp \
-    Game/Unit.cpp \
-    Game/WifeBot.cpp \
     Game/World.cpp \
     Graphics/Animation.cpp \
     Graphics/BloomEffect.cpp \
@@ -207,11 +170,6 @@ SOURCES += \
     Gui/Label.cpp \
     Gui/MessageBoxNode.cpp \
     Gui/ResponseSelector.cpp \
-    States/AbilitySelectMenuState.cpp \
-    States/BattleStatScreen.cpp \
-    States/ConquestBattleSetupState.cpp \
-    States/ConquestModeSetup.cpp \
-    States/ConquestOverviewState.cpp \
     States/CutSceneState.cpp \
     States/GameState.cpp \
     States/LoadingState.cpp \
@@ -219,17 +177,10 @@ SOURCES += \
     States/MessageBoxState.cpp \
     States/MultiplayerGameState.cpp \
     States/PauseState.cpp \
-    States/QuickBattleSetupState.cpp \
-    States/RotationSelectMenuState.cpp \
     States/SettingsState.cpp \
-    States/ShopState.cpp \
     States/SinglePlayerBattle.cpp \
-    States/SinglePlayerMenuState.cpp \
-    States/SpawnPointMenuState.cpp \
     States/SplashScreen.cpp \
-    States/StoryModeSetupState.cpp \
     States/TitleState.cpp \
-    States/WaitMenu.cpp \
     lua/lapi.c \
     lua/lauxlib.c \
     lua/lbaselib.c \

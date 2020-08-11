@@ -17,7 +17,7 @@ TitleState::TitleState( States::ID id, StateStack& stack, Context context )
 
     //mBackgroundSprite.setTexture( context.textures->get( TextureMap.at( "DivittoUnlimitedLogo" ) ) );
 
-    mTitleText = sf::Text( "Wizard's Request", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
+    mTitleText = sf::Text( "EMPTY TITLE", mContext.fonts->get( FontMap.at( "Default" ) ), 100 );
     mTitleText.setFillColor( sf::Color( 181, 182, 228, 255 ) );
     centerOrigin( mTitleText );
     mTitleText.setPosition( WINDOW_WIDTH / 2, 200 );
