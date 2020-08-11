@@ -753,40 +753,86 @@ std::vector<unsigned int> World::generateTileMap( unsigned int width, unsigned i
                 tileMap.push_back( 4 );
             else if( value < 5 )
                 tileMap.push_back( 2 );
-            else if( value < 7 )
-                tileMap.push_back( 1 );
+            else if( value < 8 )
+                tileMap.push_back( 1 ); // this should be a 1
             else if( value < 10 )
                 tileMap.push_back( 4 );
             else
-                tileMap.push_back( 1 );
-
+                tileMap.push_back( 1 ); // this should be a 1
         }
     // add roads
-    int numRoads = 5;
+    int numRoads = 3;
+    bool hasShifted = false;
+    bool vertRoadAdded = false;
+    bool horRoadAdded = false;
     while( randomInt( --numRoads ) )
     {
+        vertRoadAdded = true;
         // add vertical road
         unsigned int xPos = randomInt( width - 4 ) + 2;
         for( unsigned int i = 0; i < height; ++i )
         {
-            // use perlin noise to make more random?
-            tileMap[i * width + xPos] = 3;
+            if( !hasShifted && i > 0 && xPos < width && xPos > 0 && !randomInt( 4 ) )
+            {
+                if( randomInt( 2 ) ) xPos++; else xPos--;
+                tileMap[(i-1) * width + xPos] = 3;
+                hasShifted = true;
+            }
+            else hasShifted = false;
+            if( tileMap[i * width + xPos] != 4 )
+                tileMap[i * width + xPos] = 3;
         }
     }
     numRoads++;
     while( randomInt( --numRoads ) )
     {
+        horRoadAdded = true;
         // add horizontal road
         unsigned int yPos = randomInt( height - 4 ) + 2;
+
         for( unsigned int i = 0; i < width; ++i )
         {
-            // use perlin noise to make more random?
-            tileMap[yPos * width + i] = 3;
+            if( !hasShifted && yPos < height && yPos > 0 && !randomInt( 4 ) )
+            {
+                if( randomInt( 2 ) ) yPos++; else yPos--;
+                tileMap[yPos * width + i-1] = 3;
+                hasShifted = true;
+            }
+            else hasShifted = false;
+            if( tileMap[yPos * width + i] != 4 )
+                tileMap[yPos * width + i] = 3;
+        }
+    }
+    // Walls
+    if( !vertRoadAdded && horRoadAdded && !randomInt( 2 ) )
+    {
+        // add vetical wall
+        int xPos = randomInt( width - 6 ) + 3;
+        for( unsigned int i = 0; i < height; ++i )
+        {
+            // change tile at pos to wall unless that tile is a road or water
+            int tile = tileMap[i * width + xPos];
+            if( tile != 4 && tile != 3 )
+                tileMap[i * width + xPos] = 3;
+        }
+    }
+    else if( vertRoadAdded && !horRoadAdded && !randomInt( 2 ) )
+    {
+        // add horizontal wall
+        int yPos = randomInt( height - 6 ) + 3;
+        for( unsigned int i = 0; i < width; ++i )
+        {
+            // change tile at pos to wall unless that tile is a road or water
+            int tile = tileMap[yPos * width + i];
+            if( tile != 4 && tile != 3 )
+                tileMap[yPos * width + i] = 3;
         }
     }
 
     // Ensure all areas of map are reachable!
     // ( water cant be allowed to cut of corner of map. )
+        // A* (ish) to walk grid from place to all other places?
+
 
     return tileMap;
 }

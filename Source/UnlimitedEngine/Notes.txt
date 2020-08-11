@@ -13,6 +13,7 @@ BUGS and ISSUES:
 
     - Moving a unit makes HUD offset
         - need to update HUD during ( right after ) movement
+        - Menu buttons get offset when camera moves.
 
 FEATURES:
     - Random Map Generation:
