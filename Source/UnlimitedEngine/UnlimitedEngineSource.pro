@@ -101,7 +101,6 @@ HEADERS += \
     States/MultiplayerGameState.hpp \
     States/PauseState.hpp \
     States/SettingsState.hpp \
-    States/SinglePlayerBattle.hpp \
     States/SplashScreen.hpp \
     States/TitleState.hpp \
     States/cutSceneState.hpp.autosave \
@@ -178,7 +177,6 @@ SOURCES += \
     States/MultiplayerGameState.cpp \
     States/PauseState.cpp \
     States/SettingsState.cpp \
-    States/SinglePlayerBattle.cpp \
     States/SplashScreen.cpp \
     States/TitleState.cpp \
     lua/lapi.c \

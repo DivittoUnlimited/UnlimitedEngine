@@ -1,16 +1,16 @@
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
-#include "Game/DataTables.hpp"
-#include "ResourceManager.hpp"
-#include "Player.hpp"
-#include "StateStack.hpp"
-#include "Core/MusicPlayer.hpp"
-#include "Core/SoundPlayer.hpp"
-
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include "Core/ResourceManager.hpp"
+#include "Core/Player.hpp"
+#include "Core/StateStack.hpp"
+#include "Core/MusicPlayer.hpp"
+#include "Core/SoundPlayer.hpp"
+#include "Game/DataTables.hpp"
+#include "States/GameState.hpp"
 
 extern "C" {
     #include "lua/lua.h"

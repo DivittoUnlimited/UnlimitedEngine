@@ -31,7 +31,7 @@ public:
 //## Interface
     /// \brief World
     ///
-    World( State::Context* context, StateStack* stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked, bool isLocalMultiplayer );
+    World(State::Context* context, StateStack* stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked, bool isLocalMultiplayer );
 
     ~World( void ) { }
     /// \brief handleEvent
@@ -58,7 +58,7 @@ public:
     /// \brief buildScene
     /// \param tileMapFilePath
     ///
-    void buildScene( std::string tileMapFilePath );
+    void buildScene();
     /// \brief generateTileMap
     /// \param width
     /// \param height

@@ -10,7 +10,7 @@ namespace
     //const std::vector<std::vector<float>> UnitMoveCost = inititializeUnitMovementCostTable;
 }
 
-World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, unsigned int level, bool networked, bool isLocalMultiplayer )
+World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked, bool isLocalMultiplayer )
     : mTarget( outputTarget )
     , mSceneTexture( )
     , mWorldView( mTarget.getDefaultView( ) )
@@ -31,7 +31,7 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
     this->registerStates( );
-    buildScene( MediaFileMap.at( "Maps" ).at( level ) );
+    buildScene( );
 }
 
 void World::handleEvent( const sf::Event& )
@@ -101,7 +101,7 @@ bool World::pollGameAction( GameActions::Action& out )
     return mNetworkNode->pollGameAction( out );
 }
 
-void World::buildScene( std::string )
+void World::buildScene(  )
 {
 
     // NON tiled levels

@@ -30,7 +30,7 @@ sf::IpAddress getAddressFromFile( void )
 
 MultiplayerGameState::MultiplayerGameState( States::ID id, StateStack& stack, Context context, bool isHost = false )
     : State( id, stack, context )
-    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, LevelMap.at( "TacticsTribeDemoLevel" ), true, false )
+    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, true, false )
     , mTextureManager( *context.textures )
     , mConnected( false )
     , mGameServer( nullptr )
@@ -40,7 +40,6 @@ MultiplayerGameState::MultiplayerGameState( States::ID id, StateStack& stack, Co
     , mGameStarted( false )
     , mClientTimeout( sf::seconds( 10.f ) )
     , mTimeSinceLastPacket( sf::seconds( 0.f ) )
-    , mClientTeamColor( Category::Blue )
 {
     mBroadcastText.setFont( context.fonts->get( FontMap.at( "Default" ) ) );
     mBroadcastText.setPosition( 1024.f / 2, 100.f );

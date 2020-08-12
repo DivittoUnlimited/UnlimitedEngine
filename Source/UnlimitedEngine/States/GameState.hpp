@@ -13,7 +13,7 @@ namespace sf
 class GameState : public State
 {
 public:
-    GameState( States::ID id, StateStack& stack, Context context, unsigned int level );
+    GameState( States::ID id, StateStack& stack, Context context );
     ~GameState( void );
 
     virtual void draw( void );

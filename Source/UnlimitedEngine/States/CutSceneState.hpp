@@ -6,7 +6,7 @@
 class CutSceneState : public State
 {
 public:
-    CutSceneState( States::ID id, StateStack& stack, Context context, States::ID nextState = States::Level3 );
+    CutSceneState( States::ID id, StateStack& stack, Context context, States::ID nextState = States::GameState );
     ~CutSceneState( void );
     virtual void draw( void );
     virtual bool update( sf::Time dt );
