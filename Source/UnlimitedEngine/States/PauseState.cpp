@@ -31,26 +31,8 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
         requestStackPop( );
     });
 
-    auto playerWins = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playerWins->setPosition( WINDOW_WIDTH / 2 - 100, 350 );
-    playerWins->setText( "Player Wins!" );
-    playerWins->setCallback( [this] ( )
-    {
-        requestStateClear( );
-        requestStackPush( States::BattleStatScreen );
-    });
-
-    auto playerLoses = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    playerLoses->setPosition( WINDOW_WIDTH / 2 - 100, 410 );
-    playerLoses->setText( "Player Loses!" );
-    playerLoses->setCallback( [this] ( )
-    {
-        //requestStackPop( );
-        //requestStackPush( States::HostGame );
-    });
-
     auto settingsButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 470 );
+    settingsButton->setPosition( WINDOW_WIDTH / 2 - 100, 350 );
     settingsButton->setText( "Settings" );
     settingsButton->setCallback([this] ( )
     {
@@ -58,7 +40,7 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
     });
 
     auto exitButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 530 );
+    exitButton->setPosition( WINDOW_WIDTH / 2 - 100, 410 );
     exitButton->setText( "Return to Menu" );
     exitButton->setCallback([this] ( )
     {
@@ -67,8 +49,6 @@ PauseState::PauseState(States::ID id, StateStack& stack, Context context , bool 
     });
 
     mGUIContainer.pack( ResumeGame );
-    mGUIContainer.pack( playerWins );
-    mGUIContainer.pack( playerLoses );
     mGUIContainer.pack( settingsButton );
     mGUIContainer.pack( exitButton );
 }

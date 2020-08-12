@@ -47,15 +47,6 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     mTitleText.setOutlineThickness( 5 );
     mTitleText.setStyle( sf::Text::Bold );
 
-    auto testMap = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
-    testMap->setPosition( WINDOW_WIDTH / 2 - 100, 330 );
-    testMap->setText( "TEST_MAP" );
-    testMap->setCallback( [this] ( )
-    {
-        GAME_MODE = GameModes::QuickBattle;
-        //requestStackPop( );
-        //requestStackPush( States::SinglePlayerLevel1 );
-    });
 
     auto playButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
     playButton->setPosition( WINDOW_WIDTH / 2 - 100, 390 );
@@ -63,8 +54,8 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
     playButton->setCallback( [this] ( )
 	{
         GAME_MODE = GameModes::Online;
-        //requestStackPop( );
-        //requestStackPush( States::SinglePlayerMenuState );
+        requestStackPop( );
+        requestStackPush( States::GameState );
 	});
 
     auto playLocalButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );
@@ -105,7 +96,6 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
         requestStateClear( );
 	});
 
-    mGUIContainer.pack( testMap );
     mGUIContainer.pack( playButton );
     mGUIContainer.pack( playLocalButton );
     mGUIContainer.pack( playMultiplayerButton );

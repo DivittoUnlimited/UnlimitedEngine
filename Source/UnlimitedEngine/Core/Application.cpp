@@ -13,7 +13,6 @@
 #include "States/SplashScreen.hpp"
 #include "States/MessageBoxState.hpp"
 #include "States/CutSceneState.hpp"
-#include "States/SinglePlayerBattle.hpp"
 #include "Game/DataTables.hpp"
 #include "Globals.hpp"
 
@@ -27,8 +26,8 @@ const sf::Time Application::TimePerFrame = sf::seconds( 1.f/ 60.f );
 // Defined in Globals.hpp
 sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, WINDOW_HEIGHT ), "EMPTY TITLE", sf::Style::Default );
 GameModes::ID GAME_MODE = GameModes::NONE;
-States::ID CURRENT_LEVEL = States::SinglePlayerLevel1;
-Category::Type CURRENT_TURN = Category::Blue;
+States::ID CURRENT_LEVEL = States::GameState;
+
 
 Application::Application( )
     : mTextures( )
@@ -128,6 +127,7 @@ void Application::updateStatistics( sf::Time dt )
 
 void Application::registerStates( )
 {
+    // Engine States
     mStateStack.registerState<SplashScreen>             ( States::SplashScreen          );
     mStateStack.registerState<SettingsState>            ( States::SettingsState         );
     mStateStack.registerState<TitleState>               ( States::Title                 );
@@ -138,5 +138,8 @@ void Application::registerStates( )
     mStateStack.registerState<PauseState>               ( States::Pause,         false  );
     mStateStack.registerState<MessageBoxState>          ( States::MessageBox            );
     mStateStack.registerState<PauseState>               ( States::NetworkPause, true    );
+
+    // Iconic States
+    mStateStack.registerState<GameState>                ( States::GameState             );
 }
 

@@ -26,48 +26,7 @@ CutSceneState::CutSceneState( States::ID id, StateStack& stack, Context context,
     // mContext.music->setVolume( 30 );
     // mContext.music->play( MusicMap.at( "MenuTheme" ) );
 
-    mContext.textures->load( TextureMap.at( "DemoGirl" ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "DemoGirl" ) ) );
-
-
-    switch( mNextState )
-    {
-        case States::SinglePlayerLevel1:
-            mMessageBox = new MessageBoxNode( "IntroCutSceneDialog",  *context.fonts );
-        break;
-        case States::SinglePlayerLevel2:
-            mMessageBox = new MessageBoxNode( "Chapter1", *context.fonts );
-        break;
-        case States::SinglePlayerLevel3:
-            mMessageBox = new MessageBoxNode( "Chapter2", *context.fonts );
-        break;
-        case States::SinglePlayerLevel4:
-            mMessageBox = new MessageBoxNode( "Chapter3", *context.fonts );
-        break;
-        case States::SinglePlayerLevel5:
-            mMessageBox = new MessageBoxNode( "Chapter4", *context.fonts );
-        break;
-        case States::SinglePlayerLevel6:
-            mMessageBox = new MessageBoxNode( "Chapter5", *context.fonts );
-        break;
-        case States::SinglePlayerLevel7:
-            mMessageBox = new MessageBoxNode( "Chapter6", *context.fonts );
-        break;
-        case States::SinglePlayerLevel8:
-            mMessageBox = new MessageBoxNode( "Chapter7", *context.fonts );
-        break;
-        case States::SinglePlayerLevel9:
-            mMessageBox = new MessageBoxNode( "Chapter8", *context.fonts );
-        break;
-        case States::SinglePlayerLevel10:
-            mMessageBox = new MessageBoxNode( "Chapter9", *context.fonts );
-            std::cout << "You Win! Role Credits..." << std::endl;
-            requestStackPop( );
-            requestStackPush( States::Menu );
-        break;
-        default: break;
-    }
     mMessageBox->setPosition( 50, 400 );
-
 }
 
 CutSceneState::~CutSceneState()

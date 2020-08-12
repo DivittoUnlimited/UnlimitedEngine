@@ -5,11 +5,10 @@
 #include "Gui/Button.hpp"
 #include "Gui/Container.hpp"
 
-GameState::GameState(States::ID id, StateStack& stack, Context context , unsigned int level)
+GameState::GameState(States::ID id, StateStack& stack, Context context )
     : State( id, stack, context )
-    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, level, false, false )
+    , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, false, false )
     , mPlayer( &mWorld, nullptr, Category::Player, context.keys1 )
-    , mLevel( level )
 {
 }
 
