@@ -129,6 +129,12 @@ public:
     /// A list of all the states that are still active. Often times there are more than one state active such as when a menu is popped or when the user enters the pause screen.
     StateStack*                         mStateStack;
 
+    /// GAME ATTRIBUTES
+    /// \brief mPlayerAvatar
+    /// The sprite that represents the player on screen
+    SpriteNode*                         mPlayerAvatar;
+
+
 
 };
 

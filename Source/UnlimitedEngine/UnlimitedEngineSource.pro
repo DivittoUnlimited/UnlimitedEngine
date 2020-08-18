@@ -34,6 +34,7 @@ DISTFILES += \
     Media/Textures/Default.png \
     Media/Textures/DivittoUnlimitedLogo1024X768.png \
     Media/Textures/Particle.png \
+    Media/Textures/PlayerAvatar.png \
     Media/Textures/TexturePack.png \
     Notes.txt \
     Story.txt

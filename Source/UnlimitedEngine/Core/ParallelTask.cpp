@@ -54,7 +54,7 @@ void ParallelTask::runTask()
             lua_pushnil( L );
             while( lua_next( L, -2 ) != 0 )
             {
-                mContext.textures->load( TextureMap.at( lua_tostring( L, -1 ) ), MediaFileMap.at( "Textures" ).at( TextureMap.at( lua_tostring( L, -1 ) ) ) );
+                  mContext.textures->load( TextureMap.at( lua_tostring( L, -1 ) ), MediaFileMap.at( "Textures" ).at( TextureMap.at( lua_tostring( L, -1 ) ) ) );
                 lua_pop( L, 1 );
             }
             lua_pop( L ,1 );

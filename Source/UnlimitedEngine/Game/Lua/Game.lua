@@ -4,15 +4,8 @@ return {
                     ,     "Default"
                     ,     "Particle"
                     ,     "Buttons"
-                    ,     "UnitSpriteSheet"
-                   -- ,     "DemoGirl"
-                   -- ,     "DemoLevel"
-                   -- ,     "LightInfantry"
-                   -- ,     "HeavyInfantry"
-                   ,     "SpawnPoint"
+                    ,     "PlayerAvatar"
     };
-
-
     Fonts               = {
         [0] = "Default"
     };
@@ -25,6 +18,6 @@ return {
     };
 
     PlayerTexture       = "Default";
-    TiledMapFilePath    = "Game/Lua/Resources/Maps/Courtyard.lua";
+    -- TiledMapFilePath    = "Game/Lua/Resources/Maps/Courtyard.lua";
 
 };

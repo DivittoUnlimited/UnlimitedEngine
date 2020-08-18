@@ -28,7 +28,6 @@ sf::RenderWindow* mWindow = new sf::RenderWindow( sf::VideoMode( WINDOW_WIDTH, W
 GameModes::ID GAME_MODE = GameModes::NONE;
 States::ID CURRENT_LEVEL = States::GameState;
 
-
 Application::Application( )
     : mTextures( )
     , mFonts( )

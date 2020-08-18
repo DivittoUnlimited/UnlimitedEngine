@@ -26,6 +26,7 @@ return {
         [Tex.SpawnPoint]                = "Media/Textures/SpawnPoint.png";
         [Tex.UnitSpriteSheet]           = "Media/Textures/UnitSpriteSheet.png";
         [Tex.TexturePack]               = "Media/Textures/TexturePack.png";
+        [Tex.PlayerAvatar]              = "Media/Textures/PlayerAvatar.png";
     };
     Fonts = {
         [Font.Default]              = "Media/Sansation.ttf";

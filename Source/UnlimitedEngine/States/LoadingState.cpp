@@ -41,7 +41,7 @@ bool LoadingState::update( sf::Time dt )
 	{
         requestStackPop( );
         //mContext.music->stop( );
-        requestStackPush( States::BattleState );
+        requestStackPush( States::GameState );
     }
 	return true;
 }

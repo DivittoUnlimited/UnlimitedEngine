@@ -27,6 +27,8 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mNetworkNode( nullptr )
     , mWorldContext( *context )
     , mStateStack( stack )
+    // GAME ATTRIBUTES
+    , mPlayerAvatar( nullptr )
 {
     if( !mSceneTexture.create( static_cast<unsigned int>( mTarget.getView( ).getSize( ).x ), mTarget.getView().getSize( ).y ) ) std::cout << "Render ERROR" << std::endl;
     mSceneTexture.setView( mWorldView );
@@ -103,17 +105,26 @@ bool World::pollGameAction( GameActions::Action& out )
 
 void World::buildScene(  )
 {
-
     // NON tiled levels
     // Create layers...
     // Object layer
     std::unique_ptr<SceneNode> objectLayer( new SceneNode( Category::ObjectLayer ) );
+
+    // Add Player avatar
+
+    std::unique_ptr<SpriteNode> playerAvatar( new SpriteNode( mTextures.get( TextureMap.at( "PlayerAvatar" ) ) ) );
+    playerAvatar->setPosition( 400, 500 );
+    mPlayerAvatar = playerAvatar.get( );
+    objectLayer.get( )->attachChild( std::move( playerAvatar ) );
+
+    // Add Wall sprites
+
+    // Add Theme art.
+
     mSceneLayers.push_back( objectLayer.get( ) );
     mSceneGraph.attachChild( std::move( objectLayer ) );
     // Create objects in the world
     // Players
-
-
     /*
     // load TiledMap
         Tiled::TiledMap map = Tiled::loadFromFile( tileMapFilePath ); //mContext.TiledMapFilePath );

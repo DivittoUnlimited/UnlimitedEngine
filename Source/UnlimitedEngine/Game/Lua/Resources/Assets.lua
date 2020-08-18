@@ -23,6 +23,7 @@ return {
         SpawnPoint               = 8;
         UnitSpriteSheet          = 9;
         TexturePack              = 10;
+        PlayerAvatar             = 11;
     };
 
     SoundEffects = {            
