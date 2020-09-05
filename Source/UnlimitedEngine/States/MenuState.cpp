@@ -55,7 +55,7 @@ MenuState::MenuState( States::ID id, StateStack& stack, Context context )
 	{
         GAME_MODE = GameModes::QuickBattle;
         requestStackPop( );
-        requestStackPush( States::Loading );
+        requestStackPush( States::GameState );
 	});
 
     auto playLocalButton = std::make_shared<GUI::Button>( *context.fonts, *context.textures );

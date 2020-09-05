@@ -279,9 +279,6 @@ void GameServer::handleIncomingConnections( void )
         packet << 0;
         packet << 0;
 
-        if( mConnectedPlayers > 0 ) mPeers[mConnectedPlayers]->teamColor = Category::Red;
-        else mPeers[mConnectedPlayers]->teamColor = Category::Blue;
-
         packet << static_cast<sf::Int32>( mPeers[mConnectedPlayers]->teamColor );
 
         mPeers[mConnectedPlayers]->socket.send(packet);

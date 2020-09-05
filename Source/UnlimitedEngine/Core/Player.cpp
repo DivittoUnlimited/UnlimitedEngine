@@ -33,6 +33,7 @@ Player::Player( World* world, sf::TcpSocket* socket, sf::Int32 identifier, const
 
 void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
 {
+    /*
     if( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left )
     {
         // Network connected -> send event over network
@@ -58,8 +59,8 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
             commands.push( com );
         }
     }
-    /*
-    else if( event.type == sf::Event::KeyPressed )
+    */
+    if( event.type == sf::Event::KeyPressed )
     {
         PlayerAction::Type action;
         if( mKeyBinding && mKeyBinding->checkAction( event.key.code, action ) && !isRealtimeAction( action ) )
@@ -96,7 +97,6 @@ void Player::handleEvent( const sf::Event& event, CommandQueue& commands )
             }
         }
     }
-    */
 }
 
 bool Player::isLocal( void ) const
@@ -181,16 +181,8 @@ void Player::handleRealtimeNetworkInput(CommandQueue& commands)
     }
 }
 
-void Player::handleNetworkEvent(PlayerAction::Type action, CommandQueue& commands, sf::Vector2i pos )
+void Player::handleNetworkEvent(PlayerAction::Type, CommandQueue&, sf::Vector2i )
 {
-    if( action == PlayerAction::LeftClick )
-    {
-        Command com;
-        com.category = Category::Grid;
-        std::cout << "Player class handleNetworkEvent incomplete!" << std::endl;
-        //com.action = derivedAction<World>( [pos] ( World& g, sf::Time ){ g.handleLeftClick( pos ); } );
-        commands.push( com );
-    }
 }
 
 void Player::handleNetworkRealtimeChange(PlayerAction::Type action, bool actionEnabled ) { mActionProxies[action] = actionEnabled; }

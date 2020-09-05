@@ -19,12 +19,6 @@ return {
         [Tex.Buttons]                   = "Media/Textures/Buttons.png";
 
         -- Game Specific
-        [Tex.DemoGirl]                  = "Media/Textures/Girl.png";
-        [Tex.DemoLevel]                 = "Media/Textures/DemoLevel.png";
-        [Tex.LightInfantry]             = "Media/Textures/LightInfantry.png";
-        [Tex.HeavyInfantry]             = "Media/Textures/HeavyInfantry.png";
-        [Tex.SpawnPoint]                = "Media/Textures/SpawnPoint.png";
-        [Tex.UnitSpriteSheet]           = "Media/Textures/UnitSpriteSheet.png";
         [Tex.TexturePack]               = "Media/Textures/TexturePack.png";
         [Tex.PlayerAvatar]              = "Media/Textures/PlayerAvatar.png";
     };

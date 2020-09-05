@@ -15,17 +15,7 @@ enum Type
     SoundEffect			= 1 << 6,
     Network             = 1 << 7,
     TileLayer           = 1 << 8,
-    RedUnit             = 1 << 9,
-    BlueUnit            = 1 << 10,
-    RedBuilding         = 1 << 11,
-    BlueBuilding        = 1 << 12,
-    NeutralBuilding     = 1 << 13,
-    Grid                = 1 << 14,
-    WifeBot             = 1 << 15,
-    TeamRed             = 1 << 16,
-    TeamBlue            = 1 << 17,
-    Red                 = RedUnit | RedBuilding | WifeBot | TeamRed,
-    Blue                = BlueUnit | BlueBuilding | TeamBlue,
+    Wall                = 1 << 9
 };
 
 }

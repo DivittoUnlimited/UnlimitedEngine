@@ -16,14 +16,8 @@ return {
         Buttons              = 3;
 
         -- Game specific stuff
-        DemoGirl                 = 4;
-        DemoLevel                = 5;
-        LightInfantry            = 6;
-        HeavyInfantry            = 7;
-        SpawnPoint               = 8;
-        UnitSpriteSheet          = 9;
-        TexturePack              = 10;
-        PlayerAvatar             = 11;
+        TexturePack              = 4;
+        PlayerAvatar             = 5;
     };
 
     SoundEffects = {            
@@ -42,9 +36,9 @@ return {
 
     -- it is very important that the layer names here match the layer names in the tiled files/editor
     Layers = {
-        TileLayer1          = 0;
-        ObjectLayer1        = 1;
-        TileLayer3          = 2;
+        --TileLayer1          = 0;
+        ObjectLayer1        = 0;
+        TileLayer3          = 1; -- This is a particle effect layer
     };
 
 -- maybe usefull in World::buildScene dont delete yet

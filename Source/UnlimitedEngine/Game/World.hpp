@@ -20,7 +20,9 @@
 #include "Graphics/BloomEffect.hpp"
 #include "Graphics/VertexArrayNode.hpp"
 #include "Graphics/SpriteNode.hpp"
+
 #include "Game/DataTables.hpp"
+#include "Game/Wall.hpp"
 
 
 /// \brief The World class
@@ -33,7 +35,10 @@ public:
     ///
     World(State::Context* context, StateStack* stack, sf::RenderTarget& outputTarget, FontManager& fonts, SoundPlayer& sounds, bool networked, bool isLocalMultiplayer );
 
-    ~World( void ) { }
+    ~World( void ) {
+        mWorldContext.textures->remove( TextureMap.at( "PlayerAvatar" ) );
+
+    }
     /// \brief handleEvent
     /// \param event
     ///
@@ -107,12 +112,6 @@ public:
     /// \brief mSceneLayers
     /// The layers that make up the graphical interface of the game. ( tiles, decorations, units, HUD, etc.. )
     std::vector<SceneNode*>          	mSceneLayers;
-    /// \brief mDeltaMousePosition
-    /// used to track mouse position considering the offset caused by moving the worldView (Camera)
-    sf::Vector2f                        mDeltaMousePosition;
-    /// \brief mCameraPanSpeed
-    /// How fast the camera should move when scolling around in the world
-    float                               mCameraPanSpeed;
     /// \brief mNetworkedWorld
     /// Is this game played of a network
     bool								mNetworkedWorld;

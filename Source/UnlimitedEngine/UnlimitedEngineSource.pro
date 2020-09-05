@@ -76,6 +76,7 @@ HEADERS += \
     Core/Utility.inl \
     Game/DataTables.hpp \
     Game/Dice.hpp \
+    Game/Wall.hpp \
     Game/World.hpp \
     Graphics/Animation.hpp \
     Graphics/BloomEffect.hpp \
@@ -153,6 +154,7 @@ SOURCES += \
     Core/Utility.cpp \
     Game/DataTables.cpp \
     Game/Dice.cpp \
+    Game/Wall.cpp \
     Game/World.cpp \
     Graphics/Animation.cpp \
     Graphics/BloomEffect.cpp \

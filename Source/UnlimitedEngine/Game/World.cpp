@@ -20,8 +20,6 @@ World::World( State::Context* context, StateStack* stack, sf::RenderTarget& outp
     , mWindowSprite(  )
     , mSceneGraph( )
     , mSceneLayers( )
-    , mDeltaMousePosition( 0, 0 )
-    , mCameraPanSpeed( 8 )
     , mNetworkedWorld( networked )
     , mLocalMultiplayerWorld( isLocalMultiplayer )
     , mNetworkNode( nullptr )
@@ -53,23 +51,19 @@ bool World::update( sf::Time dt )
     // Update the view
     if( sf::Keyboard::isKeyPressed( sf::Keyboard::W ) ) // || sf::Mouse::getPosition().y < 100 )
     {
-        mWorldView.move( 0.0f, -1 * mCameraPanSpeed );
-        mDeltaMousePosition.y += mCameraPanSpeed;
+        mPlayerAvatar->move( 0, -5 ); // change 5 to variable speed
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::S  ) ) // || sf::Mouse::getPosition().y > WINDOW_HEIGHT - 100 )
     {
-        mWorldView.move( 0.0f, mCameraPanSpeed );
-        mDeltaMousePosition.y -= mCameraPanSpeed;
+        mPlayerAvatar->move( 0, 5 ); // change 5 to variable speed
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::A  ) ) //  || sf::Mouse::getPosition().x < 100 )
     {
-        mWorldView.move( -1 * mCameraPanSpeed, 0.0f );
-        mDeltaMousePosition.x += mCameraPanSpeed;
+        mPlayerAvatar->move( -5, 0 ); // change 5 to variable speed
     }
     else if( sf::Keyboard::isKeyPressed( sf::Keyboard::D ) ) // || sf::Mouse::getPosition().x > WINDOW_WIDTH - 100 )
     {
-        mWorldView.move( mCameraPanSpeed, 0.0f );
-        mDeltaMousePosition.x -= mCameraPanSpeed;
+        mPlayerAvatar->move( 5, 0 ); // change 5 to variable speed
     }
     return true;
 }
@@ -78,7 +72,7 @@ void World::draw( )
 {
     if( PostEffect::isSupported( ) )
     {
-        mSceneTexture.clear( sf::Color( 0, 0, 0 ) );
+        mSceneTexture.clear( sf::Color( 0, 0, 255 ) );
         mSceneTexture.setView( mWorldView );
         mSceneTexture.draw( mSceneGraph );
         mSceneTexture.display( );
@@ -106,14 +100,16 @@ bool World::pollGameAction( GameActions::Action& out )
 void World::buildScene(  )
 {
     // NON tiled levels
+    // load needed asssets here becuase the loadingState is not being used
+    mWorldContext.textures->load( TextureMap.at( "PlayerAvatar" ), MediaFileMap.at( "Textures" ).at( TextureMap.at( "PlayerAvatar" ) ) );
+
     // Create layers...
     // Object layer
     std::unique_ptr<SceneNode> objectLayer( new SceneNode( Category::ObjectLayer ) );
 
     // Add Player avatar
-
-    std::unique_ptr<SpriteNode> playerAvatar( new SpriteNode( mTextures.get( TextureMap.at( "PlayerAvatar" ) ) ) );
-    playerAvatar->setPosition( 400, 500 );
+    std::unique_ptr<SpriteNode> playerAvatar( new SpriteNode( mWorldContext.textures->get( TextureMap.at( "PlayerAvatar" ) ) ) );
+    playerAvatar->setPosition( WINDOW_WIDTH / 2 - (16), WINDOW_HEIGHT - 64 );
     mPlayerAvatar = playerAvatar.get( );
     objectLayer.get( )->attachChild( std::move( playerAvatar ) );
 
@@ -300,9 +296,7 @@ void World::buildScene(  )
         }
         lua_close( L );
 
-
         // Add HUD
-
 
         // Add network node, if necessary
         if( mNetworkedWorld )

@@ -10,11 +10,11 @@ GameState::GameState(States::ID id, StateStack& stack, Context context )
     , mWorld( &context, &stack, *context.window, *context.fonts, *context.sounds, false, false )
     , mPlayer( &mWorld, nullptr, Category::Player, context.keys1 )
 {
+
 }
 
 GameState::~GameState( )
 {
-    mContext.textures->remove( TextureMap.at( "PlayerAvatar" ) );
     /*
     lua_State* L = luaL_newstate( );
     luaL_openlibs( L );
